@@ -15,17 +15,23 @@ const dateSchema = new Schema({
     ref: "User",
     required: true,
   },
-  isAdmin: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  personalRates: {
+  overallRates: {
     type: Array,
     required: false,
   },
+  image: {
+    type: String,
+    required: false,
+  },
+  review: {
+    type: Boolean,
+    default: false,
+  },
+  tags: {
+    type: Array,
+  },
 });
 
-const User = mongoose.model("User", userSchema);
+const Date = mongoose.model("Date", dateSchema);
 
-export default User;
+export default Date;
