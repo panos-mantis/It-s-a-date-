@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 let db = require("../connection")
 
@@ -28,4 +28,4 @@ const adminSchema = new Schema({
 
 const Admin = mongoose.model("Admin", adminSchema);
 
-export default Admin;
+module.exports= Admin;

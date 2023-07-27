@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
-let db = require("./connection")
+let db = require("../connection")
 
 const dateSchema = new Schema({
   tittle: {
@@ -35,4 +35,4 @@ const dateSchema = new Schema({
 
 const Date = mongoose.model("Date", dateSchema);
 
-export default Date;
+module.exports= Date;
