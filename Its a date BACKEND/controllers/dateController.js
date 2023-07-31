@@ -5,7 +5,7 @@ var jwt = require("jsonwebtoken");
 
 const createDate = async (req, res) => {
   try {
-    const { tittle, tags, text, token, image } = req.body;
+    const { tittle, tags, text, token, image , } = req.body;
     if (!token) {
       return res.status(400).json({ message: "Please log in" });
     }
@@ -98,10 +98,23 @@ const rejectDateById = async (req,res)=>{
     }
 }
 
+const getDatesByTag = async (req, res) => {
+  try {
+    const tags = req.params.tags;
+    const dates = await Date.find({tags: tags });
+    res.json({ dates });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get pets dates' });
+  }
+};
+
 module.exports = {
   createDate,
   getAllDates,
   getDateById,
   deleteDateById,
   acceptDateById,
+  rejectDateById,
+  getDatesByTag
 };
