@@ -11,18 +11,22 @@ import DateTypes from './components/DateTypes'
 
 function App() {
   return (
+    <>
+    <TopNav/>
     <Router>
       <Routes>
         <Route path="/home" element ={<Home/>}/>
         <Route path="/AddDate" element ={<AddDate/>}/>
         <Route path="/AllDates" element ={<AllDates/>}/>
-        <Route path="/DateTypes" element ={<DateTypes/>}/>
+        <Route path="/DateTypes/:type" element ={<DateTypes/>}/>
         <Route path="/LogIn" element ={<LogIn/>}/>
         <Route path="/Register" element ={<Register/>}/>
-        <Route path="/SingleDate" element ={<SingleDate/>}/>
+        <Route path="/SingleDate/:id" element ={<SingleDate/>}/>
         <Route path="*" element ={<SingleDate/>}/>
       </Routes>
     </Router>
+    </>
+    
    
   );
 }

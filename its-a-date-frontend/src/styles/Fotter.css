@@ -1,0 +1,34 @@
+.text-lg-right {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.list-inline {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.list-inline-item {
+    margin-right: 10px;
+}
+
+.text-muted {
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.text-muted:not(:last-child) {
+    margin-right: 5px;
+}
+
+@media (max-width: 767.98px) {
+
+    .col-lg-6,
+    .text-lg-right {
+        justify-content: center;
+    }
+}

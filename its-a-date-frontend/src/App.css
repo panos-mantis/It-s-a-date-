@@ -1,0 +1,34 @@
+/* Style for the back to the top button */
+.top-to-btm{
+    position: relative;
+  }
+  .icon-position{
+    position: fixed;
+    bottom: 40px;
+    right: 25px;
+    z-index: 20;
+  }
+  .icon-style{
+    background-color: #551B54;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    color: #fff;
+    cursor: pointer;
+    transition: all .5s ease-in-out;
+  }
+  .icon-style:hover{
+    animation: none;
+    background: #fff;
+    color: #551B54;
+    border: 2px solid #551B54;
+  }
+/* Style for the back to the top button  END*/
+
+form{
+    width: 30%;
+    margin: 0 auto;
+    background-color: grey;
+    padding: 10px;
+}
