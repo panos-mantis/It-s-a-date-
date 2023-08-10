@@ -36,7 +36,7 @@ const TopNav = () => {
           <Navbar.Brand href="/home">It's a Date</Navbar.Brand>
           <Nav className="me-auto">
             
-            <Nav.Link href="/AllDates">All Dates</Nav.Link>
+           
 
             <NavDropdown title="Dropdown" id="nav-dropdown">
        {getUniqueTags().map((tag)=>{

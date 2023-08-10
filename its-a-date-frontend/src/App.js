@@ -8,6 +8,7 @@ import LogIn from './components/LogIn'
 import AddDate from './components/AddDate'
 import AllDates from './components/AllDates'
 import DateTypes from './components/DateTypes'
+import NotFound from './components/NotFound'
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
         <Route path="/LogIn" element ={<LogIn/>}/>
         <Route path="/Register" element ={<Register/>}/>
         <Route path="/SingleDate/:id" element ={<SingleDate/>}/>
-        <Route path="*" element ={<SingleDate/>}/>
+        <Route path="*" element ={<NotFound/>}/>
       </Routes>
     </Router>
     </>
