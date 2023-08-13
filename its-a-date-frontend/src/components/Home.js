@@ -37,7 +37,7 @@ const Home = () => {
                       <p className="card-text">
                         <small className="text-body-secondary">
                           {date.tags.map((tag) => {
-                            return <span>{tag} </span>;
+                            return <span key={tag._id}>{tag} </span>;
                           })}
                         </small>
                       </p>
