@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate()
   const [email, setEmail]=useState("")
   const [name, setName]=useState("")
   const [password, setPassword]=useState("")
@@ -10,37 +12,41 @@ const Register = () => {
     e.preventDefault();
 
     try {
+      if(!email||!name||!password){
+        alert("Please fill all the inputs properly")
+      }
       const response = await axios.post("http://localhost:4000/user/register", {email:email,
       name:name,
       password:password});
       console.log(response.data);
+      alert("You registered successfully")
       return
     } catch (error) {
-      console.log(error);
+      alert(error.response.data.message);
     }
   };
   return (
     <form className="  mt-5" onSubmit={handleRegister}>
-      <div class="mb-3">
-        <label for="InputEmail1" class="form-label">
+      <div className="mb-3">
+        <label htmlFor="InputEmail1" className="form-label">
           Email
         </label>
         <input
           type="email"
-          class="form-control"
+          className="form-control"
           id="InputEmail1"
           aria-describedby="emailHelp"
           value={email}
           onChange={(e)=>{setEmail(e.target.value)}}
         />
       </div>
-      <div class="mb-3">
-        <label for="InputName" class="form-label">
+      <div className="mb-3">
+        <label htmlFor="InputName" className="form-label">
           Name
         </label>
         <input
           type="text"
-          class="form-control"
+          className="form-control"
           id="InputName"
           aria-describedby="nameHelp"
           value={name}
@@ -48,19 +54,19 @@ const Register = () => {
         />
        
       </div>
-      <div class="mb-3">
-        <label for="InputPassword" class="form-label">
+      <div className="mb-3">
+        <label htmlFor="InputPassword" className="form-label">
           Password
         </label>
         <input
           type="password"
-          class="form-control"
+          className="form-control"
           id="InputPassword"
           value={password}
           onChange={(e)=>{setPassword(e.target.value)}}
         />
       </div>
-      <button type="submit" class="btn btn-primary">
+      <button type="submit" className="btn btn-primary">
         Submit
       </button>
     </form>

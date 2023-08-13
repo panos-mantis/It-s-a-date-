@@ -21,7 +21,8 @@ const AddDate = () => {
     console.log(img)
     setImageLink(img)
   }
-  const handleSubmit = async()=>{
+  const handleSubmit = async(e)=>{
+    e.preventDefault()
     try {
       const token = localStorage.getItem("token")
       console.log(token)
