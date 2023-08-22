@@ -9,6 +9,7 @@ import AddDate from './components/AddDate'
 import AllDates from './components/AllDates'
 import DateTypes from './components/DateTypes'
 import NotFound from './components/NotFound'
+import AdminPanel from './components/AdminPanel';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/home" element ={<Home/>}/>
+        <Route path="/" element ={<Home/>}/>
         <Route path="/AddDate" element ={<AddDate/>}/>
         <Route path="/AllDates" element ={<AllDates/>}/>
         <Route path="/DateTypes/:type" element ={<DateTypes/>}/>
@@ -24,6 +26,7 @@ function App() {
         <Route path="/Register" element ={<Register/>}/>
         <Route path="/SingleDate/:id" element ={<SingleDate/>}/>
         <Route path="*" element ={<NotFound/>}/>
+        <Route path="/Admin" element ={<AdminPanel/>}/>
       </Routes>
     </Router>
     </>

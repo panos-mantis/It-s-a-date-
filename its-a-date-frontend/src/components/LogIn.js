@@ -18,6 +18,7 @@ const LogIn = () => {
       password:password});
       console.log(response.data);
       alert("You logged in")
+      localStorage.setItem("token", response.data.token)
       navigate("/")
       return
     } catch (error) {

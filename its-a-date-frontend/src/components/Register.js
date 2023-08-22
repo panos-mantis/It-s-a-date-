@@ -19,6 +19,7 @@ const Register = () => {
       name:name,
       password:password});
       console.log(response.data);
+      localStorage.setItem("token", response.data.token)
       alert("You registered successfully")
       return
     } catch (error) {
