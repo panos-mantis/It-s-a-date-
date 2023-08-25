@@ -12,29 +12,32 @@ const AddDate = () => {
   const [imageUpload, setImageUpload] = useState("");
   const [imageLink, setImageLink] = useState("");
   const token = localStorage.getItem("token");
-  const uploadImage = async () => {
+
+  const uploadImage = async (e) => {
     
-    if (imageUpload == null) return;
+    if (e.target.files[0] == null) return;
     const imageRef = ref(storage, `dateimages/${imageUpload.name}`);
-    const response = await uploadBytes(imageRef, imageUpload);
-    alert("Image Uploaded");
+    const response = await uploadBytes(imageRef, e.target.files[0]);
+    
     const img = await getDownloadURL(imageRef);
     console.log(img);
     setImageLink(img);
+     return
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
+      
       console.log(token);
       console.log(tagToSend);
       console.log(imageLink);
       console.log(text);
-      if(!token||!tagToSend||!tittle||!imageUpload||!text){
+      if(!token||!tagToSend||!tittle||!imageLink||!text){
         alert("Please fill all the inputs properly. And don't forget to upload an image")
         return
       }
-      uploadImage();
-      console.log(1);
+    
       const response = await axios.post("http://localhost:4000/date/create", {
         tittle: tittle,
         tags: tagToSend,
@@ -42,8 +45,7 @@ const AddDate = () => {
         text: text,
         token: token,
       });
-      console.log(response.data);
-      setTags(response.data.tags);
+      console.log(response);
       return;
     } catch (error) {
       console.log(error);
@@ -128,9 +130,7 @@ const AddDate = () => {
           type="file"
           className="form-control"
           id="image"
-          onChange={(e) => {
-            setImageUpload(e.target.files[0]);
-          }}
+          onChange={(e) => uploadImage(e)}
         />
       </div>
       <button type="submit" className="btn btn-success">

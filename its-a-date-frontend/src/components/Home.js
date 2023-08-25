@@ -16,6 +16,7 @@ const Home = () => {
   const myImageStyle = { width: "400px", objectFit: "contain" };
   return (
     <>
+      
       <ul>
         {dates.map((date) => {
           return (
@@ -37,7 +38,7 @@ const Home = () => {
                       <p className="card-text">
                         <small className="text-body-secondary">
                           {date.tags.map((tag) => {
-                            return <span key={tag._id}>{tag} </span>;
+                            return <span key={tag}>{tag} </span>;
                           })}
                         </small>
                       </p>
@@ -56,7 +57,7 @@ const Home = () => {
         })}
       </ul>
       <BackTop />
-      <Footer />
+      
     </>
   );
 };

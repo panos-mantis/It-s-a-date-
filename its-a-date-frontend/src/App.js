@@ -10,6 +10,8 @@ import AllDates from './components/AllDates'
 import DateTypes from './components/DateTypes'
 import NotFound from './components/NotFound'
 import AdminPanel from './components/AdminPanel';
+import Footer from './components/Footer';
+import BackTop from './components/BackTop';
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
         <Route path="/Admin" element ={<AdminPanel/>}/>
       </Routes>
     </Router>
+    <BackTop/>
+    <Footer/>
     </>
     
    

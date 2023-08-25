@@ -6,22 +6,24 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import axios from 'axios';
 
 const TopNav = () => {
-  const getDates = async()=>{
-    const response = await axios.get("http://localhost:4000/date/");
-    console.log(response.data.dates)
-    return  setDates(response.data.dates);
-   
-  }
 
-    const getUniqueTags = () => {
-    const datesSet = new Set(dates.map((date) => date.tags[0]));
-    return(Array.from(datesSet)) ;
-  };
-
+  const [tags, setTags] = useState([]);
   const [dates,setDates]= useState([])
+
+     const getTags = async () => {
+      try {
+        const response = await axios.get("http://localhost:4000/tag/");
+        console.log(response)
+        setTags(response.data.tags);
+        return;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
   useEffect( () => {
     try{
-      getDates()
+      getTags()
       
     }catch(error){
   console.log(error)
@@ -39,9 +41,9 @@ const TopNav = () => {
            
 
             <NavDropdown title="Dropdown" id="nav-dropdown">
-       {getUniqueTags().map((tag)=>{
+       {tags.map((tag)=>{
         return(
-          <NavDropdown.Item key="date._id" href={`/DateTypes/${tag}`}>{tag}</NavDropdown.Item>
+          <NavDropdown.Item key={tag._id} href={`/DateTypes/${tag.tagName}`}>{tag.tagName}</NavDropdown.Item>
         )
        })}
       </NavDropdown>

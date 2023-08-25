@@ -1,93 +1,201 @@
-import React, { useEffect } from 'react'
-import { useState } from 'react'
-import axios from 'axios'
+import React, { useEffect } from "react";
+import { useState } from "react";
+import axios from "axios";
 
 const AdminPanel = () => {
-    const tokenLocal = localStorage.getItem("token")
-    const [email, setEmail]=useState("")
-    const [password, setPassword]=useState("")
-    const [name, setName]=useState("")
+  const tokenLocal = localStorage.getItem("token");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
 
-    const [token, setToken]= useState("")
+  const [token, setToken] = useState("");
 
-    const [dates, setDates] = useState("");
+  const [datesToReview, setDatesToReview] = useState([]);
 
-    const [tittle, setTittle] = useState("");
-    const [text, setText] = useState("");
-    const [tags, setTags] = useState([]);
-    const [tagToSend, setTagToSend] = useState("");
+  const [tittle, setTittle] = useState("");
+  const [image, setImage] = useState("");
+  const [text, setText] = useState("");
+  const [tags, setTags] = useState([]);
+  const [tagToSend, setTagToSend] = useState("");
+  const [dateId, setDateId] = useState("");
+  const [headingContent, setHeadingContent] = useState("");
 
-    const handleRegister = async (e) => {
-      e.preventDefault();
+  const getTags = async () => {
+    try {
+      const response = await axios.get("http://localhost:4000/tag/");
+      setTags(response.data.tags);
+      return;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteHandler = async (e) => {
+    e.preventDefault()
+    try {
+      const confirmBox = window.confirm(
+        "Do you really want to reject this date?"
+      );
+      if (confirmBox === true) {
+        await handleReject();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   
-      try {
-        if(!email||!name||!password){
-          alert("Please fill all the inputs properly")
-        }
-        const response = await axios.post("http://localhost:4000/user/register", {email:email,
-        name:name,
-        password:password});
-        console.log(response.data);
-        localStorage.setItem("token", response.data.token)
-        alert("You registered successfully")
-        return
-      } catch (error) {
-        alert(error.response.data.message);
-      }
-    };
-    const createAdmin = async()=>{
 
-    }
-    const getDatesToReview = async () => {
-      const response = await axios.get("http://localhost:4000/date/review");
-      setDates(response.data.dates);
-      console.log(dates)
-      return 
-    };
-    const checkIfAdmin=async()=>{
-      try {
-        if(!email||!password){
-          alert("Please fill all the inputs properly")
-        }
-        const response = await axios.post("http://localhost:4000/user/login/admin", {email:email,
-        password:password});
-        console.log(response.data);
-        setToken(response.data.token)
-        alert("You logged in as admin ")
-        
-        return
-      } catch (error) {
-        alert(error.response.data.message);
+  const handleReject = async() => {
+    try{
+      console.log(dateId)
+      if(dateId){
+        const response = await axios.delete("http://localhost:4000/date/delete/"+ dateId);
+        console.log(response)
+        getDatesToReview()
+      }else{
+        console.log("potatos")
       }
+      
+    }catch(error){
+      console.log(error)
     }
-    useEffect(()=>{
-      setToken(tokenLocal)
-      getDatesToReview()
-      console.log(dates[4])
-    },[])
-    const handleLogIn = async (e) => {
-      e.preventDefault();
-      try {
-        if(!email||!password){
-          alert("Please fill all the inputs properly")
-        }
-        const response = await axios.post("http://localhost:4000/user/login/admin", {email:email,
-        password:password});
-        console.log(response.data);
-        setToken(response.data.token)
-        localStorage.setItem("token", response.data.token)
-        alert("You logged in as admin ")
-        setEmail("")
-        setPassword("")
-        return
-      } catch (error) {
-        alert(error.response.data.message);
+  };
+  const handleAccept = async(e) => {
+    try{
+      e.preventDefault()
+      console.log(dateId)
+      if(dateId){
+        const response = await axios.put("http://localhost:4000/date/accept/"+ dateId , {tittle:tittle , text:text, tags:tagToSend});
+        console.log(response)
+        getDatesToReview()
+      }else{
+        console.log("potatos")
       }
-    };
+      
+    }catch(error){
+      console.log(error)
+    }
+  };
+  const createAdmin = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (!email || !name || !password) {
+        alert("Please fill all the inputs properly");
+      }
+      const response = await axios.post("http://localhost:4000/user/register/admin", {
+        email: email,
+        name: name,
+        password: password,
+      });
+      console.log(response.data);
+      alert("You registered successfully");
+      return;
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+  };
+  const getDatesToReview = async () => {
+    const response = await axios.get("http://localhost:4000/date/review");
+    console.log(response.data.dates);
+    if(response.data.dates.length>0){
+      setDatesToReview(response.data.dates);
+    setTittle(response.data.dates[0].tittle);
+    setTagToSend(response.data.dates[0].tags[0]);
+    setImage(response.data.dates[0].image);
+    setText(response.data.dates[0].text);
+    setDateId(response.data.dates[0]._id);
+    setHeadingContent("Dates to review")
+    }
+    else{
+      setHeadingContent("There are no dates to review")
+    }
+    
+    
+    return;
+  };
+  const checkIfAdmin = async () => {
+    try {
+      if (!email || !password) {
+        alert("Please fill all the inputs properly");
+      }
+      const response = await axios.post(
+        "http://localhost:4000/user/login/admin",
+        { email: email, password: password }
+      );
+      console.log(response.data);
+      setToken(response.data.token);
+      alert("You logged in as admin ");
+
+      return;
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+  };
+  useEffect(() => {
+    setToken(tokenLocal);
+    getTags();
+    getDatesToReview();
+  }, []);
+  const handleLogIn = async (e) => {
+    e.preventDefault();
+    try {
+      if (!email || !password) {
+        alert("Please fill all the inputs properly");
+      }
+      const response = await axios.post(
+        "http://localhost:4000/user/login/admin",
+        { email: email, password: password }
+      );
+      console.log(response.data);
+      setToken(response.data.token);
+      localStorage.setItem("token", response.data.token);
+      alert("You logged in as admin ");
+      setEmail("");
+      setPassword("");
+      return;
+    } catch (error) {
+      alert(error.response.data.message);
+    }
+  };
   return (
     <>
-    {!token? (
-          <form className="  mt-5" onSubmit={handleLogIn}>
+      {!token ? (
+        <form className="  mt-5" onSubmit={handleLogIn}>
+          <div className="mb-3">
+            <label htmlFor="InputEmail1" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              className="form-control"
+              id="InputEmail1"
+              aria-describedby="emailHelp"
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="InputPassword" className="form-label">
+              Password
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="InputPassword"
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Log in as Admin
+          </button>
+        </form>
+      ) : (
+        <div>
+          <form className="  mt-5" onSubmit={createAdmin}>
             <div className="mb-3">
               <label htmlFor="InputEmail1" className="form-label">
                 Email
@@ -97,7 +205,25 @@ const AdminPanel = () => {
                 className="form-control"
                 id="InputEmail1"
                 aria-describedby="emailHelp"
-                onChange={(e)=>{setEmail(e.target.value)}}
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="InputName" className="form-label">
+                Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="InputName"
+                aria-describedby="nameHelp"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
               />
             </div>
             <div className="mb-3">
@@ -108,122 +234,89 @@ const AdminPanel = () => {
                 type="password"
                 className="form-control"
                 id="InputPassword"
-                onChange={(e)=>{setPassword(e.target.value)}}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
               />
             </div>
             <button type="submit" className="btn btn-primary">
-              Log in as Admin
+              Create Admin
             </button>
-          </form>)
-          :
-          (<div><form className="  mt-5" onSubmit={createAdmin}>
-      <div className="mb-3">
-        <label htmlFor="InputEmail1" className="form-label">
-          Email
-        </label>
-        <input
-          type="email"
-          className="form-control"
-          id="InputEmail1"
-          aria-describedby="emailHelp"
-          value={email}
-          onChange={(e)=>{setEmail(e.target.value)}}
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="InputName" className="form-label">
-          Name
-        </label>
-        <input
-          type="text"
-          className="form-control"
-          id="InputName"
-          aria-describedby="nameHelp"
-          value={name}
-          onChange={(e)=>{setName(e.target.value)}}
-        />
-       
-      </div>
-      <div className="mb-3">
-        <label htmlFor="InputPassword" className="form-label">
-          Password
-        </label>
-        <input
-          type="password"
-          className="form-control"
-          id="InputPassword"
-          value={password}
-          onChange={(e)=>{setPassword(e.target.value)}}
-        />
-      </div>
-      <button type="submit" className="btn btn-primary">
-        Create Admin
-      </button>
-    </form>
-   
-    <form className='mt-5'>
-      <div className="mb-3">
-        <label htmlFor="tittle" className="form-label">
-          Tittle
-        </label>
-        <input
-          type="text"
-          className="form-control"
-          id="tittle"
-          placeholder="Go for sushi"
-          value={tittle}
-          onChange={(e) => {
-            setTittle(e.target.value);
-            console.log(tittle);
-          }}
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="tag" className="form-label">
-          Date Tag
-        </label>
-        <select
-          className="form-select form-select-lg mb-3"
-          onChange={(e) => {
-            setTagToSend(e.target.value);
-            console.log(tagToSend);
-          }}
-        >
-          {tags.map((tag) => {
-            return (
-              <option key={tag._id} value={tag.tagName}>
-                {tag.tagName}
-              </option>
-            );
-          })}
-        </select>
-      </div>
-      <div className="mb-3">
-        <label htmlFor="textArea" className="form-label">
-          Main Text
-        </label>
-        <textarea
-          className="form-control"
-          id="textArea"
-          rows="5"
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            console.log(text);
-          }}
-        ></textarea>
-      </div>
-      <div>
-        <img scr= {dates[0].image} alt='Not Found'/>
-      </div>
-      
-    </form>
-   
-    </div>)
-        
-      }
-    </>
-  )
-}
+          </form>
+                <h2>{headingContent}</h2>
+          <form className="mt-5">
+            <div className="mb-3">
+              <label htmlFor="tittle" className="form-label">
+                Tittle
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="tittle"
+                placeholder="Go for sushi"
+                value={tittle}
+                onChange={(e) => {
+                  setTittle(e.target.value);
+                  console.log(tittle);
+                }}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="tag" className="form-label">
+                Date Tag
+              </label>
+              <select
+                className="form-select form-select-lg mb-3"
+                value={tagToSend}
+                onChange={(e) => {
+                  setTagToSend(e.target.value);
+                  console.log(tagToSend);
+                }}
+              >
+                {tags.map((tag) => {
+                  return (
+                    <option key={tag._id} value={tag.tagName}>
+                      {tag.tagName}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div className="mb-3">
+              <label htmlFor="textArea" className="form-label">
+                Main Text
+              </label>
+              <textarea
+                className="form-control"
+                id="textArea"
+                rows="5"
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  console.log(text);
+                }}
+              ></textarea>
+            </div>
+            <img
+              src={image}
+              className="card-img-top"
+              alt="Not Found"
+            />
+            <div>
+              <button onClick={deleteHandler} className="btn btn-danger">
+                Reject
+              </button>
 
-export default AdminPanel
+              <button onClick={handleAccept} className="btn btn-success">
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default AdminPanel;
