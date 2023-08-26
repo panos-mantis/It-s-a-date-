@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "../styles/AddDate.css"
+import {Link} from "react-router-dom"
 
 const Register = () => {
   const navigate = useNavigate()
@@ -27,7 +29,9 @@ const Register = () => {
     }
   };
   return (
-    <form className="  mt-5" onSubmit={handleRegister}>
+    <div className="fullHeight formContainer">
+       <h1 className="formHeader">Register</h1>
+      <form className=" addDate " onSubmit={handleRegister} > 
       <div className="mb-3">
         <label htmlFor="InputEmail1" className="form-label">
           Email
@@ -70,7 +74,13 @@ const Register = () => {
       <button type="submit" className="btn btn-primary">
         Submit
       </button>
+      <p className="mt-3">
+       Already have an account ? Click <Link to="/LogIn">here</Link> to
+       login.
+      </p>
     </form>
+    </div>
+    
   );
 };
 

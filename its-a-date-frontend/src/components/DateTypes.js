@@ -31,7 +31,7 @@ const DateTypes = () => {
   };
 
   return (
-    <div>
+    <div className="fullHeight">
       <h1>{type} Dates</h1>
       <div>
         {getDatesOfType().map((date) => {

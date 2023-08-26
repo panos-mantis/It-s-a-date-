@@ -1,3 +1,14 @@
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.fullHeight{
+  min-height: 88vh;
+}
+
+
 /* Style for the back to the top button */
 .top-to-btm{
     position: relative;
@@ -25,10 +36,10 @@
     border: 2px solid #551B54;
   }
 /* Style for the back to the top button  END*/
-
+/* 
 form{
     width: 30%;
     margin: 0 auto;
     background-color: grey;
     padding: 10px;
-}
+} */

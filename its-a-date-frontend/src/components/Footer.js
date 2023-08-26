@@ -6,7 +6,7 @@ import '../styles/Footer.css'
 
 const Footer = () => {
   return (
-    <footer className="bg-dark">
+    <footer className="footer">
       <div className="container py-3">
         <div className="row">
           <div className="col-lg-6">
@@ -29,9 +29,9 @@ const Footer = () => {
             </ul>
           </div>
           <div className="col-lg-6 text-lg-right">
-            <span className="text-muted">AboutUs</span>
+            <span className="text-muted">About Us</span>
             <span className="mx-2 text-muted">|</span>
-            <span className="text-muted">ContactUs</span>
+            <span className="text-muted">Contact Us</span>
           </div>
         </div>
       </div>

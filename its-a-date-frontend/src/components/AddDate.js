@@ -4,6 +4,7 @@ import axios from "axios";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../config/firebase";
 import { Link } from "react-router-dom";
+import "../styles/AddDate.css"
 const AddDate = () => {
   const [tittle, setTittle] = useState("");
   const [text, setText] = useState("");
@@ -68,9 +69,9 @@ const AddDate = () => {
   }, []);
 
   return (
-    <>
+    <div className="fullHeight formContainer">
     
-    {token ? ( <form onSubmit={handleSubmit}>
+    {token ? ( <form onSubmit={handleSubmit} className="addDate">
       <div className="mb-3">
         <label htmlFor="tittle" className="form-label">
           Tittle
@@ -98,6 +99,7 @@ const AddDate = () => {
             console.log(tagToSend);
           }}
         >
+          <option disabled selected value> -- Select a Tag -- </option>
           {tags.map((tag) => {
             return (
               <option key={tag._id} value={tag.tagName}>
@@ -142,7 +144,7 @@ const AddDate = () => {
       </div>
     )}
    
-    </>);
+    </div>);
 };
 
 export default AddDate;

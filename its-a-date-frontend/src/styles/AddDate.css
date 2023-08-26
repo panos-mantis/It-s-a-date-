@@ -1,0 +1,18 @@
+.addDate{
+    
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    width:40%;
+    margin: 0 auto;
+    padding: 10px;
+    
+}
+
+.formContainer{
+    background-image: linear-gradient(#cdb4db, #bde0fe);
+    padding: 50px;
+}
+
+.formHeader{
+    text-align: center;
+    margin-bottom: 50px;
+}

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import axios from "axios";
+import "../styles/AdminPanel.css"
 
 const AdminPanel = () => {
   const tokenLocal = localStorage.getItem("token");
@@ -159,7 +160,7 @@ const AdminPanel = () => {
     }
   };
   return (
-    <>
+    <div className="fullHeight formContainer">
       {!token ? (
         <form className="  mt-5" onSubmit={handleLogIn}>
           <div className="mb-3">
@@ -194,8 +195,10 @@ const AdminPanel = () => {
           </button>
         </form>
       ) : (
-        <div>
-          <form className="  mt-5" onSubmit={createAdmin}>
+        <div className="container">
+          <div class="row">
+            <div class="col">
+            <form className="adminForm  mt-5" onSubmit={createAdmin}>
             <div className="mb-3">
               <label htmlFor="InputEmail1" className="form-label">
                 Email
@@ -243,9 +246,11 @@ const AdminPanel = () => {
             <button type="submit" className="btn btn-primary">
               Create Admin
             </button>
-          </form>
-                <h2>{headingContent}</h2>
-          <form className="mt-5">
+            </form>
+            </div>
+            <div class="col">
+            <h2>{headingContent}</h2>
+            <form className="mt-5">
             <div className="mb-3">
               <label htmlFor="tittle" className="form-label">
                 Tittle
@@ -313,9 +318,15 @@ const AdminPanel = () => {
               </button>
             </div>
           </form>
+            </div>
+            
+            </div>
+          
+                
+         
         </div>
       )}
-    </>
+    </div>
   );
 };
 

@@ -2,7 +2,8 @@ import React from "react";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import "../styles/AddDate.css"
+import {Link} from "react-router-dom"
 const LogIn = () => {
   const [email, setEmail]=useState("")
   const [password, setPassword]=useState("")
@@ -26,7 +27,9 @@ const LogIn = () => {
     }
   };
   return (
-    <form className="  mt-5" onSubmit={handleLogIn}>
+    <div className="fullHeight formContainer">
+      <h1 className="formHeader">Log in</h1>
+       <form className="addDate " onSubmit={handleLogIn}>
       <div className="mb-3">
         <label htmlFor="InputEmail1" className="form-label">
           Email
@@ -53,7 +56,13 @@ const LogIn = () => {
       <button type="submit" className="btn btn-primary">
         Submit
       </button>
+      <p className="mt-3">
+        Don't have an account yet? Click <Link to="/Register">here</Link> to
+        register.
+      </p>
     </form>
+    </div>
+   
   );
 };
 

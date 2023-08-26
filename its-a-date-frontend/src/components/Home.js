@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import BackTop from "./BackTop";
-import Footer from "./Footer";
+import "../styles/Home.css"
+
 const Home = () => {
   const [dates, setDates] = useState([]);
   const getDates = async () => {
@@ -17,10 +18,10 @@ const Home = () => {
   return (
     <>
       
-      <ul>
+      <ul className="dateList" >
         {dates.map((date) => {
           return (
-            <li key={date._id} className="mt-3 list-group-item container-sm">
+            <li key={date._id} className=" list-group-item container-sm">
               <div className="card mb-3">
                 <div className="row g-0">
                   <div className="col-md-4">

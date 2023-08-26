@@ -1,0 +1,9 @@
+.formContainer{
+    background-image: linear-gradient(#cdb4db, #bde0fe);
+    padding: 50px;
+}
+
+.splitForms{
+    display: flex;
+    justify-content: space-between;
+}
