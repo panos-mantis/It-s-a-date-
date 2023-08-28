@@ -1,0 +1,25 @@
+#header{
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 15px;
+    font-size: 90px;
+    font-weight: 300;
+}
+
+.dateTittle{
+    text-align: center;
+    font-weight: 300;
+}
+
+.bgColour{
+    padding-top:20px ;
+    background-image: linear-gradient(#cdb4db, #bde0fe);
+}
+
+#button{
+    text-align: right;
+    margin-left: 70%;
+    background-image:linear-gradient(#cdb4db, #bde0fe) ;
+    color: rgb(0, 0, 0);
+    border: 0;
+}

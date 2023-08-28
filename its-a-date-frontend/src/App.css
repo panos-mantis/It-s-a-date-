@@ -43,3 +43,7 @@ form{
     background-color: grey;
     padding: 10px;
 } */
+
+.similarIdeasBtn{
+  background-image: linear-gradient(#cdb4db, #bde0fe);
+}

@@ -72,7 +72,7 @@ const Register = () => {
         />
       </div>
       <button type="submit" className="btn btn-primary">
-        Submit
+        Create Account
       </button>
       <p className="mt-3">
        Already have an account ? Click <Link to="/LogIn">here</Link> to

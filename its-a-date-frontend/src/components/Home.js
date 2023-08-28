@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     getDates();
   }, []);
-  const myImageStyle = { width: "400px", objectFit: "contain" };
+  const myImageStyle = { height: "240px", objectFit: "cover", width :"400px"};
   return (
     <>
       
@@ -35,7 +35,7 @@ const Home = () => {
                   <div className="col-md-8">
                     <div className="card-body">
                       <h5 className="card-title">{date.tittle}</h5>
-                      <p className="card-text">{date.text}</p>
+                      <p className="card-text">{date.text.substring(0,200)} ...</p>
                       <p className="card-text">
                         <small className="text-body-secondary">
                           {date.tags.map((tag) => {
@@ -45,9 +45,9 @@ const Home = () => {
                       </p>
                       <Link
                         to={`/SingleDate/${date._id}`}
-                        className="btn btn-primary"
+                        className="btn btn-outline-dark similarIdeasBtn"
                       >
-                        Learn More
+                        Read More
                       </Link>
                     </div>
                   </div>

@@ -6,7 +6,6 @@ import SingleDate from './components/SingleDate';
 import Register from './components/Register'
 import LogIn from './components/LogIn'
 import AddDate from './components/AddDate'
-import AllDates from './components/AllDates'
 import DateTypes from './components/DateTypes'
 import NotFound from './components/NotFound'
 import AdminPanel from './components/AdminPanel';
@@ -22,7 +21,7 @@ function App() {
         <Route path="/home" element ={<Home/>}/>
         <Route path="/" element ={<Home/>}/>
         <Route path="/AddDate" element ={<AddDate/>}/>
-        <Route path="/AllDates" element ={<AllDates/>}/>
+        
         <Route path="/DateTypes/:type" element ={<DateTypes/>}/>
         <Route path="/LogIn" element ={<LogIn/>}/>
         <Route path="/Register" element ={<Register/>}/>

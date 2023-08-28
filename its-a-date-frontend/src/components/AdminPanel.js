@@ -90,7 +90,10 @@ const AdminPanel = () => {
         password: password,
       });
       console.log(response.data);
-      alert("You registered successfully");
+      alert("Admin created successfully");
+      setEmail("")
+      setPassword("")
+      setName("")
       return;
     } catch (error) {
       alert(error.response.data.message);
@@ -100,16 +103,24 @@ const AdminPanel = () => {
     const response = await axios.get("http://localhost:4000/date/review");
     console.log(response.data.dates);
     if(response.data.dates.length>0){
-      setDatesToReview(response.data.dates);
+    setDatesToReview(response.data.dates);
     setTittle(response.data.dates[0].tittle);
     setTagToSend(response.data.dates[0].tags[0]);
     setImage(response.data.dates[0].image);
     setText(response.data.dates[0].text);
     setDateId(response.data.dates[0]._id);
     setHeadingContent("Dates to review")
+    return
     }
     else{
       setHeadingContent("There are no dates to review")
+    setDatesToReview(response.data.dates);
+    setTittle("");
+    setTagToSend("");
+    setImage("");
+    setText("");
+    setDateId("");
+    setHeadingContent("Dates to review")
     }
     
     
@@ -162,7 +173,9 @@ const AdminPanel = () => {
   return (
     <div className="fullHeight formContainer">
       {!token ? (
-        <form className="  mt-5" onSubmit={handleLogIn}>
+
+        <form className="adminLogIn  mt-5" onSubmit={handleLogIn}>
+          <h2>Admin LogIn</h2>
           <div className="mb-3">
             <label htmlFor="InputEmail1" className="form-label">
               Email
@@ -196,8 +209,10 @@ const AdminPanel = () => {
         </form>
       ) : (
         <div className="container">
-          <div class="row">
+          
+          <div class="row gap-lg-5">
             <div class="col">
+            <h2>Create An admin</h2>
             <form className="adminForm  mt-5" onSubmit={createAdmin}>
             <div className="mb-3">
               <label htmlFor="InputEmail1" className="form-label">
@@ -319,11 +334,8 @@ const AdminPanel = () => {
             </div>
           </form>
             </div>
-            
-            </div>
-          
-                
-         
+
+            </div>  
         </div>
       )}
     </div>

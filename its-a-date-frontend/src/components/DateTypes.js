@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import { useNavigate  } from "react-router";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import "../styles/DateTypes.css"
 
 
 const DateTypes = () => {
@@ -11,7 +12,7 @@ const DateTypes = () => {
   const [dateTypes, setDateTypes] = useState([]);
   const { type } = useParams();
   const navigate = useNavigate();
-  const myImageStyle = { height: "300px", objectFit: "cover" };
+  const myImageStyle = { height: "240px", objectFit: "cover", width :"100%"};
 
   useEffect(() => {
     console.log(type);
@@ -31,28 +32,35 @@ const DateTypes = () => {
   };
 
   return (
-    <div className="fullHeight">
-      <h1>{type} Dates</h1>
-      <div>
+    <div className="bgColour">
+      <div className="fullHeight container">
+      <h1 id="header">{type} dates</h1>
+      <div className="grid m-auto">
+      <div className="row row-cols-3 m-0 p-0">
         {getDatesOfType().map((date) => {
           return (
-            <div className="card" >
-              <img src={date.image} className="card-img-top" alt="..." />
+            <div className=" col card m-0 p-0 mb-3">
+              <h3 className="dateTittle">{date.tittle}</h3>
+              <img src={date.image} className="card-img" alt="..." style={myImageStyle}/>
               <div className="card-body">
                 <h5 className="card-title">{date.title}</h5>
                 <p className="card-text">
-                 {date.text}
+                 {date.text.substring(0,90)} ...
                 </p>
                 
-                <Link to={`/SingleDate/${date._id}`} className="btn btn-primary">
+                <Link to={`/SingleDate/${date._id}`} id="button" className="btn btn-primary me-md-2">
                   Learn More
                 </Link>
               </div> 
             </div>
           );
         })}
+        </div>
+        
       </div>
     </div>
+    </div>
+    
   );
 };
 

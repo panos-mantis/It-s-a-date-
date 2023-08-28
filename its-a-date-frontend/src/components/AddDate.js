@@ -17,12 +17,13 @@ const AddDate = () => {
   const uploadImage = async (e) => {
     
     if (e.target.files[0] == null) return;
-    const imageRef = ref(storage, `dateimages/${imageUpload.name}`);
+    const imageRef = ref(storage, `dateimages/${ e.target.files[0].name}`);
     const response = await uploadBytes(imageRef, e.target.files[0]);
     
     const img = await getDownloadURL(imageRef);
     console.log(img);
     setImageLink(img);
+    alert("image uploaded")
      return
   };
   const handleSubmit = async (e) => {
@@ -47,6 +48,7 @@ const AddDate = () => {
         token: token,
       });
       console.log(response);
+      alert("Your date will be reviewed by an admin soon")
       return;
     } catch (error) {
       console.log(error);
@@ -99,7 +101,7 @@ const AddDate = () => {
             console.log(tagToSend);
           }}
         >
-          <option disabled selected value> -- Select a Tag -- </option>
+          <option disabled selected value=""> -- Select a Tag -- </option>
           {tags.map((tag) => {
             return (
               <option key={tag._id} value={tag.tagName}>
@@ -139,8 +141,8 @@ const AddDate = () => {
         Submit
       </button>
     </form>):(
-      <div>
-        <h2>Please <Link to="/LogIn">log in</Link>  first</h2>
+      <div className="preLogin">
+        <h2> If you want to add a date idea so everyone can see it and enjoy it please <Link to="/LogIn">log in</Link>  first</h2>
       </div>
     )}
    
