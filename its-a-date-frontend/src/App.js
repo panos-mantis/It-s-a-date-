@@ -18,14 +18,13 @@ function App() {
     <TopNav/>
     <Router>
       <Routes>
-        <Route path="/home" element ={<Home/>}/>
-        <Route path="/" element ={<Home/>}/>
+        <Route path="https://its-a-date.onrender.com/home" element ={<Home/>}/>
+        <Route path="https://its-a-date.onrender.com/" element ={<Home/>}/>
         <Route path="/AddDate" element ={<AddDate/>}/>
-        
         <Route path="/DateTypes/:type" element ={<DateTypes/>}/>
-        <Route path="/LogIn" element ={<LogIn/>}/>
-        <Route path="/Register" element ={<Register/>}/>
-        <Route path="/SingleDate/:id" element ={<SingleDate/>}/>
+        <Route path="https://its-a-date.onrender.com/LogIn" element ={<LogIn/>}/>
+        <Route path="https://its-a-date.onrender.com/Register" element ={<Register/>}/>
+        <Route path="https://its-a-date.onrender.com/SingleDate/:id" element ={<SingleDate/>}/>
         <Route path="*" element ={<NotFound/>}/>
         <Route path="/Admin" element ={<AdminPanel/>}/>
       </Routes>

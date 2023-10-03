@@ -6,6 +6,7 @@ const dateController = require("../controllers/dateController")
 
 router.post("/create", dateController.createDate )
 router.get("/", dateController.getAllDates)
+router.get("/review", dateController.getDatesToReview)
 router.get("/:id", dateController.getDateById)
 router.get("/dates/:tags", dateController.getDatesByTag)
 

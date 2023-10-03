@@ -79,8 +79,7 @@ const registerAdmin = async(req,res)=>{
         console.log(1)
         let token = jwt.sign(email, process.env.JWT_SECRET);
         return res.status(200).json({
-          message: "User registered successfully",
-          user: newUser,
+          message: "Admin created successfully",
           token: token,
         });
        
@@ -114,7 +113,7 @@ const logInAdmin = async(req,res)=>{
 
     return res.status(200).json({message:"Logged in", token:token})
   } catch (error) {
-    console.log(error);
+    return res.status(401).json({message:error.message})
   }
 }
 

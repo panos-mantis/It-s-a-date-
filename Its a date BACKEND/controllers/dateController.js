@@ -5,12 +5,16 @@ var jwt = require("jsonwebtoken");
 
 const createDate = async (req, res) => {
   try {
-    const { tittle, tags, text, token, image , } = req.body;
+    const { tittle, tags, text, token, image  } = req.body;
     if (!token) {
       return res.status(400).json({ message: "Please log in" });
     }
     let payload = jwt.verify(token, process.env.JWT_SECRET);
     if (!tittle || !tags || !text || !image) {
+      console.log(tittle)
+      console.log(text)
+      console.log(tags)
+      console.log(image)
       return res
         .status(400)
         .json({ message: "Please fill all the inputs properly" });
@@ -57,11 +61,12 @@ const getDateById = async (req, res) => {
 const deleteDateById = async (req, res) => {
   try {
     const id = req.params.id;
+    console.log(id)
     const date = await Date.findByIdAndDelete(id);
     if (!date) {
       return res.status(404).json({ error: "Date not found" });
     }
-    const dates = await Date.find({ review: true });
+    const dates = await Date.find({ review: false });
     return res.json({ message: "deleted", dates: dates });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete date"});
@@ -70,6 +75,7 @@ const deleteDateById = async (req, res) => {
 
 const acceptDateById = async (req, res) => {
   try {
+    
     const id = req.params.id;
     const date = await Date.findById(id);
     if (!date) {
@@ -91,8 +97,8 @@ const rejectDateById = async (req,res)=>{
     if (!date) {
       return res.status(404).json({ error: "Date not found" });
     }
-    const allDates = await Date.find({ review: true });
-    return res.status(200).json({ message: "success", dates: allDates });
+    const allDates = await Date.find({ review: false });
+    return res.status(200).json({ message: "deleted", dates: allDates });
     }catch(error){
         res.status(500).json({ error: "Failed to reject date" });
     }
@@ -109,6 +115,15 @@ const getDatesByTag = async (req, res) => {
   }
 };
 
+const getDatesToReview = async (req, res) => {
+  try {
+    const dates = await Date.find({ review: false });
+    res.json({ dates });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to get dates" });
+  }
+};
+
 module.exports = {
   createDate,
   getAllDates,
@@ -116,5 +131,6 @@ module.exports = {
   deleteDateById,
   acceptDateById,
   rejectDateById,
-  getDatesByTag
+  getDatesByTag,
+  getDatesToReview
 };
