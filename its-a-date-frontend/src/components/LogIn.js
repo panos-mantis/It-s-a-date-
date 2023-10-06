@@ -15,7 +15,7 @@ const LogIn = () => {
       if(!email||!password){
         alert("Please fill all the inputs properly")
       }
-      const response = await axios.post("http://localhost:4000/user/login", {email:email,
+      const response = await axios.post("https://its-a-date-backend-pm.onrender.com/user/login", {email:email,
       password:password});
       console.log(response.data);
       alert("You logged in")

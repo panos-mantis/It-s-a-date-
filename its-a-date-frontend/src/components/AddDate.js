@@ -40,7 +40,7 @@ const AddDate = () => {
         return
       }
     
-      const response = await axios.post("http://localhost:4000/date/create", {
+      const response = await axios.post("https://its-a-date-backend-pm.onrender.com/date/create", {
         tittle: tittle,
         tags: tagToSend,
         image: imageLink,
@@ -57,7 +57,7 @@ const AddDate = () => {
 
   const getTags = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/tag/");
+      const response = await axios.get("https://its-a-date-backend-pm.onrender.com/tag/");
       console.log(response.data);
       setTags(response.data.tags);
       return;

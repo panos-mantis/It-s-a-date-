@@ -14,7 +14,7 @@ const SingleDate = () => {
     }
 
   const getDate = async () => {
-    const response = await axios.get("http://localhost:4000/date/" + id);
+    const response = await axios.get("https://its-a-date-backend-pm.onrender.com/date/" + id);
     console.log(response.data);
     return setDate(response.data.date);
   };

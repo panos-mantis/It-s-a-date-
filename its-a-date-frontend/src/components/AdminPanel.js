@@ -23,7 +23,7 @@ const AdminPanel = () => {
 
   const getTags = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/tag/");
+      const response = await axios.get("https://its-a-date-backend-pm.onrender.com/tag/");
       setTags(response.data.tags);
       return;
     } catch (error) {
@@ -50,7 +50,7 @@ const AdminPanel = () => {
     try{
       console.log(dateId)
       if(dateId){
-        const response = await axios.delete("http://localhost:4000/date/delete/"+ dateId);
+        const response = await axios.delete("https://its-a-date-backend-pm.onrender.com/date/delete/"+ dateId);
         console.log(response)
         getDatesToReview()
       }else{
@@ -66,7 +66,7 @@ const AdminPanel = () => {
       e.preventDefault()
       console.log(dateId)
       if(dateId){
-        const response = await axios.put("http://localhost:4000/date/accept/"+ dateId , {tittle:tittle , text:text, tags:tagToSend});
+        const response = await axios.put("https://its-a-date-backend-pm.onrender.com/date/accept/"+ dateId , {tittle:tittle , text:text, tags:tagToSend});
         console.log(response)
         getDatesToReview()
       }else{
@@ -84,7 +84,7 @@ const AdminPanel = () => {
       if (!email || !name || !password) {
         alert("Please fill all the inputs properly");
       }
-      const response = await axios.post("http://localhost:4000/user/register/admin", {
+      const response = await axios.post("https://its-a-date-backend-pm.onrender.com/user/register/admin", {
         email: email,
         name: name,
         password: password,
@@ -100,7 +100,7 @@ const AdminPanel = () => {
     }
   };
   const getDatesToReview = async () => {
-    const response = await axios.get("http://localhost:4000/date/review");
+    const response = await axios.get("https://its-a-date-backend-pm.onrender.com/date/review");
     console.log(response.data.dates);
     if(response.data.dates.length>0){
     setDatesToReview(response.data.dates);
@@ -132,7 +132,7 @@ const AdminPanel = () => {
         alert("Please fill all the inputs properly");
       }
       const response = await axios.post(
-        "http://localhost:4000/user/login/admin",
+        "https://its-a-date-backend-pm.onrender.com/user/login/admin",
         { email: email, password: password }
       );
       console.log(response.data);
@@ -156,7 +156,7 @@ const AdminPanel = () => {
         alert("Please fill all the inputs properly");
       }
       const response = await axios.post(
-        "http://localhost:4000/user/login/admin",
+        "https://its-a-date-backend-pm.onrender.com/user/login/admin",
         { email: email, password: password }
       );
       console.log(response.data);

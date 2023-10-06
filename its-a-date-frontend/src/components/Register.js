@@ -17,7 +17,7 @@ const Register = () => {
       if(!email||!name||!password){
         alert("Please fill all the inputs properly")
       }
-      const response = await axios.post("http://localhost:4000/user/register", {email:email,
+      const response = await axios.post("https://its-a-date-backend-pm.onrender.com/user/register", {email:email,
       name:name,
       password:password});
       console.log(response.data);
