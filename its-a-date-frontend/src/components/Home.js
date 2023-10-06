@@ -7,7 +7,7 @@ import "../styles/Home.css"
 const Home = () => {
   const [dates, setDates] = useState([]);
   const getDates = async () => {
-    const response = await axios.get("http://localhost:4000/date/");
+    const response = await axios.get("https://its-a-date-backend-pm.onrender.com/date/");
     console.log(response.data);
     return setDates(response.data.dates);
   };
