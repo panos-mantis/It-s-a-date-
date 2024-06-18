@@ -2,23 +2,26 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import BackTop from "./BackTop";
-import "../styles/Home.css"
+import "../styles/Home.css";
 
 const Home = () => {
   const [dates, setDates] = useState([]);
+  const [loading, setLoading] = useState(true);
   const getDates = async () => {
-    const response = await axios.get("https://its-a-date-backend-pm.onrender.com/date/");
+    const response = await axios.get(
+      "https://its-a-date-backend-pm.onrender.com/date/"
+    );
     console.log(response.data);
+    setLoading(false);
     return setDates(response.data.dates);
   };
   useEffect(() => {
     getDates();
   }, []);
-  const myImageStyle = { height: "240px", objectFit: "cover", width :"400px"};
-  return (
+  const myImageStyle = { height: "240px", objectFit: "cover", width: "400px" };
+  return !loading ? (
     <>
-      
-      <ul className="dateList" >
+      <ul className="dateList">
         {dates.map((date) => {
           return (
             <li key={date._id} className=" list-group-item container-sm">
@@ -35,7 +38,9 @@ const Home = () => {
                   <div className="col-md-8">
                     <div className="card-body">
                       <h5 className="card-title">{date.tittle}</h5>
-                      <p className="card-text">{date.text.substring(0,200)} ...</p>
+                      <p className="card-text">
+                        {date.text.substring(0, 200)} ...
+                      </p>
                       <p className="card-text">
                         <small className="text-body-secondary">
                           {date.tags.map((tag) => {
@@ -58,7 +63,35 @@ const Home = () => {
         })}
       </ul>
       <BackTop />
-      
+    </>
+  ) : (
+    <>
+      <div class="text-center">
+        <div class="spinner-grow text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-secondary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-success" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-danger" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-warning" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-info" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-light" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div class="spinner-grow text-dark" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
     </>
   );
 };
