@@ -3,11 +3,14 @@ import { useState } from "react";
 import axios from "axios";
 import "../styles/AdminPanel.css"
 
+const authHeaders = () => ({
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+});
+
 const AdminPanel = () => {
   const tokenLocal = localStorage.getItem("token");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
 
   const [token, setToken] = useState("");
 
@@ -20,6 +23,17 @@ const AdminPanel = () => {
   const [tagToSend, setTagToSend] = useState("");
   const [dateId, setDateId] = useState("");
   const [headingContent, setHeadingContent] = useState("");
+
+  const handleAuthError = (error) => {
+    const status = error && error.response && error.response.status;
+    if (status === 401 || status === 403) {
+      localStorage.removeItem("token");
+      setToken("");
+      alert(error.response.data && error.response.data.message);
+      return true;
+    }
+    return false;
+  };
 
   const getTags = async () => {
     try {
@@ -50,7 +64,7 @@ const AdminPanel = () => {
     try{
       console.log(dateId)
       if(dateId){
-        const response = await axios.delete("https://its-a-date-backend-pm.onrender.com/date/delete/"+ dateId);
+        const response = await axios.delete("https://its-a-date-backend-pm.onrender.com/date/delete/"+ dateId, authHeaders());
         console.log(response)
         getDatesToReview()
       }else{
@@ -58,7 +72,7 @@ const AdminPanel = () => {
       }
       
     }catch(error){
-      console.log(error)
+      if (!handleAuthError(error)) console.log(error)
     }
   };
   const handleAccept = async(e) => {
@@ -66,7 +80,7 @@ const AdminPanel = () => {
       e.preventDefault()
       console.log(dateId)
       if(dateId){
-        const response = await axios.put("https://its-a-date-backend-pm.onrender.com/date/accept/"+ dateId , {tittle:tittle , text:text, tags:tagToSend});
+        const response = await axios.put("https://its-a-date-backend-pm.onrender.com/date/accept/"+ dateId , {tittle:tittle , text:text, tags:tagToSend}, authHeaders());
         console.log(response)
         getDatesToReview()
       }else{
@@ -74,33 +88,18 @@ const AdminPanel = () => {
       }
       
     }catch(error){
-      console.log(error)
-    }
-  };
-  const createAdmin = async (e) => {
-    e.preventDefault();
-
-    try {
-      if (!email || !name || !password) {
-        alert("Please fill all the inputs properly");
-      }
-      const response = await axios.post("https://its-a-date-backend-pm.onrender.com/user/register/admin", {
-        email: email,
-        name: name,
-        password: password,
-      });
-      console.log(response.data);
-      alert("Admin created successfully");
-      setEmail("")
-      setPassword("")
-      setName("")
-      return;
-    } catch (error) {
-      alert(error.response.data.message);
+      if (!handleAuthError(error)) console.log(error)
     }
   };
   const getDatesToReview = async () => {
-    const response = await axios.get("https://its-a-date-backend-pm.onrender.com/date/review");
+    if (!localStorage.getItem("token")) return;
+    let response;
+    try {
+      response = await axios.get("https://its-a-date-backend-pm.onrender.com/date/review", authHeaders());
+    } catch (error) {
+      if (!handleAuthError(error)) console.log(error);
+      return;
+    }
     console.log(response.data.dates);
     if(response.data.dates.length>0){
     setDatesToReview(response.data.dates);
@@ -165,6 +164,7 @@ const AdminPanel = () => {
       alert("You logged in as admin ");
       setEmail("");
       setPassword("");
+      getDatesToReview();
       return;
     } catch (error) {
       alert(error.response.data.message);
@@ -211,58 +211,6 @@ const AdminPanel = () => {
         <div className="container">
           
           <div class="row gap-lg-5">
-            <div class="col">
-            <h2>Create An admin</h2>
-            <form className="adminForm  mt-5" onSubmit={createAdmin}>
-            <div className="mb-3">
-              <label htmlFor="InputEmail1" className="form-label">
-                Email
-              </label>
-              <input
-                type="email"
-                className="form-control"
-                id="InputEmail1"
-                aria-describedby="emailHelp"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="InputName" className="form-label">
-                Name
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="InputName"
-                aria-describedby="nameHelp"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="InputPassword" className="form-label">
-                Password
-              </label>
-              <input
-                type="password"
-                className="form-control"
-                id="InputPassword"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
-              />
-            </div>
-            <button type="submit" className="btn btn-primary">
-              Create Admin
-            </button>
-            </form>
-            </div>
             <div class="col">
             <h2>{headingContent}</h2>
             <form className="mt-5">
