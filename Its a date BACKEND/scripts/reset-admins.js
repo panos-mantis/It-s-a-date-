@@ -55,31 +55,46 @@ function ask(question, hidden) {
 async function main() {
   await init()
   console.log(`Target DB: ${dbName}`)
-  const pw = await ask("Password (min 12 chars): ", true)
-  if (pw.length < 12) {
-    console.error("Password must be at least 12 characters")
-    process.exit(1)
-  }
-  const confirm = await ask("Type the DB name to confirm: ", false)
-  if (confirm.trim() !== dbName) {
-    console.error("DB name did not match, aborting")
-    process.exit(1)
-  }
-  if (rl) rl.close()
-
-  const hash = await bcrypt.hash(pw, 10)
   const client = new MongoClient(uri)
   await client.connect()
   try {
     const users = client.db(dbName).collection("users")
+    // Case-insensitive exact match: legacy rows may be stored with mixed case.
+    const escaped = email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    const matches = await users
+      .find({ email: new RegExp("^" + escaped + "$", "i") }, { projection: { email: 1 } })
+      .toArray()
+    if (matches.length > 1) {
+      console.error("Multiple accounts match this email, nothing written:")
+      matches.forEach((m) => console.error("  " + m.email))
+      process.exit(1)
+    }
+
+    const pw = await ask("Password (min 12 chars): ", true)
+    if (pw.length < 12) {
+      console.error("Password must be at least 12 characters")
+      process.exit(1)
+    }
+    const confirm = await ask("Type the DB name to confirm: ", false)
+    if (confirm.trim() !== dbName) {
+      console.error("DB name did not match, aborting")
+      process.exit(1)
+    }
+    if (rl) rl.close()
+
+    const hash = await bcrypt.hash(pw, 10)
     const demoted = await users.updateMany({}, { $set: { isAdmin: false } })
-    await users.updateOne(
-      { email },
-      { $set: { name, isAdmin: true, password: hash }, $setOnInsert: { personalRates: [] } },
-      { upsert: true }
-    )
+    if (matches.length === 1) {
+      await users.updateOne(
+        { _id: matches[0]._id },
+        { $set: { email, name, isAdmin: true, password: hash } }
+      )
+    } else {
+      await users.insertOne({ email, name, isAdmin: true, password: hash, personalRates: [] })
+    }
     console.log(`Demoted accounts: ${demoted.modifiedCount}`)
     console.log(`Admin: ${email}`)
+    console.log("Log in with the lowercased email exactly as printed above.")
   } finally {
     await client.close()
   }
