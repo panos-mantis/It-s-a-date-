@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="Open Design Agent Kit">
+<title>Style tiles for &quot;It&#39;s a Date&quot;: a web app where people share… — directions</title>
+<style>
+:root { --bg: #f6f6f4; --surface: #fff; --fg: #1b1b1a; --muted: #6b6b66; --border: #e2e2dd; --accent: #2f6fde; --chosen: #1f8a4c; }
+@media (prefers-color-scheme: dark) { :root { --bg: #151514; --surface: #1e1e1c; --fg: #ededea; --muted: #a3a39d; --border: #34342f; --accent: #7aa7ff; --chosen: #4cc283; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+main { max-width: 1680px; margin: 0 auto; padding: 32px 24px 48px; }
+h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.meta, .muted { color: var(--muted); }
+.brief { color: var(--muted); max-width: 900px; margin: 8px 0 0; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 28px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; min-width: 0; }
+.card.chosen { border: 2px solid var(--chosen); }
+.card header { display: flex; align-items: center; gap: 10px; }
+.card h2 { font-size: 16px; margin: 0; flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badges { display: flex; gap: 6px; margin: 8px 0 12px 36px; }
+.index { flex: none; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--fg); color: var(--surface); font-weight: 600; font-size: 13px; }
+.badge { font-size: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; }
+.chosen-badge { color: var(--chosen); border-color: var(--chosen); font-weight: 600; }
+.frame { position: relative; aspect-ratio: 3 / 4; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
+/* One-third scale: each preview gets a desktop-width virtual viewport (~1400px for a 470px card). */
+.frame iframe { position: absolute; top: 0; left: 0; width: 300%; height: 300%; border: 0; transform: scale(0.3333); transform-origin: 0 0; }
+.placeholder { display: grid; place-content: center; gap: 6px; text-align: center; color: var(--muted); background: repeating-linear-gradient(45deg, transparent 0 10px, var(--border) 10px 11px); }
+.summary { margin: 12px 0 4px; }
+.link { margin: 0; font-size: 13px; overflow-wrap: anywhere; }
+a { color: var(--accent); }
+code { font: 12px/1.4 ui-monospace, Menlo, monospace; color: var(--muted); }
+.built { margin-top: 32px; }
+.built h2 { font-size: 16px; }
+footer { margin-top: 32px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Style tiles for &quot;It&#39;s a Date&quot;: a web app where people share…</h1>
+  <div class="meta">3 directions · Custom</div>
+  <p class="brief">Style tiles for &quot;It&#39;s a Date&quot;: a web app where people share date ideas, rate them 1-5 stars, filter by tag (food, adventure, home, self-date...), and find places near them. Must feel like Airbnb (photo-first cards, 12px rounded corners, generous whitespace, sticky pill search bar, category icon row, light theme) but be its own brand: never use Airbnb red #FF385C, the Cereal font, or the Airbnb name/logo. Use free Google Fonts only. Each tile shows palette with contrast, type specimen, a date-idea card (photo, title, star rating, tag), primary/secondary buttons, the pill search bar and the category icon row.</p>
+  <div class="grid">
+<article class="card" data-direction="rose-romance">
+  <header>
+    <span class="index">A</span>
+    <h2 title="Rose Romance">Rose Romance</h2>
+  </header>
+  <div class="badges"><span class="badge">Custom</span></div>
+  <div class="frame"><iframe src="rose-romance.html" title="Rose Romance" scrolling="no"></iframe></div>
+  <p class="summary">Deep rose accent (its own shade in the #E11D48 family), blush neutrals, Plus Jakarta Sans throughout. Romantic but clean; closest to the …</p>
+  <p class="link"><a href="rose-romance.html">Open full size</a> <code>.open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/rose-romance.html</code></p>
+</article>
+<article class="card chosen" data-direction="coral-friendly">
+  <header>
+    <span class="index">B</span>
+    <h2 title="Coral Friendly">Coral Friendly</h2>
+  </header>
+  <div class="badges"><span class="badge">Custom</span><span class="badge chosen-badge">Chosen</span></div>
+  <div class="frame"><iframe src="coral-friendly.html" title="Coral Friendly" scrolling="no"></iframe></div>
+  <p class="summary">Coral/peach accent, soft serif display font (Fraunces) for headings paired with DM Sans body. Warmer and more approachable, more personal…</p>
+  <p class="link"><a href="coral-friendly.html">Open full size</a> <code>.open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/coral-friendly.html</code></p>
+</article>
+<article class="card" data-direction="sunset-playful">
+  <header>
+    <span class="index">C</span>
+    <h2 title="Sunset Playful">Sunset Playful</h2>
+  </header>
+  <div class="badges"><span class="badge">Custom</span></div>
+  <div class="frame"><iframe src="sunset-playful.html" title="Sunset Playful" scrolling="no"></iframe></div>
+  <p class="summary">Plum plus sunset-orange two-tone accent, Nunito Sans rounded type, slightly bolder colour blocks. Playful and energetic, good for adventu…</p>
+  <p class="link"><a href="sunset-playful.html">Open full size</a> <code>.open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/sunset-playful.html</code></p>
+</article>
+  </div>
+  
+  <footer>Generated by Open Design Agent Kit. Tell your agent which direction you want, e.g. “go with B” or “B, with A’s hero”.</footer>
+</main>
+</body>
+</html>

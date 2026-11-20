@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "explorationId": "style-tiles-for-it-s-a-date-a-web-app-where-peop",
+  "title": "Style tiles for \"It's a Date\": a web app where people share…",
+  "brief": "Style tiles for \"It's a Date\": a web app where people share date ideas, rate them 1-5 stars, filter by tag (food, adventure, home, self-date...), and find places near them. Must feel like Airbnb (photo-first cards, 12px rounded corners, generous whitespace, sticky pill search bar, category icon row, light theme) but be its own brand: never use Airbnb red #FF385C, the Cereal font, or the Airbnb name/logo. Use free Google Fonts only. Each tile shows palette with contrast, type specimen, a date-idea card (photo, title, star rating, tag), primary/secondary buttons, the pill search bar and the category icon row.",
+  "skillId": "style-tile",
+  "skillMode": "design-system",
+  "axis": "custom",
+  "createdAt": "2026-11-20T02:54:58.093Z",
+  "directions": [
+    {
+      "id": "rose-romance",
+      "label": "Rose Romance",
+      "axis": "custom",
+      "summary": "Deep rose accent (its own shade in the #E11D48 family), blush neutrals, Plus Jakarta Sans throughout. Romantic but clean; closest to the …",
+      "spec": "### Rose Romance  `(id: rose-romance)`\n\nDeep rose accent (its own shade in the #E11D48 family), blush neutrals, Plus Jakarta Sans throughout. Romantic but clean; closest to the Airbnb feel.\n",
+      "entryPath": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/rose-romance.html"
+    },
+    {
+      "id": "coral-friendly",
+      "label": "Coral Friendly",
+      "axis": "custom",
+      "summary": "Coral/peach accent, soft serif display font (Fraunces) for headings paired with DM Sans body. Warmer and more approachable, more personal…",
+      "spec": "### Coral Friendly  `(id: coral-friendly)`\n\nCoral/peach accent, soft serif display font (Fraunces) for headings paired with DM Sans body. Warmer and more approachable, more personality in headings.\n",
+      "entryPath": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/coral-friendly.html"
+    },
+    {
+      "id": "sunset-playful",
+      "label": "Sunset Playful",
+      "axis": "custom",
+      "summary": "Plum plus sunset-orange two-tone accent, Nunito Sans rounded type, slightly bolder colour blocks. Playful and energetic, good for adventu…",
+      "spec": "### Sunset Playful  `(id: sunset-playful)`\n\nPlum plus sunset-orange two-tone accent, Nunito Sans rounded type, slightly bolder colour blocks. Playful and energetic, good for adventure dates.\n",
+      "entryPath": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/sunset-playful.html"
+    }
+  ],
+  "chosen": {
+    "directionId": "coral-friendly",
+    "next": "save-design-system",
+    "chosenAt": "2026-11-20T03:01:13.297Z"
+  }
+}

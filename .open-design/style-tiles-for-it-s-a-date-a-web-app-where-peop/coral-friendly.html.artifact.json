@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Coral Friendly",
+  "entry": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/coral-friendly.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "standalone",
+    "site",
+    "png",
+    "jpeg",
+    "pdf"
+  ],
+  "createdAt": "2026-11-20T02:59:56.676Z",
+  "updatedAt": "2026-11-20T02:59:56.676Z",
+  "sourceSkillId": "od:design-system:style-tile",
+  "explorationId": "style-tiles-for-it-s-a-date-a-web-app-where-peop",
+  "directionId": "coral-friendly"
+}

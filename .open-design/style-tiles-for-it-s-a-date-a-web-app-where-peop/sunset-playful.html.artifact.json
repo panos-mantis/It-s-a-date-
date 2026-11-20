@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Sunset Playful",
+  "entry": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/sunset-playful.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "standalone",
+    "site",
+    "png",
+    "jpeg",
+    "pdf"
+  ],
+  "createdAt": "2026-11-20T03:00:05.113Z",
+  "updatedAt": "2026-11-20T03:00:05.113Z",
+  "sourceSkillId": "od:design-system:style-tile",
+  "explorationId": "style-tiles-for-it-s-a-date-a-web-app-where-peop",
+  "directionId": "sunset-playful"
+}

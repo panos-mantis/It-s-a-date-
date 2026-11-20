@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "entryPath": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/coral-friendly.html",
+      "title": "Coral Friendly",
+      "skillId": "od:design-system:style-tile",
+      "explorationId": "style-tiles-for-it-s-a-date-a-web-app-where-peop",
+      "directionId": "coral-friendly",
+      "date": "2026-11-20T02:59:56.695Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/sunset-playful.html",
+      "title": "Sunset Playful",
+      "skillId": "od:design-system:style-tile",
+      "explorationId": "style-tiles-for-it-s-a-date-a-web-app-where-peop",
+      "directionId": "sunset-playful",
+      "date": "2026-11-20T03:00:05.133Z",
+      "signature": {
+        "accent": "#6a23a8",
+        "displayFont": "Nunito",
+        "bodyFont": "Nunito Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/rose-romance.html",
+      "title": "Rose Romance",
+      "skillId": "od:design-system:style-tile",
+      "explorationId": "style-tiles-for-it-s-a-date-a-web-app-where-peop",
+      "directionId": "rose-romance",
+      "date": "2026-11-20T03:00:06.430Z",
+      "signature": {
+        "accent": "#ce1a4c",
+        "displayFont": "Plus Jakarta Sans",
+        "bodyFont": "Plus Jakarta Sans",
+        "theme": "light",
+        "hero": "split"
+      }
+    }
+  ]
+}

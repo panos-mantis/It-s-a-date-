@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Rose Romance",
+  "entry": ".open-design/style-tiles-for-it-s-a-date-a-web-app-where-peop/rose-romance.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "standalone",
+    "site",
+    "png",
+    "jpeg",
+    "pdf"
+  ],
+  "createdAt": "2026-11-20T03:00:06.408Z",
+  "updatedAt": "2026-11-20T03:00:06.408Z",
+  "sourceSkillId": "od:design-system:style-tile",
+  "explorationId": "style-tiles-for-it-s-a-date-a-web-app-where-peop",
+  "directionId": "rose-romance"
+}
