@@ -12,7 +12,9 @@
     "nodemon": "^3.0.1"
   },
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "copy-to-dev": "node scripts/copy-to-dev.js",
+    "reset-admins": "node scripts/reset-admins.js"
   },
   "name": "its-a-date-backend",
   "version": "1.0.0",

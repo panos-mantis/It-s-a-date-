@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sunset Playful</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Identity */
+  --bg: #FFF6EC;
+  --surface: #FFFCF8;
+  --fg: #24112E;
+  --muted: #6B5566;
+  --border: #EBD9CB;
+  --border-strong: #6B5566;
+  --accent: #6A23A8;
+  --accent-hover: #561A8C;
+  --accent-on: #FFF6EC;
+  --accent-soft: #F1E4FB;
+  --accent-2: #FF7A33;
+  --accent-2-ink: #B3440E;
+  --accent-2-soft: #FFE3CF;
+  --accent-2-on: #24112E;
+  --star: #FF7A33;
+  --success: #1E7A4C;
+  --warn: #A8530A;
+  --danger: #C0262D;
+
+  /* Type */
+  --font-display: "Nunito", "Nunito Sans", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  --font-body: "Nunito Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5625rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+  --text-4xl: 3.5rem;
+  --leading-body: 1.55;
+  --leading-tight: 1.05;
+  --tracking-display: -0.025em;
+  --tracking-caps: 0.08em;
+  --tracking-ui: 0.02em;
+  --weight-read: 400;
+  --weight-emph: 600;
+  --weight-announce: 800;
+
+  /* Shape */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  --radius-pill: 999px;
+  --elev-raised: 0 2px 4px rgba(36, 17, 46, 0.06), 0 12px 28px -8px rgba(36, 17, 46, 0.18);
+  --elev-search: 0 6px 20px -6px rgba(36, 17, 46, 0.28);
+  --focus-ring: 0 0 0 3px rgba(106, 35, 168, 0.28);
+
+  /* Space */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Layout */
+  --container-max: 1200px;
+  --container-gutter-phone: 16px;
+  --container-gutter-tablet: 24px;
+  --container-gutter-desktop: 32px;
+  --section-y-phone: 24px;
+  --section-y-tablet: 32px;
+  --section-y-desktop: 40px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  font-weight: var(--weight-read);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tile {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--section-y-desktop) var(--container-gutter-desktop);
+  display: grid;
+  gap: var(--space-5);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-emph);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 var(--space-3);
+}
+
+/* ---------- Hero block ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--accent);
+  color: var(--accent-on);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-5);
+  align-items: end;
+}
+.hero .eyebrow { color: var(--accent-on); opacity: 0.85; }
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  margin: 0;
+}
+.hero h1 span { color: var(--accent-2); }
+.hero p.mood {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-emph);
+  max-width: 46ch;
+}
+.sun {
+  position: absolute;
+  right: -40px;
+  top: -70px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: var(--accent-2);
+}
+.hill {
+  position: absolute;
+  right: 120px;
+  top: 120px;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: var(--accent-hover);
+}
+.hero > * { position: relative; }
+.hero .sun, .hero .hill { position: absolute; }
+.hero .search { position: sticky; }
+
+/* Search pill */
+.search {
+  position: sticky;
+  top: var(--space-3);
+  z-index: 5;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--elev-search);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-2);
+  max-width: 760px;
+  margin-top: var(--space-4);
+}
+.search .seg {
+  flex: 1;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-pill);
+  min-width: 0;
+}
+.search .seg + .seg { border-left: 1px solid var(--border); }
+.search .seg label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-ui);
+}
+.search .seg span {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.search button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 52px;
+  padding: 0 var(--space-5) 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent-2);
+  color: var(--accent-2-on);
+  font: 800 var(--text-base) var(--font-display);
+  letter-spacing: var(--tracking-ui);
+  cursor: pointer;
+}
+
+/* Category row */
+.cats {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  scrollbar-width: none;
+}
+.cat {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  font-weight: var(--weight-emph);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-ui);
+  color: var(--fg);
+  white-space: nowrap;
+}
+.cat svg { width: 22px; height: 22px; flex: none; }
+.cat.is-active {
+  background: var(--accent-2-soft);
+  border-color: var(--accent-2-ink);
+  color: var(--accent-2-ink);
+  font-weight: 700;
+}
+
+/* ---------- Main grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+.col { display: grid; gap: var(--space-5); align-content: start; min-width: 0; }
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--space-5);
+}
+.panel h2 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-announce);
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  margin: 0 0 var(--space-4);
+}
+
+/* Date card */
+.card { display: grid; gap: var(--space-3); }
+.card .photo {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--accent-2-soft);
+}
+.card .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card .photo .tag { position: absolute; left: var(--space-3); top: var(--space-3); }
+.heart {
+  position: absolute; right: var(--space-3); top: var(--space-3);
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface); color: var(--fg);
+  display: grid; place-items: center;
+  box-shadow: var(--elev-raised);
+}
+.heart svg { width: 18px; height: 18px; }
+.card-head { display: flex; justify-content: space-between; gap: var(--space-3); align-items: baseline; }
+.card h3 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-announce);
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  margin: 0;
+}
+.card .meta { margin: 0; color: var(--muted); font-size: var(--text-sm); }
+.card .desc { margin: 0; font-size: var(--text-sm); }
+.rating { display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--text-sm); white-space: nowrap; }
+.rating .stars { display: inline-flex; gap: 1px; }
+.rating svg { width: 14px; height: 14px; }
+.rating strong { font-weight: 700; margin-left: var(--space-1); }
+.rating .count { color: var(--muted); }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--accent-2-soft);
+  color: var(--accent-2-ink);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+.tag svg { width: 14px; height: 14px; }
+.tag.plum { background: var(--accent-soft); color: var(--accent); }
+.tag.neutral { background: var(--bg); color: var(--fg); border: 1px solid var(--border); }
+
+/* Type specimen */
+.specimen .display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  margin: 0 0 var(--space-3);
+}
+.specimen .body {
+  font-size: var(--text-base);
+  max-width: 60ch;
+  margin: 0 0 var(--space-4);
+}
+.fam { display: flex; gap: var(--space-4); flex-wrap: wrap; font-size: var(--text-xs); color: var(--muted); margin-bottom: var(--space-4); letter-spacing: 0.01em; }
+.fam b { color: var(--fg); font-weight: 700; }
+.scale { list-style: none; margin: 0; padding: var(--space-3) 0 0; border-top: 1px solid var(--border); display: grid; gap: 2px; }
+.scale li { display: grid; grid-template-columns: 74px 1fr; align-items: baseline; gap: var(--space-3); }
+.scale code { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); }
+.scale .s { font-family: var(--font-display); font-weight: var(--weight-announce); line-height: 1.2; min-width: 0; overflow-wrap: anywhere; }
+.scale .s4 { font-size: var(--text-4xl); letter-spacing: var(--tracking-display); }
+.scale .s3 { font-size: var(--text-3xl); letter-spacing: -0.02em; }
+.scale .s2 { font-size: var(--text-2xl); letter-spacing: -0.015em; }
+.scale .s1 { font-size: var(--text-xl); letter-spacing: -0.01em; }
+.scale .sl { font-size: var(--text-lg); }
+.scale .sb { font-size: var(--text-base); font-family: var(--font-body); font-weight: var(--weight-read); }
+.scale .ss { font-size: var(--text-sm); font-family: var(--font-body); font-weight: var(--weight-read); letter-spacing: 0.01em; }
+.scale .sx { font-size: var(--text-xs); font-family: var(--font-body); font-weight: var(--weight-read); letter-spacing: 0.02em; }
+
+/* Palette */
+.swatches { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.sw { border-radius: var(--radius-sm); border: 1px solid var(--border); overflow: hidden; background: var(--surface); }
+.sw .chip { height: 46px; display: flex; align-items: flex-end; padding: 4px var(--space-3); font-family: var(--font-display); font-weight: var(--weight-announce); font-size: var(--text-sm); }
+.sw .info { padding: 6px var(--space-3) var(--space-2); font-size: var(--text-xs); line-height: 1.4; letter-spacing: 0.01em; }
+.sw .info b { display: block; font-weight: 700; font-size: var(--text-sm); }
+.sw .info code { font-family: var(--font-mono); color: var(--muted); }
+.sw .info .ratio { display: block; color: var(--fg); }
+.sw.wide { grid-column: 1 / -1; }
+.sw .chip.bg { background: var(--bg); color: var(--fg); }
+.sw .chip.surface { background: var(--surface); color: var(--fg); border-bottom: 1px solid var(--border); }
+.sw .chip.fg { background: var(--fg); color: var(--bg); }
+.sw .chip.muted { background: var(--muted); color: var(--bg); }
+.sw .chip.border { background: var(--border); color: var(--fg); }
+.sw .chip.accent { background: var(--accent); color: var(--accent-on); }
+.sw .chip.accent-2 { background: var(--accent-2); color: var(--accent-2-on); }
+.sw .chip.ink { background: var(--accent-2-ink); color: var(--accent-on); }
+.status { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); grid-column: 1 / -1; }
+.status div { font-size: var(--text-xs); line-height: 1.35; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--bg); border: 1px solid var(--border); letter-spacing: 0.01em; }
+.status b { display: block; font-size: var(--text-sm); }
+.status .ok b { color: var(--success); }
+.status .wn b { color: var(--warn); }
+.status .dg b { color: var(--danger); }
+.status code { font-family: var(--font-mono); color: var(--muted); }
+
+/* Components */
+.btns { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4); }
+.btn {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  height: 48px; padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
+  font: 800 var(--text-base) var(--font-display);
+  letter-spacing: var(--tracking-ui);
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.btn svg { width: 18px; height: 18px; }
+.btn-primary { background: var(--accent); color: var(--accent-on); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--fg); }
+.btn-secondary:hover { background: var(--bg); }
+.btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.field { display: grid; gap: 6px; margin-bottom: var(--space-4); }
+.field label { font-size: var(--text-sm); font-weight: 700; letter-spacing: var(--tracking-ui); }
+.field input {
+  height: 48px; padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--fg);
+  font: var(--weight-read) var(--text-base) var(--font-body);
+}
+.field input::placeholder { color: var(--muted); }
+.field input:focus { outline: none; border-color: var(--accent); box-shadow: var(--focus-ring); }
+.field small { font-size: var(--text-xs); color: var(--muted); letter-spacing: 0.01em; }
+.tags { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+.promo {
+  min-height: 200px;
+  background: var(--accent-2);
+  color: var(--accent-2-on);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-4);
+  position: relative; overflow: hidden;
+}
+.promo .eyebrow { color: var(--accent-2-on); }
+.promo h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.promo p { margin: 0; font-size: var(--text-sm); font-weight: var(--weight-emph); max-width: 30ch; }
+.promo .blob { position: absolute; right: -36px; bottom: -36px; width: 130px; height: 130px; border-radius: 50%; background: var(--accent); }
+.promo > *:not(.blob) { position: relative; }
+
+.radii { display: flex; gap: var(--space-3); align-items: end; margin-bottom: var(--space-4); }
+.radii div { flex: 1; text-align: center; font-size: var(--text-xs); color: var(--muted); letter-spacing: 0.01em; }
+.radii i { display: block; height: 44px; background: var(--accent-soft); border: 1.5px solid var(--accent); margin-bottom: 4px; }
+.ruler { display: flex; align-items: end; gap: var(--space-2); margin-bottom: var(--space-4); }
+.ruler div { display: grid; justify-items: center; gap: 4px; font-size: var(--text-xs); color: var(--muted); font-family: var(--font-mono); }
+.ruler i { display: block; width: 10px; background: var(--accent-2); border-radius: var(--radius-pill); }
+.elev { display: flex; align-items: center; gap: var(--space-3); }
+.elev .box { width: 64px; height: 44px; border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--elev-raised); }
+.elev span { font-size: var(--text-xs); color: var(--muted); letter-spacing: 0.01em; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1080px) {
+  .tile { padding: var(--section-y-tablet) var(--container-gutter-tablet); }
+  .grid { grid-template-columns: 1fr 1fr; }
+  .grid .col-pal { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; align-items: start; }
+}
+@media (max-width: 680px) {
+  .tile { padding: var(--section-y-phone) var(--container-gutter-phone); gap: var(--space-4); }
+  .hero { padding: var(--space-5) var(--space-4) var(--space-4); grid-template-columns: 1fr; }
+  .hero h1 { font-size: var(--text-3xl); max-width: 9ch; }
+  .hero p.mood { font-size: var(--text-base); }
+  .sun { width: 120px; height: 120px; right: -48px; top: -56px; }
+  .hill { display: none; }
+  .search .seg.opt { display: none; }
+  .search .seg { padding: var(--space-1) var(--space-3); }
+  .search button .lbl { display: none; }
+  .search button { width: 48px; height: 48px; padding: 0; justify-content: center; }
+  .cats { flex-wrap: nowrap; }
+  .cat { flex: 0 0 auto; }
+  .grid, .grid .col-pal { grid-template-columns: 1fr; }
+  .col { gap: var(--space-4); }
+  .panel { padding: var(--space-4); }
+  .specimen .display { font-size: var(--text-3xl); }
+  .scale .s4 { font-size: var(--text-3xl); }
+  .scale .s3 { font-size: var(--text-2xl); }
+}
+</style>
+</head>
+<body>
+<main class="tile" data-od-style-tile data-direction="sunset-playful">
+
+  <!-- Header / hero colour block with the sticky search pill -->
+  <header class="hero">
+    <div class="sun" aria-hidden="true"></div>
+    <div class="hill" aria-hidden="true"></div>
+    <div>
+      <p class="eyebrow">It's a Date · Style tile 03</p>
+      <h1>Sunset <span>Playful</span></h1>
+      <p class="mood">Bold, sunny, up for anything. Plum nights, orange sunsets.</p>
+    </div>
+    <form class="search" role="search" aria-label="Find a date idea" onsubmit="return false">
+      <div class="seg"><label>Where</label><span>Near me · Brooklyn, NY</span></div>
+      <div class="seg opt"><label>When</label><span>This Saturday</span></div>
+      <div class="seg opt"><label>Vibe</label><span>Adventure, food…</span></div>
+      <button type="submit" aria-label="Search">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <span class="lbl">Search</span>
+      </button>
+    </form>
+  </header>
+
+  <!-- Category icon row -->
+  <nav class="cats" aria-label="Filter by tag">
+    <span class="cat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0Z"/><path d="M9 7c0-1.5 1-2 1-3.5M13 7c0-1.5 1-2 1-3.5"/></svg>
+      Food
+    </span>
+    <span class="cat is-active" aria-current="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 20 7-12 4 6 2.5-3.5L22 20Z"/><circle cx="17" cy="5" r="2"/></svg>
+      Adventure
+    </span>
+    <span class="cat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>
+      Home
+    </span>
+    <span class="cat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/><path d="M19 2.5v3M17.5 4h3"/></svg>
+      Self-date
+    </span>
+    <span class="cat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 6 12h3l-4 6h14l-4-6h3Z"/><path d="M12 18v3"/></svg>
+      Outdoors
+    </span>
+    <span class="cat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 12 4l9 5"/><path d="M5 9v9M9.5 9v9M14.5 9v9M19 9v9"/><path d="M3 20h18"/></svg>
+      Culture
+    </span>
+  </nav>
+
+  <!-- Card + components · Type + colour block · Palette + shape -->
+  <section class="grid">
+    <div class="col">
+    <article class="panel card" aria-label="Date idea card">
+      <div class="photo">
+        <img src="https://picsum.photos/seed/bouldering/640/480" alt="Placeholder photo for the date idea" width="640" height="480">
+        <span class="tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m2 20 7-12 4 6 2.5-3.5L22 20Z"/></svg>
+          Adventure
+        </span>
+        <span class="heart" aria-label="Save idea">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>
+        </span>
+      </div>
+      <div class="card-head">
+        <h3>Indoor bouldering + ramen</h3>
+      </div>
+      <div class="rating" aria-label="Rated 4.6 out of 5 from 128 ratings">
+        <span class="stars" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path fill="var(--star)" d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8Z"/></svg>
+          <svg viewBox="0 0 24 24"><path fill="var(--star)" d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8Z"/></svg>
+          <svg viewBox="0 0 24 24"><path fill="var(--star)" d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8Z"/></svg>
+          <svg viewBox="0 0 24 24"><path fill="var(--star)" d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8Z"/></svg>
+          <svg viewBox="0 0 24 24"><defs><linearGradient id="half"><stop offset="60%" stop-color="var(--star)"/><stop offset="60%" stop-color="var(--border)"/></linearGradient></defs><path fill="url(#half)" d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8Z"/></svg>
+        </span>
+        <strong>4.6</strong><span class="count">(128 ratings)</span>
+      </div>
+      <p class="meta">Brooklyn · 1.2 mi away · $$ · 3 hrs</p>
+      <p class="desc">Climb a few beginner routes, then refuel with tonkotsu around the corner. Rentals included.</p>
+    </article>
+    <section class="panel comp" aria-label="Components">
+      <p class="eyebrow">Components</p>
+      <div class="btns">
+        <button class="btn btn-primary" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Share a date idea
+        </button>
+        <button class="btn btn-secondary" type="button">Save for later</button>
+      </div>
+      <div class="field">
+        <label for="idea-title">Name your date idea</label>
+        <input id="idea-title" type="text" placeholder="e.g. Sunrise hike + diner pancakes">
+        <small>Keep it short and specific. 60 characters max.</small>
+      </div>
+      <div class="tags">
+        <span class="tag">Adventure</span>
+        <span class="tag plum">Self-date</span>
+        <span class="tag neutral">Food</span>
+        <span class="tag neutral">Under $40</span>
+      </div>
+    </section>
+    </div>
+    <div class="col">
+    <section class="panel specimen" aria-label="Type specimen">
+      <p class="eyebrow">Type</p>
+      <p class="display">Say yes to more.</p>
+      <p class="body">Every idea on It's a Date comes from someone who actually went. Browse by vibe, save the ones that make you grin, and rate them after so the next couple knows what they're in for.</p>
+      <div class="fam"><span><b>Nunito</b> 800/900 · display</span><span><b>Nunito Sans</b> 400/600 · body</span></div>
+      <ul class="scale">
+        <li><code>4xl 56</code><span class="s s4">Sunset</span></li>
+        <li><code>3xl 39</code><span class="s s3">Picnic</span></li>
+        <li><code>2xl 31</code><span class="s s2">Golden hour</span></li>
+        <li><code>xl 25</code><span class="s s1">Pottery for two</span></li>
+        <li><code>lg 20</code><span class="s sl">Near you this weekend</span></li>
+        <li><code>base 16</code><span class="s sb">Two hours, under $40.</span></li>
+        <li><code>sm 14</code><span class="s ss">128 ratings · 1.2 mi</span></li>
+        <li><code>xs 12</code><span class="s sx">Posted by Maya · 3 days ago</span></li>
+      </ul>
+    </section>
+    <aside class="promo" aria-label="Colour block example">
+      <div class="blob" aria-hidden="true"></div>
+      <div>
+        <p class="eyebrow">Tonight's pick</p>
+        <h3>Night kayak under the bridge</h3>
+      </div>
+      <p>Bold colour blocks for featured ideas. Fg on sunset 6.77:1.</p>
+    </aside>
+    </div>
+    <div class="col col-pal">
+    <section class="panel palette" aria-label="Palette">
+      <p class="eyebrow">Palette · computed contrast</p>
+      <div class="swatches">
+        <div class="sw wide"><div class="chip accent">Plum · accent</div><div class="info"><code>#6A23A8</code> · hover <code>#561A8C</code><span class="ratio">accent-on on accent 8.12:1 · on hover 10.22:1 · accent text on bg 8.12:1</span></div></div>
+        <div class="sw"><div class="chip accent-2">Sunset</div><div class="info"><b>accent-2</b><code>#FF7A33</code><span class="ratio">fg on it 6.77:1</span></div></div>
+        <div class="sw"><div class="chip ink">Ember</div><div class="info"><b>accent-2-ink</b><code>#B3440E</code><span class="ratio">on bg 5.24:1 · on soft 4.57:1</span></div></div>
+        <div class="sw"><div class="chip bg">Aa</div><div class="info"><b>bg</b><code>#FFF6EC</code><span class="ratio">fg on bg 16.44:1</span></div></div>
+        <div class="sw"><div class="chip surface">Aa</div><div class="info"><b>surface</b><code>#FFFCF8</code><span class="ratio">fg on surface 17.19:1</span></div></div>
+        <div class="sw"><div class="chip fg">Aa</div><div class="info"><b>fg</b><code>#24112E</code><span class="ratio">bg on fg 16.44:1</span></div></div>
+        <div class="sw"><div class="chip muted">Aa</div><div class="info"><b>muted</b><code>#6B5566</code><span class="ratio">muted on bg 6.30:1</span></div></div>
+        <div class="sw wide"><div class="chip border">border</div><div class="info"><code>#EBD9CB</code><span class="ratio">vs bg 1.28:1 · dividers only; inputs use muted 6.30:1</span></div></div>
+        <div class="status">
+          <div class="ok"><b>success</b><code>#1E7A4C</code><br>4.98:1</div>
+          <div class="wn"><b>warn</b><code>#A8530A</code><br>5.03:1</div>
+          <div class="dg"><b>danger</b><code>#C0262D</code><br>5.52:1</div>
+        </div>
+      </div>
+    </section>
+    <section class="panel" aria-label="Shape and space">
+      <p class="eyebrow">Shape &amp; space</p>
+      <div class="radii">
+        <div><i style="border-radius: var(--radius-sm)"></i>sm 12</div>
+        <div><i style="border-radius: var(--radius-md)"></i>md 20</div>
+        <div><i style="border-radius: var(--radius-lg)"></i>lg 32</div>
+        <div><i style="border-radius: var(--radius-pill)"></i>pill</div>
+      </div>
+      <div class="ruler" aria-label="Spacing scale">
+        <div><i style="height: var(--space-1)"></i>4</div>
+        <div><i style="height: var(--space-2)"></i>8</div>
+        <div><i style="height: var(--space-3)"></i>12</div>
+        <div><i style="height: var(--space-4)"></i>16</div>
+        <div><i style="height: var(--space-5)"></i>24</div>
+        <div><i style="height: var(--space-6)"></i>32</div>
+        <div><i style="height: var(--space-7)"></i>48</div>
+        <div><i style="height: var(--space-8)"></i>64</div>
+      </div>
+      <div class="elev"><div class="box"></div><span>elev-raised · cards, heart button, menus</span></div>
+    </section>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

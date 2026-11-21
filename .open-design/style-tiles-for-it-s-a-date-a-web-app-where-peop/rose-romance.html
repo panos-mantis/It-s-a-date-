@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rose Romance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Identity */
+  --bg: #FBF8FA;
+  --surface: #FFFFFF;
+  --fg: #1E1A24;
+  --muted: #6A6372;
+  --border: #E9E2E8;
+  --border-strong: #918A99;
+  --accent: #CE1A4C;
+  --accent-hover: #A9123C;
+  --accent-on: #FFFFFF;
+  --accent-soft: #FBEAF0;
+  --success: #1F7A4D;
+  --warn: #9A5B00;
+  --danger: #B42318;
+
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-body: "Plus Jakarta Sans", ui-sans-serif, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  /* Type scale */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+  --text-4xl: 48px;
+  --leading-body: 1.55;
+  --leading-tight: 1.1;
+  --tracking-display: -0.025em;
+
+  /* Layout */
+  --container-max: 1200px;
+  --container-gutter-phone: 16px;
+  --container-gutter-tablet: 24px;
+  --container-gutter-desktop: 40px;
+  --section-y-phone: 48px;
+  --section-y-tablet: 64px;
+  --section-y-desktop: 96px;
+
+  /* Shape + depth */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --elev-raised: 0 1px 2px rgba(30, 26, 36, 0.06), 0 6px 20px rgba(30, 26, 36, 0.10);
+  --elev-search: 0 1px 2px rgba(30, 26, 36, 0.08), 0 4px 12px rgba(30, 26, 36, 0.06);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+}
+svg { display: block; }
+
+.tile {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* ---------- App chrome (sticky) ---------- */
+.chrome {
+  position: sticky; top: 0; z-index: 5;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.chrome-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--container-gutter-desktop);
+}
+.brand {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 600; font-size: var(--text-lg);
+  letter-spacing: -0.01em;
+}
+.brand-mark {
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  background: var(--fg); color: var(--surface);
+  display: grid; place-items: center;
+}
+.chrome-right { display: flex; justify-content: flex-end; align-items: center; gap: var(--space-3); font-size: var(--text-sm); font-weight: 500; }
+.avatar {
+  display: flex; align-items: center; gap: var(--space-2);
+  border: 1px solid var(--border); border-radius: var(--radius-pill);
+  padding: 5px 5px 5px var(--space-3);
+}
+.avatar-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--muted); color: var(--surface); display: grid; place-items: center; font-size: var(--text-xs); font-weight: 600; }
+
+.search {
+  display: flex; align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--elev-search);
+  padding: 6px 6px 6px var(--space-2);
+}
+.search-seg { padding: 4px var(--space-5); border-right: 1px solid var(--border); min-width: 0; }
+.search-seg:last-of-type { border-right: 0; }
+.search-seg b { display: block; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.02em; }
+.search-seg span { display: block; font-size: var(--text-sm); color: var(--muted); white-space: nowrap; }
+.search-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: 0;
+  background: var(--accent); color: var(--accent-on);
+  display: grid; place-items: center; cursor: pointer; flex: none;
+}
+
+.cats {
+  display: flex; gap: var(--space-6);
+  padding: var(--space-3) var(--container-gutter-desktop) 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cat {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding-bottom: var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.02em;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap; flex: none;
+}
+.cat.is-active { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
+
+/* ---------- Board ---------- */
+.board {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr) 300px;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--container-gutter-desktop) var(--space-6);
+}
+.eyebrow {
+  font-size: var(--text-xs); font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--space-3);
+}
+.block + .block { margin-top: var(--space-5); }
+
+/* Header */
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl); font-weight: 600;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em;
+}
+.mood { color: var(--muted); font-size: var(--text-base); margin-top: var(--space-2); }
+
+/* Date card */
+.card { background: transparent; }
+.card-photo {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--border);
+}
+.card-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card-badge {
+  position: absolute; top: var(--space-3); left: var(--space-3);
+  background: var(--surface); color: var(--fg);
+  font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.02em;
+  padding: 4px 10px; border-radius: var(--radius-pill);
+  box-shadow: var(--elev-search);
+}
+.card-heart {
+  position: absolute; top: var(--space-3); right: var(--space-3);
+  color: var(--surface);
+  filter: drop-shadow(0 1px 2px rgba(30, 26, 36, 0.4));
+}
+.card-dots { position: absolute; bottom: var(--space-3); left: 0; right: 0; display: flex; justify-content: center; gap: 5px; }
+.card-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--surface); opacity: 0.6; }
+.card-dots i:first-child { opacity: 1; }
+.card-body { padding-top: var(--space-3); }
+.card-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
+.card-title { font-size: var(--text-base); font-weight: 600; line-height: 1.35; }
+.rating { display: flex; align-items: center; gap: 4px; font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
+.rating .count { color: var(--muted); font-weight: 400; }
+.card-meta { font-size: var(--text-sm); color: var(--muted); line-height: 1.5; }
+.card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-2); }
+.stars { display: flex; gap: 2px; color: var(--fg); }
+.stars .off { color: var(--border); }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.tag-outline { background: var(--surface); color: var(--fg); border: 1px solid var(--border); }
+
+/* Mini cards strip */
+.mini-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-4); }
+.mini { display: flex; gap: var(--space-2); align-items: center; }
+.mini img { width: 44px; height: 44px; border-radius: var(--radius-sm); object-fit: cover; background: var(--border); flex: none; }
+.mini b { display: block; font-size: var(--text-sm); font-weight: 600; line-height: 1.3; }
+.mini span { font-size: var(--text-xs); color: var(--muted); letter-spacing: 0.01em; }
+
+/* Palette */
+.swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); }
+.sw {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface);
+}
+.sw-chip { height: 38px; display: flex; align-items: flex-end; padding: 6px 8px; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.02em; }
+.sw-info { padding: 6px 8px 8px; }
+.sw-role { font-size: var(--text-xs); font-weight: 600; }
+.sw-hex { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0; }
+.sw-cr { font-size: 11px; color: var(--muted); letter-spacing: 0.01em; line-height: 1.35; margin-top: 2px; }
+.sw-cr b { color: var(--fg); font-weight: 600; }
+
+/* Type */
+.specimen {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+}
+.specimen em { font-style: normal; color: var(--muted); font-weight: 500; }
+.body-copy { max-width: 58ch; margin-top: var(--space-3); color: var(--fg); }
+.fam { margin-top: var(--space-2); font-size: var(--text-xs); color: var(--muted); letter-spacing: 0.01em; }
+.scale { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-2) var(--space-1); }
+.scale-step { display: flex; flex-direction: column; align-items: flex-start; }
+.scale-step span { font-weight: 600; line-height: 1.1; }
+.scale-step code { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.25; }
+
+/* Components */
+.btns { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.btn {
+  font-family: var(--font-body);
+  font-size: var(--text-base); font-weight: 600; letter-spacing: 0.02em;
+  padding: 11px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.btn-primary { background: var(--accent); color: var(--accent-on); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--fg); }
+.btn-secondary:hover { background: var(--bg); }
+.btn-ghost { background: transparent; color: var(--fg); text-decoration: underline; text-underline-offset: 3px; padding-left: 8px; padding-right: 8px; }
+.btn-note { font-size: var(--text-xs); color: var(--muted); margin-top: var(--space-2); letter-spacing: 0.01em; }
+
+.field label { display: block; font-size: var(--text-sm); font-weight: 600; margin-bottom: 6px; }
+.field .box {
+  display: flex; align-items: center; gap: var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 11px 14px;
+  font-size: var(--text-base);
+}
+.field .box span { color: var(--muted); }
+.field .hint { font-size: var(--text-xs); color: var(--muted); margin-top: 6px; letter-spacing: 0.01em; }
+
+.tags { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+.status { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.02em; }
+.status span { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.status small { display: block; width: 100%; font-weight: 400; font-size: 11px; color: var(--muted); padding-left: 14px; letter-spacing: 0.01em; }
+.status i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+/* Shape & space */
+.shape { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.radii { display: flex; gap: var(--space-2); align-items: flex-end; }
+.radii div { text-align: center; font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+.radii i { display: block; width: 34px; height: 34px; border: 1.5px solid var(--fg); border-right: 0; border-bottom: 0; margin-bottom: 4px; background: var(--bg); }
+.ruler { display: flex; align-items: flex-end; gap: 6px; }
+.ruler div { text-align: center; font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+.ruler i { display: block; background: var(--fg); height: 6px; margin: 0 auto 4px; border-radius: 1px; }
+.elev {
+  margin-top: var(--space-4);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--elev-raised);
+  padding: var(--space-3) var(--space-4);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: var(--text-sm);
+}
+.elev code { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .board { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding-left: var(--container-gutter-tablet); padding-right: var(--container-gutter-tablet); }
+  .col-type { grid-column: 1 / -1; order: 3; }
+  .chrome-top, .cats { padding-left: var(--container-gutter-tablet); padding-right: var(--container-gutter-tablet); }
+  .chrome-top { grid-template-columns: auto 1fr; }
+  .chrome-right { display: none; }
+  .search { justify-self: end; }
+}
+@media (max-width: 760px) {
+  .board { grid-template-columns: minmax(0, 1fr); padding: var(--space-5) var(--container-gutter-phone); gap: var(--space-6); }
+  .col-type { order: 0; }
+  .chrome-top { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); padding: var(--space-3) var(--container-gutter-phone); }
+  .cats { padding-left: var(--container-gutter-phone); padding-right: var(--container-gutter-phone); gap: var(--space-5); }
+  .search { justify-self: stretch; }
+  .search-seg { flex: 1; padding: 2px var(--space-3); }
+  .search-seg.opt { display: none; }
+  .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .specimen { font-size: var(--text-3xl); }
+  .title { font-size: var(--text-2xl); }
+  .shape { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="tile" data-od-style-tile>
+
+  <!-- Sticky app chrome: pill search + category row -->
+  <header class="chrome">
+    <div class="chrome-top">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1.1 8.3 3.2 4.5 7 4.5c2.1 0 3.6 1.1 5 2.9 1.4-1.8 2.9-2.9 5-2.9 3.8 0 5.9 3.8 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>
+        </span>
+        It’s a Date
+      </div>
+
+      <div class="search" role="search" aria-label="Find a date idea">
+        <div class="search-seg"><b>Where</b><span>Near Brooklyn, NY</span></div>
+        <div class="search-seg opt"><b>When</b><span>This Friday</span></div>
+        <div class="search-seg opt"><b>Vibe</b><span>Any mood</span></div>
+        <button class="search-btn" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        </button>
+      </div>
+
+      <div class="chrome-right">
+        <span>Share an idea</span>
+        <span class="avatar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <span class="avatar-dot">MJ</span>
+        </span>
+      </div>
+    </div>
+
+    <nav class="cats" aria-label="Categories">
+      <div class="cat is-active">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2.2 1.3-3 3.6-3 6.5V13h3"/></svg>
+        Food
+      </div>
+      <div class="cat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20l7-12 4 6 2.5-3.5L22 20z"/><path d="M7.5 10.6 9 12l1.5-1"/></svg>
+        Adventure
+      </div>
+      <div class="cat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 9.5V20h14V9.5"/><path d="M12 17.5s-3-1.8-3-3.8a1.5 1.5 0 0 1 3-.6 1.5 1.5 0 0 1 3 .6c0 2-3 3.8-3 3.8z"/></svg>
+        Home
+      </div>
+      <div class="cat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3.5"/><path d="M5 21c0-3.9 3.1-7 7-7s7 3.1 7 7"/><path d="M19 4.2c-.8-.9-2.2-.5-2.2.6 0 1.1 2.2 2.4 2.2 2.4s2.2-1.3 2.2-2.4c0-1.1-1.4-1.5-2.2-.6z"/></svg>
+        Self-date
+      </div>
+      <div class="cat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l5 7h-3l4 6H6l4-6H7z"/><path d="M12 16v5"/></svg>
+        Outdoors
+      </div>
+      <div class="cat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-5 9 5"/><path d="M4 9h16M6 9v9M10 9v9M14 9v9M18 9v9M3 20h18"/></svg>
+        Culture
+      </div>
+      <div class="cat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+        Live music
+      </div>
+      <div class="cat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
+        Golden hour
+      </div>
+    </nav>
+  </header>
+
+  <main class="board">
+
+    <!-- Column 1: identity + the hero card -->
+    <section class="col-card">
+      <div class="block">
+        <p class="eyebrow">Style tile · 1 of 3</p>
+        <h1 class="title">Rose Romance</h1>
+        <p class="mood">Tender, clean, quietly swoony. Photos lead; rose only where it counts.</p>
+      </div>
+
+      <div class="block">
+        <article class="card">
+          <div class="card-photo">
+            <img src="https://picsum.photos/seed/sushipicnic/640/480" alt="Placeholder photo for the date idea">
+            <span class="card-badge">Couples’ favourite</span>
+            <span class="card-heart" aria-label="Save">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="rgba(30,26,36,0.35)" stroke="currentColor" stroke-width="2"><path d="M12 20.5s-7.5-4.6-9.5-9.3C1.1 7.8 3.2 4 7 4c2.1 0 3.6 1.1 5 2.9C13.4 5.1 14.9 4 17 4c3.8 0 5.9 3.8 4.5 7.2-2 4.7-9.5 9.3-9.5 9.3z"/></svg>
+            </span>
+            <div class="card-dots"><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="card-body">
+            <div class="card-row">
+              <h3 class="card-title">Sunset sushi picnic</h3>
+              <span class="rating">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>
+                4.9 <span class="count">(128)</span>
+              </span>
+            </div>
+            <p class="card-meta">Brooklyn Bridge Park · 1.2 mi away</p>
+            <p class="card-meta">Takeout omakase, a blanket, golden hour</p>
+            <div class="card-foot">
+              <div class="stars" aria-label="Rated 4 of 5 by you">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>
+                <svg class="off" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>
+              </div>
+              <span class="tag">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2.2 1.3-3 3.6-3 6.5V13h3"/></svg>
+                Food
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <div class="mini-row">
+          <div class="mini">
+            <img src="https://picsum.photos/seed/pottery/120/120" alt="Placeholder photo">
+            <div><b>Pottery for two</b><span>★ 4.8 · Home</span></div>
+          </div>
+          <div class="mini">
+            <img src="https://picsum.photos/seed/trailhead/120/120" alt="Placeholder photo">
+            <div><b>Solo museum night</b><span>★ 4.7 · Self-date</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Column 2: palette + type -->
+    <section class="col-type">
+      <div class="block">
+        <p class="eyebrow">Palette · computed WCAG contrast</p>
+        <div class="swatches">
+          <div class="sw">
+            <div class="sw-chip" style="background: var(--bg); color: var(--fg);">Aa</div>
+            <div class="sw-info"><div class="sw-role">bg</div><div class="sw-hex">#FBF8FA</div><div class="sw-cr">fg on bg <b>16.21:1</b></div></div>
+          </div>
+          <div class="sw">
+            <div class="sw-chip" style="background: var(--surface); color: var(--fg); border-bottom: 1px solid var(--border);">Aa</div>
+            <div class="sw-info"><div class="sw-role">surface</div><div class="sw-hex">#FFFFFF</div><div class="sw-cr">fg on surface <b>17.09:1</b></div></div>
+          </div>
+          <div class="sw">
+            <div class="sw-chip" style="background: var(--fg); color: var(--surface);">Aa</div>
+            <div class="sw-info"><div class="sw-role">fg</div><div class="sw-hex">#1E1A24</div><div class="sw-cr">surface on fg <b>17.09:1</b></div></div>
+          </div>
+          <div class="sw">
+            <div class="sw-chip" style="background: var(--muted); color: var(--surface);">Aa</div>
+            <div class="sw-info"><div class="sw-role">muted</div><div class="sw-hex">#6A6372</div><div class="sw-cr">muted on surface <b>5.77:1</b></div></div>
+          </div>
+          <div class="sw">
+            <div class="sw-chip" style="background: var(--border); color: var(--fg);">Aa</div>
+            <div class="sw-info"><div class="sw-role">border</div><div class="sw-hex">#E9E2E8</div><div class="sw-cr">dividers <b>1.27:1</b> · inputs #918A99 <b>3.33:1</b></div></div>
+          </div>
+          <div class="sw">
+            <div class="sw-chip" style="background: var(--accent); color: var(--accent-on);">Aa</div>
+            <div class="sw-info"><div class="sw-role">accent</div><div class="sw-hex">#CE1A4C</div><div class="sw-cr">white on accent <b>5.42:1</b></div></div>
+          </div>
+          <div class="sw">
+            <div class="sw-chip" style="background: var(--accent-hover); color: var(--accent-on);">Aa</div>
+            <div class="sw-info"><div class="sw-role">hover</div><div class="sw-hex">#A9123C</div><div class="sw-cr">white on hover <b>7.40:1</b></div></div>
+          </div>
+          <div class="sw">
+            <div class="sw-chip" style="background: var(--accent-soft); color: var(--accent-hover);">Aa</div>
+            <div class="sw-info"><div class="sw-role">soft</div><div class="sw-hex">#FBEAF0</div><div class="sw-cr">hover on soft <b>6.39:1</b></div></div>
+          </div>
+        </div>
+        <div class="status" style="margin-top: var(--space-3);">
+          <span><i style="background: var(--success);"></i>success<small>#1F7A4D · 5.32:1</small></span>
+          <span><i style="background: var(--warn);"></i>warn<small>#9A5B00 · 5.43:1</small></span>
+          <span><i style="background: var(--danger);"></i>danger<small>#B42318 · 6.57:1</small></span>
+        </div>
+      </div>
+
+      <div class="block">
+        <p class="eyebrow">Type · Plus Jakarta Sans throughout</p>
+        <p class="specimen">Plan less. <em>Fall&nbsp;more.</em></p>
+        <p class="body-copy">Every idea was tried by a real couple, or someone treating themselves. Rate it out of five, save the ones that make you smile, and find where to go tonight.</p>
+        <p class="fam">Display 600, −0.025em tracking · Body 400, 1.55 leading</p>
+      </div>
+    </section>
+
+    <!-- Column 3: components + shape -->
+    <section class="col-comp">
+      <div class="block">
+        <p class="eyebrow">Buttons</p>
+        <div class="btns">
+          <button class="btn btn-primary">Plan this date</button>
+          <button class="btn btn-secondary">Save idea</button>
+        </div>
+        <p class="btn-note">Rose fill is reserved for one primary action per view</p>
+      </div>
+
+      <div class="block field">
+        <label for="idea">Name your date idea</label>
+        <div class="box" id="idea">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"><path d="M12 20.5s-7.5-4.6-9.5-9.3C1.1 7.8 3.2 4 7 4c2.1 0 3.6 1.1 5 2.9C13.4 5.1 14.9 4 17 4c3.8 0 5.9 3.8 4.5 7.2-2 4.7-9.5 9.3-9.5 9.3z"/></svg>
+          <span>e.g. Midnight ramen crawl</span>
+        </div>
+        <p class="hint">Keep it under 40 characters.</p>
+      </div>
+
+      <div class="block">
+        <p class="eyebrow">Tag + filter chips</p>
+        <div class="tags">
+          <span class="tag">Food</span>
+          <span class="tag tag-outline">Adventure</span>
+          <span class="tag tag-outline">Home</span>
+          <span class="tag tag-outline">Self-date</span>
+        </div>
+      </div>
+
+      <div class="block">
+        <p class="eyebrow">Type scale · 4xl → xs</p>
+        <div class="scale" aria-label="Type scale, 4xl to xs">
+          <div class="scale-step"><span style="font-size: var(--text-4xl); letter-spacing: var(--tracking-display);">Aa</span><code>4xl<br>48</code></div>
+          <div class="scale-step"><span style="font-size: var(--text-3xl); letter-spacing: -0.02em;">Aa</span><code>3xl<br>36</code></div>
+          <div class="scale-step"><span style="font-size: var(--text-2xl); letter-spacing: -0.015em;">Aa</span><code>2xl<br>28</code></div>
+          <div class="scale-step"><span style="font-size: var(--text-xl);">Aa</span><code>xl<br>22</code></div>
+          <div class="scale-step"><span style="font-size: var(--text-lg); font-weight: 500;">Aa</span><code>lg<br>18</code></div>
+          <div class="scale-step"><span style="font-size: var(--text-base); font-weight: 400;">Aa</span><code>base<br>16</code></div>
+          <div class="scale-step"><span style="font-size: var(--text-sm); font-weight: 400;">Aa</span><code>sm<br>14</code></div>
+          <div class="scale-step"><span style="font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.02em;">Aa</span><code>xs<br>12</code></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <p class="eyebrow">Shape &amp; space</p>
+        <div class="shape">
+          <div class="radii">
+            <div><i style="border-top-left-radius: var(--radius-sm);"></i>sm 8</div>
+            <div><i style="border-top-left-radius: var(--radius-md);"></i>md 12</div>
+            <div><i style="border-top-left-radius: var(--radius-lg);"></i>lg 20</div>
+          </div>
+          <div class="ruler">
+            <div><i style="width: var(--space-1);"></i>4</div>
+            <div><i style="width: var(--space-2);"></i>8</div>
+            <div><i style="width: var(--space-3);"></i>12</div>
+            <div><i style="width: var(--space-4);"></i>16</div>
+            <div><i style="width: var(--space-5);"></i>24</div>
+            <div><i style="width: var(--space-6);"></i>32</div>
+          </div>
+        </div>
+        <div class="elev">
+          <span>Raised surface</span>
+          <code>--elev-raised</code>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+</body>
+</html>
