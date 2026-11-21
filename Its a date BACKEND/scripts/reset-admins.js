@@ -19,20 +19,60 @@ if (!email || !name || !dbName) {
   process.exit(1)
 }
 
-// Line source: hidden prompts on a TTY, plain lines from stdin when piped.
+// Line source: prompts on a TTY, plain lines from stdin when piped.
 const isTTY = process.stdin.isTTY
-let rl
 let pipedLines
 let pipedIdx = 0
 
 async function init() {
-  if (isTTY) {
-    rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true })
-  } else {
+  if (!isTTY) {
     const chunks = []
     for await (const c of process.stdin) chunks.push(c)
     pipedLines = Buffer.concat(chunks).toString("utf8").split(/\r?\n/)
   }
+}
+
+// Visible line: the console echoes typing itself; readline gets no output stream,
+// so it can't redraw (and erase) the prompt label.
+function readVisibleLine() {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, terminal: false })
+    rl.once("line", (line) => {
+      rl.close()
+      resolve(line)
+    })
+  })
+}
+
+// Hidden line: raw mode, nothing echoed. Enter finishes, Backspace deletes, Ctrl+C quits.
+function readHiddenLine() {
+  return new Promise((resolve) => {
+    const stdin = process.stdin
+    let buf = ""
+    const finish = () => {
+      stdin.removeListener("data", onData)
+      stdin.setRawMode(false)
+      stdin.pause()
+      process.stdout.write("\n")
+      resolve(buf)
+    }
+    const onData = (chunk) => {
+      for (const ch of chunk) {
+        if (ch === "\r" || ch === "\n") return finish()
+        if (ch === "\u0003") {
+          stdin.setRawMode(false)
+          process.stdout.write("\nCancelled, nothing written\n")
+          process.exit(130)
+        }
+        if (ch === "\u007f" || ch === "\b") buf = buf.slice(0, -1)
+        else if (ch >= " ") buf += ch
+      }
+    }
+    stdin.setEncoding("utf8")
+    stdin.setRawMode(true)
+    stdin.on("data", onData)
+    stdin.resume()
+  })
 }
 
 function ask(question, hidden) {
@@ -40,16 +80,8 @@ function ask(question, hidden) {
     process.stdout.write(question + "\n")
     return Promise.resolve((pipedLines[pipedIdx++] || "").replace(/\r$/, ""))
   }
-  return new Promise((resolve) => {
-    const orig = rl._writeToOutput
-    if (hidden) rl._writeToOutput = () => {}
-    process.stdout.write(question)
-    rl.question("", (answer) => {
-      rl._writeToOutput = orig
-      if (hidden) process.stdout.write("\n")
-      resolve(answer)
-    })
-  })
+  process.stdout.write(question)
+  return hidden ? readHiddenLine() : readVisibleLine()
 }
 
 async function main() {
@@ -80,7 +112,6 @@ async function main() {
       console.error("DB name did not match, aborting")
       process.exit(1)
     }
-    if (rl) rl.close()
 
     const hash = await bcrypt.hash(pw, 10)
     const demoted = await users.updateMany({}, { $set: { isAdmin: false } })
