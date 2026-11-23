@@ -1,6 +1,6 @@
 # START HERE — resuming the It's a Date modernization
 
-Last updated: 2026-11-23. Read this first in a new session, then the files it points to.
+Last updated: 2026-11-23 (after Phase 1). Read this first in a new session, then the files it points to.
 
 ## How to resume
 
@@ -13,11 +13,21 @@ Last updated: 2026-11-23. Read this first in a new session, then the files it po
 
 1. Spec (approved): `docs/superpowers/specs/2026-11-20-its-a-date-modernization-design.md`
 2. Roadmap (phases, agents, order, branch rules): `docs/superpowers/plans/2026-11-20-00-roadmap.md`
-3. **Next plan to execute: `docs/superpowers/plans/2026-11-20-phase-1-foundation.md`** (branch `phase-1-foundation`, cut from `modernize`)
+3. Phase 1 plan (executed): `docs/superpowers/plans/2026-11-20-phase-1-foundation.md`. **Next: once the Phase 1 PR is merged into `modernize`, write the Phase 2, 3 and 4 plans** with superpowers:writing-plans (they run in parallel, each on its own branch cut from `modernize`).
 4. Style guide for any UI work: `DESIGN.md` (Coral Friendly)
 5. For history only: the Phase 0 plan and its ledger, `.superpowers/sdd/2026-11-20-phase-0-security/progress.md`
 
 ## Where things stand
+
+**Phase 1 is built and reviewed (2026-11-23); its PR into `modernize` awaits the owner's merge.**
+- Branch `phase-1-foundation`: npm workspaces `packages/shared` (Zod contracts, DTOs), `apps/api` (Express 5 skeleton, `/healthz`, port 4000), `apps/web` (Vite + React 19 skeleton, port 5173, proxies `/api` to 4000). The old apps now live in `apps/api/legacy/` and `apps/web/legacy/`. Root `npm run ci` passes, and so does a fresh clone. GitHub Actions runs `prettier --check` and `npm run ci`. Husky + lint-staged pre-commit.
+- The local `.env` moved to **`apps/api/legacy/.env`** (still untracked and ignored). The legacy scripts (`reset-admins`, `copy-to-dev`) run from `apps/api/legacy`.
+- Node engines: `^22.22.2 || >=24.15.0` (the lockfile's real floor).
+
+**Notes for the Phase 2–4 plans (from the Phase 1 final review):**
+- Phase 2: Express 5's `req.query` is a read-only getter, so `validate()` must store parsed input elsewhere (e.g. `res.locals` or a typed `req.validated`). Check on the server that image URLs and `publicId` belong to the app's own Cloudinary folder (the shared schema only enforces https). Add error middleware (malformed JSON or an oversize body returns HTML today), env validation, SIGTERM shutdown, and `eslint .` for the api's config files. Dedupe is already enforced: `tagIds` must be unique.
+- Phase 3: query fields in `ideaQuerySchema`/`placesQuerySchema` are preprocessed (an empty string means absent), so their Zod *input* type is `unknown`. Forms should type with `z.input<>`. The exported `*Input`/`IdeaQuery` names are *output* types. Split web tsconfig into app and node configs (today `src/` sees Node types). `loginSchema` is deliberately lenient (no email-format check, password up to 1024) so legacy users can still log in; `registerSchema` is strict (password ≤ 72 bytes).
+- Phase 7: `"prepare": "husky"` fails on installs without dev deps (Render with `NODE_ENV=production`). Use `npm ci --include=dev` or `HUSKY=0`.
 
 **Phase 0 is done (2026-11-22).**
 - `main` has PR #1 (secrets and `node_modules` untracked, admin routes locked, open admin signup removed, dev DB and admin-reset scripts) and PR #2 (reset-admins prompt fix). Both are deployed on Render.
@@ -28,7 +38,7 @@ Last updated: 2026-11-23. Read this first in a new session, then the files it po
 
 **Local setup (the owner's PC):**
 - `Its a date BACKEND/.env` is untracked and git-ignored. It was recreated on 2026-11-23 and points at **`itsadate_dev`** (verified: 20 ideas, 1 admin, the dev test account "Owner"). It has `DNS_SERVERS=1.1.1.1,8.8.8.8`, because Node can't resolve `mongodb+srv` on this PC, and `PORT=4200`. Its `JWT_SECRET` is local-only and differs from production.
-- **This `.env` is irreplaceable without the owner**: only the owner has the DB password. Never delete, print or stage it. Phase 1 Task 1 moves it to `apps/api/legacy/.env`; the plan says how.
+- **This `.env` is irreplaceable without the owner**: only the owner has the DB password. Never delete, print or stage it. Since Phase 1 it lives at `apps/api/legacy/.env`. When Phase 2's API first needs the DB, the owner copies the values into `apps/api/.env`.
 - **Never check out a commit from before Phase 0** (`e1cf2fe` or older). It overwrites, then deletes, the local `.env` and `node_modules`. This happened on 2026-11-22. To update a stale branch, use `git fetch` and `git branch -f`.
 - Prod and dev share one cluster and one DB user. Only the database name at the end of `MONGODB_URI` differs: `/ItsADate` exists only in Render's env vars, and `/itsadate_dev` is in the local `.env`. Scripts reach prod only with an explicit `--db ItsADate` and a typed confirmation.
 
