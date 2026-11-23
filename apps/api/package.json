@@ -7,14 +7,17 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsup",
     "start": "node dist/server.js",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint ."
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^22",
     "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^5.1.1",
     "supertest": "^7.3.2",
     "tsup": "^9.0.0",
     "tsx": "^4.23.15",
@@ -22,7 +25,12 @@
   },
   "dependencies": {
     "@itsadate/shared": "*",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "express": "^5.3.0",
+    "helmet": "^8.3.0",
+    "pino": "^10.4.0",
+    "pino-http": "^11.0.0",
     "zod": "^4.6.7"
   }
 }

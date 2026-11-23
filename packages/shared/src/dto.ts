@@ -62,3 +62,14 @@ export type ApiErrorCode =
 export interface ApiErrorBody {
   error: { code: ApiErrorCode; message: string; details?: unknown };
 }
+
+export interface ValidationIssue {
+  location: 'body' | 'query' | 'params';
+  /** Dot-joined path, e.g. `image.url`; empty string for the root. */
+  path: string;
+  message: string;
+}
+
+export interface ValidationErrorDetails {
+  issues: ValidationIssue[];
+}
