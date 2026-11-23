@@ -13,8 +13,14 @@ export default defineConfig(
   globalIgnores(['**/legacy/**', '**/dist/**', '**/coverage/**', '.open-design/**']),
   {
     files: ['**/*.{js,mjs,cjs,ts,tsx}'],
+    ignores: ['apps/web/src/**'],
     extends: [js.configs.recommended],
     languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    files: ['apps/web/src/**/*.{ts,tsx}'],
+    extends: [js.configs.recommended],
+    languageOptions: { globals: { ...globals.browser } },
   },
   {
     files: ['**/*.{ts,tsx}'],
@@ -26,6 +32,5 @@ export default defineConfig(
   {
     files: ['apps/web/**/*.{ts,tsx}'],
     extends: [reactHooks.configs.flat.recommended, jsxA11y.flatConfigs.recommended],
-    languageOptions: { globals: { ...globals.browser } },
   },
 );
