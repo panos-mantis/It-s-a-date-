@@ -21,3 +21,24 @@ describe('places schemas', () => {
     expect(geocodeQuerySchema.safeParse({ q: 'a' }).success).toBe(false);
   });
 });
+
+describe('places schemas empty and strict values', () => {
+  it('rejects empty or null coordinates', () => {
+    expect(placesQuerySchema.safeParse({ ideaId: id, lat: '', lng: '' }).success).toBe(false);
+    expect(placesQuerySchema.safeParse({ ideaId: id, lat: null, lng: null }).success).toBe(false);
+    expect(placesQuerySchema.safeParse({ ideaId: id, lat: '0', lng: '' }).success).toBe(false);
+  });
+  it('treats empty radius as default', () => {
+    expect(placesQuerySchema.parse({ ideaId: id, lat: '1', lng: '2', radius: '' }).radius).toBe(
+      3000,
+    );
+  });
+  it('accepts signed decimals, rejects exponent/hex', () => {
+    expect(placesQuerySchema.parse({ ideaId: id, lat: '-37.5', lng: '+23.7' })).toMatchObject({
+      lat: -37.5,
+      lng: 23.7,
+    });
+    expect(placesQuerySchema.safeParse({ ideaId: id, lat: '1e1', lng: '0' }).success).toBe(false);
+    expect(placesQuerySchema.safeParse({ ideaId: id, lat: '0x10', lng: '0' }).success).toBe(false);
+  });
+});
