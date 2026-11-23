@@ -44,12 +44,16 @@
 
 - [ ] **Step 1: Branch and move**
 
+First, stop any running `node`/`npm` processes for this repo; on Windows, open handles block the folder rename. Then delete the on-disk `node_modules` in both old folders. They're untracked since Phase 0, and deleting them first keeps the move fast and avoids locked-file errors.
+
 ```bash
 git switch modernize && git pull && git switch -c phase-1-foundation
+mkdir -p apps/api apps/web
 git mv "Its a date BACKEND" apps/api/legacy
 git mv its-a-date-frontend apps/web/legacy
 ```
-Delete the moved folders' on-disk `node_modules` (they're untracked since Phase 0).
+
+**Keep the owner's local `.env`.** `Its a date BACKEND/.env` is untracked, git-ignored and can't be recovered if lost: it holds the rotated DB password and points at `itsadate_dev`. After the move, check that it is at `apps/api/legacy/.env`. If git left it behind in the old folder, move it there by hand. Never delete it, print it or stage it. Until Phase 2 replaces them, the legacy scripts (`reset-admins`, `copy-to-dev`) run from `apps/api/legacy` and read that file. When the new API first needs the database (Phase 2), the owner copies the values into `apps/api/.env`. Expected afterwards: `Its a date BACKEND/` and `its-a-date-frontend/` no longer exist, and `git check-ignore apps/api/legacy/.env` prints the path.
 
 - [ ] **Step 2: Root `package.json`**
 

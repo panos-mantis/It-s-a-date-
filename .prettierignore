@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+**/legacy
+.open-design
+package-lock.json
+docs
+*.md
