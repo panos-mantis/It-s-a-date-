@@ -3,7 +3,7 @@ An app where people can upload date ideas rate them filter them and find places 
 
 ## Local setup (work in progress)
 
-Requirements: Node 22+ and npm.
+Requirements: Node ^22.22.2 or >=24.15.0 and npm.
 
 ```bash
 git clone <repo-url> its-a-date

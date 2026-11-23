@@ -10,7 +10,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    // Absolute so it resolves when vitest is launched from the repo root.
+    // Absolute path so it resolves regardless of the cwd vitest is launched from.
     setupFiles: [fileURLToPath(new URL('./src/test/setup.ts', import.meta.url))],
     include: ['src/**/*.test.{ts,tsx}'],
   },
