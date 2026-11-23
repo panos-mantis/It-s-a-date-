@@ -1,5 +1,7 @@
 # Phase 0 — Security & Repo Hygiene Implementation Plan
 
+> **Status: DONE (2026-11-22).** PR #1 (Tasks 1–4) and PR #2 (reset-admins prompt fix) are merged into `main`. The owner ran `reset-admins` on `ItsADate`: 12 admins were demoted, and the one admin is now `png.mantis@gmail.com`. The live API returns 401 on admin routes, and `/user/register/admin` is gone (404). The owner logged in at the live `/Admin`. `modernize` was created from `main` at `fbae295` and pushed. Optional Task 6 (history purge) was not run; that's the owner's call. Execution log, rulings (R1–R6) and deferred minor findings: `.superpowers/sdd/2026-11-20-phase-0-security/progress.md`. The checkboxes below were not ticked during execution; this note is the record.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Stop leaking secrets, protect the live site from its open admin routes, and give development its own database. No new features.
