@@ -1,26 +1,35 @@
 # START HERE — resuming the It's a Date modernization
 
-Last updated: 2026-11-23 (after Phase 1). Read this first in a new session, then the files it points to.
+Last updated: 2026-11-24 (Phase 1 merged). Read this first in a new session, then the files it points to.
 
 ## How to resume
 
 1. Open the folder `C:\Users\manti\Desktop\its-a-date` in VS Code and start a **new** Claude Code conversation.
-2. Say: **"Read docs/superpowers/START-HERE.md, then execute Phase 1 using subagent-driven development."**
+2. Next up are Phases 2, 3 and 4. They can run in parallel, one Claude Code conversation each. Their plans aren't written yet. Each conversation writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below. Then it executes the plan.
+   - **Phase 2 (API) is the critical path and runs in the main folder.** It's the only phase that needs the local `.env`. Say: **"Read docs/superpowers/START-HERE.md, then write the Phase 2 plan and execute it using subagent-driven development."**
+   - **Phase 3 (web foundation)** can optionally run in parallel. Use the same prompt with "Phase 3", and add "Work in a git worktree, not the main folder."
+   - **Phase 4 (designs)** can optionally run in parallel. It needs the owner present to sign off the Home and Idea detail screens. Use the same prompt with "Phase 4", plus the worktree line.
+3. Each phase ends with its own PR into `modernize`. Phase 5 starts after 2, 3 and 4 have merged.
 
-**Execution method (owner's choice): agent per task.** Use superpowers:subagent-driven-development. Each task gets a fresh implementer agent, using the project agent named for that phase in the roadmap (Phase 1: `itsadate-platform`). Each task then gets a fresh `itsadate-reviewer` check before the next one starts. Keep the ledger in `.superpowers/sdd/<date>-phase-N-<name>/progress.md`, as Phase 0 did.
+**Execution method (owner's choice): agent per task.** Use superpowers:subagent-driven-development.
+- Each task gets a fresh implementer agent, using the project agent named for that phase in the roadmap: Phase 2 `itsadate-api`, Phase 3 `itsadate-web`, Phase 4 `itsadate-designer`.
+- Each task then gets a fresh `itsadate-reviewer` check before the next one starts.
+- The phase ends with a whole-branch review on the most capable model.
+- Keep the ledger in `.superpowers/sdd/<date>-phase-N-<name>/progress.md`.
+- Plan files go in `docs/superpowers/plans/` as `<date>-phase-N-<name>.md`. Use the Phase 1 plan as the format model.
 
 ## Read in this order
 
 1. Spec (approved): `docs/superpowers/specs/2026-11-20-its-a-date-modernization-design.md`
 2. Roadmap (phases, agents, order, branch rules): `docs/superpowers/plans/2026-11-20-00-roadmap.md`
-3. Phase 1 plan (executed): `docs/superpowers/plans/2026-11-20-phase-1-foundation.md`. **Next: once the Phase 1 PR is merged into `modernize`, write the Phase 2, 3 and 4 plans** with superpowers:writing-plans (they run in parallel, each on its own branch cut from `modernize`).
+3. Phase 1 plan (done; the format model for new plans): `docs/superpowers/plans/2026-11-20-phase-1-foundation.md`. The Phase 1 code to build on is `packages/shared/src/` (contract names are binding), `apps/api/src/app.ts` and `apps/web/`.
 4. Style guide for any UI work: `DESIGN.md` (Coral Friendly)
 5. For history only: the Phase 0 plan and its ledger, `.superpowers/sdd/2026-11-20-phase-0-security/progress.md`
 
 ## Where things stand
 
-**Phase 1 is built and reviewed (2026-11-23); its PR into `modernize` awaits the owner's merge.**
-- Branch `phase-1-foundation`: npm workspaces `packages/shared` (Zod contracts, DTOs), `apps/api` (Express 5 skeleton, `/healthz`, port 4000), `apps/web` (Vite + React 19 skeleton, port 5173, proxies `/api` to 4000). The old apps now live in `apps/api/legacy/` and `apps/web/legacy/`. Root `npm run ci` passes, and so does a fresh clone. GitHub Actions runs `prettier --check` and `npm run ci`. Husky + lint-staged pre-commit.
+**Phase 1 is done: merged into `modernize` on 2026-11-23 (PR #3), CI green.**
+- `modernize` now has: npm workspaces `packages/shared` (Zod contracts, DTOs), `apps/api` (Express 5 skeleton, `/healthz`, port 4000), `apps/web` (Vite + React 19 skeleton, port 5173, proxies `/api` to 4000). The old apps now live in `apps/api/legacy/` and `apps/web/legacy/`. Root `npm run ci` passes, and so does a fresh clone. GitHub Actions runs `prettier --check` and `npm run ci`. Husky + lint-staged pre-commit.
 - The local `.env` moved to **`apps/api/legacy/.env`** (still untracked and ignored). The legacy scripts (`reset-admins`, `copy-to-dev`) run from `apps/api/legacy`.
 - Node engines: `^22.22.2 || >=24.15.0` (the lockfile's real floor).
 
