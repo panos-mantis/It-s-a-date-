@@ -4,3 +4,5 @@ coverage
 **/legacy
 .open-design
 package-lock.json
+docs
+*.md
