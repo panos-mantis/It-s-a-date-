@@ -4,3 +4,7 @@ export { EmptyState } from './EmptyState';
 export { Input } from './Input';
 export { CardSkeleton, Skeleton } from './Skeleton';
 export { ToastProvider, useToast } from './Toast';
+export { Card } from './Card';
+export { CategoryRow } from './CategoryRow';
+export { SearchBar, type SearchValues } from './SearchBar';
+export { StarRating, StarRatingInput } from './StarRating';
