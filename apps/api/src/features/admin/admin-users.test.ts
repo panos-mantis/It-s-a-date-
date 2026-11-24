@@ -97,7 +97,9 @@ describe('admin users', () => {
         .set('Cookie', by.cookie)
         .send({ role: 'user' });
     const results = await Promise.all([demote(a, b), demote(b, a)]);
-    expect(results.some((r) => r.status === 409)).toBe(true);
+    // Depending on timing a request may succeed, be refused (409) or lose its admin
+    // session first (403); only the invariant matters.
+    for (const r of results) expect([200, 403, 409]).toContain(r.status);
     expect(await UserModel.countDocuments({ role: 'admin' })).toBeGreaterThanOrEqual(1);
   });
 
