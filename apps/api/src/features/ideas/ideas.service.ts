@@ -1,5 +1,8 @@
-import type { IdeaDTO, IdeaQuery, Paginated } from '@itsadate/shared';
-import { notFound } from '../../lib/errors.js';
+import type { Types } from 'mongoose';
+import type { IdeaCreateInput, IdeaDTO, IdeaQuery, Paginated } from '@itsadate/shared';
+import type { Env } from '../../config/env.js';
+import { notFound, validationError } from '../../lib/errors.js';
+import { isOwnImage } from '../../lib/images.js';
 import type { AuthContext } from '../../types/auth.js';
 import { tagsRepository } from '../tags/tags.repository.js';
 import { toIdeaDTOs } from './ideas.mapper.js';
@@ -39,5 +42,51 @@ export const ideasService = {
     if (!allowed) throw notFound('Idea not found');
     const [dto] = await toIdeaDTOs([idea], viewer?.userId);
     return dto!;
+  },
+
+  /** Checks what the schema cannot: our own image and existing tags. Throws a 422. */
+  async assertIdeaInput(input: Partial<IdeaCreateInput>, env: Env): Promise<void> {
+    const issues: { location: 'body'; path: string; message: string }[] = [];
+    if (input.image && !isOwnImage(input.image, env)) {
+      issues.push({
+        location: 'body',
+        path: 'image',
+        message: "Use an image uploaded through It's a Date",
+      });
+    }
+    if (input.tagIds) {
+      const existing = new Set(await tagsRepository.findExistingIds(input.tagIds));
+      if (input.tagIds.some((id) => !existing.has(id))) {
+        issues.push({ location: 'body', path: 'tagIds', message: 'Unknown tag' });
+      }
+    }
+    if (issues.length > 0) throw validationError({ issues });
+  },
+
+  async create(input: IdeaCreateInput, viewer: AuthContext, env: Env): Promise<IdeaDTO> {
+    await ideasService.assertIdeaInput(input, env);
+    const { tagIds, ...rest } = input;
+    const created = await ideasRepository.create({
+      ...rest,
+      tags: tagIds as unknown as Types.ObjectId[],
+      creator: viewer.userId as unknown as Types.ObjectId,
+      status: 'pending',
+    });
+    const idea = await ideasRepository.findById(created.id as string);
+    const [dto] = await toIdeaDTOs([idea!], viewer.userId);
+    return dto!;
+  },
+
+  async listMine(
+    page: { page: number; pageSize: number },
+    viewer: AuthContext,
+  ): Promise<Paginated<IdeaDTO>> {
+    const { items, total } = await ideasRepository.find(
+      { creatorId: viewer.userId },
+      'new',
+      page.page,
+      page.pageSize,
+    );
+    return { items: await toIdeaDTOs(items, viewer.userId), ...page, total };
   },
 };

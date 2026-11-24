@@ -35,6 +35,12 @@ describe('GET /ideas/:id', () => {
     expect((await get(pending._id).set('Cookie', other.cookie)).status).toBe(404);
   });
 
+  it('hides rejected ideas from anonymous visitors and other users', async () => {
+    const { rejected, other } = await seed();
+    expect((await get(rejected._id)).status).toBe(404);
+    expect((await get(rejected._id).set('Cookie', other.cookie)).status).toBe(404);
+  });
+
   it('shows pending to the creator and rejected to an admin', async () => {
     const { pending, rejected, creator, admin } = await seed();
     const own = await get(pending._id).set('Cookie', creator.cookie);

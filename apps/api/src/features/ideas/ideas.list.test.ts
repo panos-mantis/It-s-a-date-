@@ -98,6 +98,12 @@ describe('GET /ideas', () => {
     }
   });
 
+  it('finds a title containing regex characters when searched literally', async () => {
+    await createTestIdea({ creator: user._id, title: 'Picnic (with dessert)' });
+    expect((await list('?q=(')).total).toBe(1);
+    expect((await list('?q=.*')).total).toBe(0);
+  });
+
   it('sorts by top: average, then count', async () => {
     const stats = [
       ['Sushi night', 4.5, 2],
