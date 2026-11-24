@@ -1,7 +1,7 @@
 import type { Role } from '@itsadate/shared';
 import { UserModel, type UserDoc } from '../../models/user.js';
 
-const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+import { escapeRegex } from '../../lib/regex.js';
 
 export const usersRepository = {
   findById(id: string): Promise<UserDoc | null> {

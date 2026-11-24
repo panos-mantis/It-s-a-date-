@@ -11,6 +11,7 @@ import { createLogger } from './lib/logger.js';
 import { authRoutes } from './features/auth/auth.routes.js';
 import { adminRoutes } from './features/admin/admin.routes.js';
 import { tagsRoutes } from './features/tags/tags.routes.js';
+import { ideasRoutes } from './features/ideas/ideas.routes.js';
 import { errorHandler } from './middleware/error.js';
 
 export interface AppDeps {
@@ -57,6 +58,7 @@ export function createApp(deps: AppDeps): Express {
   // Later tasks add one line each here.
   v1.use('/auth', authRoutes(env));
   v1.use('/tags', tagsRoutes());
+  v1.use('/ideas', ideasRoutes(env));
   v1.use('/admin', adminRoutes(env));
   deps.extraRoutes?.(v1);
   app.use('/api/v1', v1);
