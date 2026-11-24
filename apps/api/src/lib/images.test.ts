@@ -42,4 +42,14 @@ describe('isOwnImage', () => {
     expect(isOwnImage({ ...ok, url: ok.url.replace('https', 'http') }, env)).toBe(false);
     expect(isOwnImage(ok, { ...env, CLOUDINARY_CLOUD_NAME: undefined })).toBe(false);
   });
+
+  it('rejects cloudinary transformation segments, allows an optional version', () => {
+    const base = 'https://res.cloudinary.com/demo/image/upload/';
+    const publicId = 'itsadate/dev/x';
+    const at = (mid: string) => isOwnImage({ url: `${base}${mid}${publicId}.jpg`, publicId }, env);
+    expect(at('l_fetch:aHR0cHM6Ly9ldmlsLmV4YW1wbGUveC5wbmc=/')).toBe(false);
+    expect(at('c_scale,w_10000/')).toBe(false);
+    expect(at('v1712/')).toBe(true);
+    expect(at('')).toBe(true);
+  });
 });

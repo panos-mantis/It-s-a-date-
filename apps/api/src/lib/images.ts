@@ -25,8 +25,10 @@ export function isOwnImage(
   }
   if (url.protocol !== 'https:' || url.host !== 'res.cloudinary.com') return false;
   if (url.username || url.password) return false;
-  if (!url.pathname.startsWith(`/${cloud}/image/upload/`)) return false;
-  // The file name is the last part of the public id plus an image extension, and the
-  // whole public id (folder included) must precede it.
-  return EXTENSIONS.some((ext) => url.pathname.endsWith(`/${publicId}.${ext}`));
+  // Only an optional version segment may sit between `upload/` and the public id: any
+  // other segment would be a Cloudinary transformation (e.g. l_fetch:, c_scale,w_10000).
+  const prefix = `/${cloud}/image/upload/`;
+  if (!url.pathname.startsWith(prefix)) return false;
+  const rest = url.pathname.slice(prefix.length).replace(/^v\d+\//, '');
+  return EXTENSIONS.some((ext) => rest === `${publicId}.${ext}`);
 }
