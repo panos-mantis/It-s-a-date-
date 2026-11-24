@@ -3,6 +3,9 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'node',
+    globalSetup: ['./src/test/global-setup.ts'],
+    testTimeout: 15_000,
+    hookTimeout: 60_000,
     include: ['src/**/*.test.ts'],
     coverage: {
       provider: 'v8',

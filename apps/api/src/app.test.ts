@@ -1,6 +1,8 @@
+import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { createApp } from './app.js';
+import { errorHandler } from './middleware/error.js';
 import { testEnv } from './test/env.js';
 import { errorOf } from './test/http.js';
 
@@ -94,5 +96,39 @@ describe('createApp', () => {
   it('sets security headers', async () => {
     const res = await request(app()).get('/healthz');
     expect(res.headers['x-content-type-options']).toBe('nosniff');
+  });
+
+  it('maps other 4xx body-parser errors to a generic 400-range error', async () => {
+    const res = await request(app())
+      .post('/api/v1/anything')
+      .set('Content-Type', 'application/json; charset=foo')
+      .send('{}');
+    expect(res.status).toBe(415);
+    expect(res.headers['content-type']).toMatch(/json/);
+    expect(res.body).toEqual({ error: { code: 'BAD_REQUEST', message: 'Bad request' } });
+  });
+
+  it('does not throw when mounted without pino-http', async () => {
+    const a = express();
+    a.get('/boom', () => {
+      throw new Error('boom');
+    });
+    a.use(errorHandler);
+    const res = await request(a).get('/boom');
+    expect(res.status).toBe(500);
+    expect(errorOf(res).code).toBe('INTERNAL');
+  });
+
+  it('initialises res.locals.validated before routes', async () => {
+    const a = createApp({
+      env: testEnv(),
+      extraRoutes: (router) => {
+        router.get('/locals', (_req, res) => {
+          res.json(res.locals.validated);
+        });
+      },
+    });
+    const res = await request(a).get('/api/v1/locals');
+    expect(res.body).toEqual({});
   });
 });

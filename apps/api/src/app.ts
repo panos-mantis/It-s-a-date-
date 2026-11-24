@@ -39,6 +39,10 @@ export function createApp(deps: AppDeps): Express {
       },
     }),
   );
+  app.use((_req, res, next) => {
+    res.locals.validated = {};
+    next();
+  });
   app.use(express.json({ limit: '100kb' }));
   app.use(cookieParser());
 

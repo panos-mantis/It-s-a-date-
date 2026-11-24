@@ -26,7 +26,13 @@ export const errorHandler: ErrorRequestHandler = (err: unknown, req, res, next) 
     return;
   }
 
-  const e = (err ?? {}) as { type?: string; name?: string; code?: unknown };
+  const e = (err ?? {}) as {
+    type?: unknown;
+    name?: string;
+    code?: unknown;
+    status?: unknown;
+    statusCode?: unknown;
+  };
   if (e.type === 'entity.parse.failed') {
     send(res, 400, { code: 'BAD_REQUEST', message: 'Malformed JSON' });
     return;
@@ -44,6 +50,16 @@ export const errorHandler: ErrorRequestHandler = (err: unknown, req, res, next) 
     return;
   }
 
-  req.log.error({ err, reqId: req.id }, 'unhandled error');
+  const status = typeof e.status === 'number' ? e.status : e.statusCode;
+  if (typeof e.type === 'string' && typeof status === 'number' && status >= 400 && status <= 499) {
+    send(res, status, { code: 'BAD_REQUEST', message: 'Bad request' });
+    return;
+  }
+
+  if (req.log) {
+    req.log.error({ err, reqId: req.id }, 'unhandled error');
+  } else {
+    console.error('unhandled error', err);
+  }
   send(res, 500, { code: 'INTERNAL', message: 'Something went wrong' });
 };
