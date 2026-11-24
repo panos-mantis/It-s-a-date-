@@ -35,3 +35,5 @@ export const paginationSchema = z.object({
 export const budgetSchema = decimalIntegerSchema.pipe(
   z.union([z.literal(BUDGETS[0]), z.literal(BUDGETS[1]), z.literal(BUDGETS[2])]),
 );
+
+export const idParamsSchema = z.object({ id: objectIdSchema });
