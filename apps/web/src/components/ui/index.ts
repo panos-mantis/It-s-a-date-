@@ -1,5 +1,6 @@
 export { Button, buttonClasses } from './Button';
 export { Chip } from './Chip';
+export { Container } from './Container';
 export { EmptyState } from './EmptyState';
 export { Input } from './Input';
 export { CardSkeleton, Skeleton } from './Skeleton';

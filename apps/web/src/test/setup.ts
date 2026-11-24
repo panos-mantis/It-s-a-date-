@@ -9,6 +9,9 @@ import { server } from './msw/server';
 // same `expect` instance the tests use.
 expect.extend(matchers);
 
+// jsdom does not implement scrollTo (ScrollRestoration calls it).
+if (typeof window !== 'undefined') window.scrollTo = () => undefined;
+
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 
 // Vitest `globals` is off, so Testing Library's automatic cleanup is never registered.
