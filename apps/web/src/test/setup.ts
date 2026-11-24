@@ -2,6 +2,7 @@
 import * as matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, expect } from 'vitest';
+import { authStore } from './msw/handlers';
 import { server } from './msw/server';
 
 // Explicit extend (instead of '@testing-library/jest-dom/vitest') so the matchers attach to the
@@ -14,6 +15,7 @@ beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => {
   cleanup();
   server.resetHandlers();
+  authStore.reset();
 });
 
 afterAll(() => server.close());
