@@ -5,16 +5,24 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "create-admin": "tsx src/scripts/create-admin.ts",
+    "migrate": "tsx src/scripts/migrate.ts",
+    "seed": "tsx src/scripts/seed.ts",
     "build": "tsup",
     "start": "node dist/server.js",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint ."
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22",
     "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^5.1.1",
+    "mongodb-memory-server": "^11.4.0",
     "supertest": "^7.3.2",
     "tsup": "^9.0.0",
     "tsx": "^4.23.15",
@@ -22,7 +30,16 @@
   },
   "dependencies": {
     "@itsadate/shared": "*",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.24.11",
+    "pino": "^10.4.0",
+    "pino-http": "^11.0.0",
     "zod": "^4.6.7"
   }
 }

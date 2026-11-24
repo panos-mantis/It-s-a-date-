@@ -6,3 +6,4 @@ export * from './schemas/tags.js';
 export * from './schemas/ideas.js';
 export * from './schemas/ratings.js';
 export * from './schemas/places.js';
+export * from './schemas/admin.js';
