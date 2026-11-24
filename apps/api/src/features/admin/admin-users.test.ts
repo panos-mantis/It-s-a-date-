@@ -88,6 +88,19 @@ describe('admin users', () => {
     expect(ok.status).toBe(200);
   });
 
+  it('never ends with zero admins when two admins demote each other at once', async () => {
+    const a = await createTestUser({ role: 'admin' });
+    const b = await createTestUser({ role: 'admin' });
+    const demote = (target: typeof a, by: typeof a) =>
+      request(app)
+        .post(`${base}/${target.user.id as string}/role`)
+        .set('Cookie', by.cookie)
+        .send({ role: 'user' });
+    const results = await Promise.all([demote(a, b), demote(b, a)]);
+    expect(results.some((r) => r.status === 409)).toBe(true);
+    expect(await UserModel.countDocuments({ role: 'admin' })).toBeGreaterThanOrEqual(1);
+  });
+
   it('requires an admin session on every route (401 and 403)', async () => {
     const { cookie: userCookie } = await createTestUser();
     const id = new Types.ObjectId().toString();
