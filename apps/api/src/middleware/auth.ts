@@ -1,41 +1,45 @@
-import type { Request, RequestHandler } from 'express';
+import type { Request, RequestHandler, Response } from 'express';
+import { isValidObjectId } from 'mongoose';
 import type { Role } from '@itsadate/shared';
 import type { Env } from '../config/env.js';
 import { SESSION_COOKIE, verifySession } from '../features/auth/session.js';
 import { usersRepository } from '../features/users/users.repository.js';
 import { forbidden, unauthorized } from '../lib/errors.js';
-import type { AuthContext } from '../types/auth.js';
+import type { UserDoc } from '../models/user.js';
 
-/** Resolves the cookie to a live user; the role comes from the DB, not the token. */
-async function resolve(req: Request, env: Env): Promise<AuthContext | null> {
+/**
+ * Resolves the cookie to a live user; the role comes from the DB, not the token.
+ * Only a bad token or id yields null; DB failures propagate to the error handler.
+ */
+async function resolve(req: Request, env: Env): Promise<UserDoc | null> {
   const token: unknown = req.cookies?.[SESSION_COOKIE];
   if (typeof token !== 'string' || token === '') return null;
   const claims = verifySession(token, env);
-  if (!claims) return null;
-  try {
-    const user = await usersRepository.findById(claims.sub);
-    return user ? { userId: user.id as string, role: user.role } : null;
-  } catch {
-    return null; // e.g. malformed id
-  }
+  if (!claims || !isValidObjectId(claims.sub)) return null;
+  return usersRepository.findById(claims.sub);
+}
+
+function attach(res: Response, user: UserDoc): void {
+  res.locals.auth = { userId: user.id as string, role: user.role };
+  res.locals.user = user;
 }
 
 export function requireAuth(env: Env): RequestHandler {
   return async (req, res, next) => {
-    const auth = await resolve(req, env);
-    if (!auth) {
+    const user = await resolve(req, env);
+    if (!user) {
       next(unauthorized());
       return;
     }
-    res.locals.auth = auth;
+    attach(res, user);
     next();
   };
 }
 
 export function optionalAuth(env: Env): RequestHandler {
   return async (req, res, next) => {
-    const auth = await resolve(req, env);
-    if (auth) res.locals.auth = auth;
+    const user = await resolve(req, env);
+    if (user) attach(res, user);
     next();
   };
 }

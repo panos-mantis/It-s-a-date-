@@ -1,9 +1,11 @@
 import bcrypt from 'bcryptjs';
 import type { UserDTO } from '@itsadate/shared';
 import request from 'supertest';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../app.js';
 import { UserModel } from '../../models/user.js';
+import { createTestUser } from '../../test/auth.js';
+import { usersRepository } from '../users/users.repository.js';
 import { errorOf } from '../../test/http.js';
 import { testEnv } from '../../test/env.js';
 import { useTestDb } from '../../test/db.js';
@@ -98,6 +100,14 @@ describe('auth', () => {
 
   it('logout works without a cookie', async () => {
     expect((await request(app).post('/api/v1/auth/logout')).status).toBe(204);
+  });
+  it('answers 500 (not 401) when the user lookup fails', async () => {
+    const { cookie } = await createTestUser();
+    const spy = vi.spyOn(usersRepository, 'findById').mockRejectedValueOnce(new Error('db down'));
+    const res = await request(app).get('/api/v1/auth/me').set('Cookie', cookie);
+    spy.mockRestore();
+    expect(res.status).toBe(500);
+    expect(errorOf(res).code).toBe('INTERNAL');
   });
 
   it('rate-limits register and login per app instance', async () => {

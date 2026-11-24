@@ -3,7 +3,6 @@ import type { LoginInput, RegisterInput } from '@itsadate/shared';
 import type { Env } from '../../config/env.js';
 import { unauthorized } from '../../lib/errors.js';
 import { toUserDTO } from '../users/users.mapper.js';
-import { usersRepository } from '../users/users.repository.js';
 import { authService } from './auth.service.js';
 import { clearSessionCookie, setSessionCookie, signSession } from './session.js';
 
@@ -25,8 +24,8 @@ export function authController(env: Env) {
     res.status(204).end();
   };
 
-  const me: RequestHandler = async (_req, res) => {
-    const user = res.locals.auth && (await usersRepository.findById(res.locals.auth.userId));
+  const me: RequestHandler = (_req, res) => {
+    const user = res.locals.user;
     if (!user) throw unauthorized();
     res.json(toUserDTO(user));
   };

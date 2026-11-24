@@ -49,6 +49,10 @@ describe('auth middleware', () => {
     expect(anon.status).toBe(200);
     expect(anon.body).toEqual({ auth: null });
   });
+  it('treats a token with a non-ObjectId subject as unauthenticated', async () => {
+    const bad = cookieFor(jwt.sign({ sub: 'nope', role: 'admin' }, secret, { algorithm: 'HS256' }));
+    expect((await request(app).get('/api/v1/t/auth').set('Cookie', bad)).status).toBe(401);
+  });
 
   it('rejects an expired token', async () => {
     const { user } = await createTestUser();
