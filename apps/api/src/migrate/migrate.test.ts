@@ -262,6 +262,60 @@ describe('runMigration', () => {
     expect(await db.listCollections({ name: 'ideas' }).hasNext()).toBe(false);
   });
 
+  it.each([
+    [
+      'an email group mixes a migrated account with legacy ones',
+      async () => {
+        const registered = at('2021-04-01T00:00:00Z');
+        await db.collection('users').insertOne({
+          _id: registered,
+          name: 'Registered on the new API',
+          email: 'a@x.com',
+          passwordHash: 'h',
+          role: 'user',
+        });
+        return new RegExp(String(registered));
+      },
+    ],
+    [
+      'the ratings collection holds legacy rating docs',
+      async () => {
+        await db.collection('ratings').insertMany([
+          { dateId: String(legacyDateId), ratingsAll: 2, averageRating: 4 },
+          { dateId: String(otherId), ratingsAll: 1, averageRating: 5 },
+        ]);
+        return /ratings: 2 legacy/;
+      },
+    ],
+    [
+      'a legacy user has no password',
+      async () => {
+        await db.collection('users').updateOne({ _id: userB }, { $unset: { password: '' } });
+        return new RegExp(String(userB));
+      },
+    ],
+  ])('aborts with nothing written when %s', async (_case, arrange) => {
+    const pattern = await arrange();
+    await expect(runMigration(db, { dryRun: true })).rejects.toThrow(pattern);
+    await expect(runMigration(db, { dryRun: false })).rejects.toThrow(/nothing was written/);
+    expect(await db.collection('users').countDocuments({ isAdmin: { $exists: true } })).toBe(3);
+    expect(await db.collection('tags').countDocuments({ tagName: { $exists: true } })).toBe(3);
+    expect(await db.listCollections({ name: 'dates' }).hasNext()).toBe(true);
+    expect(await db.listCollections({ name: 'ideas' }).hasNext()).toBe(false);
+  });
+
+  it('keeps a role that create-admin set on a legacy account before migrating', async () => {
+    expect((await createAdmin({ email: 'b@x.com', name: 'Bo' })).action).toBe('promoted');
+    const report = await runMigration(db, { dryRun: false });
+    expect(report.users.demoted).toBe(1); // only the legacy isAdmin flag on the oldest A
+    expect((await UserModel.findById(userB))?.role).toBe('admin');
+    expect((await UserModel.findById(oldestA))?.role).toBe('user');
+    const login = await request(createApp({ env: testEnv() }))
+      .post('/api/v1/auth/login')
+      .send({ email: 'b@x.com', password: 'pw-b' });
+    expect(login.status).toBe(200);
+  });
+
   it('refuses to write to a database other than the mongoose connection', async () => {
     const other = mongoose.connection.getClient().db(`${db.databaseName}_other`);
     await expect(runMigration(other, { dryRun: false })).rejects.toThrow(/connection/);

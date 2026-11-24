@@ -5,6 +5,7 @@ import mongoose, { type mongo } from 'mongoose';
 import { connectDb, disconnectDb } from '../db/connect.js';
 import { runMigrationWithDetails } from '../migrate/migrate.js';
 import { parseArgs, type ParsedArgs } from './lib/args.js';
+import { describeScriptError } from './lib/describe-error.js';
 import { confirmTarget, loadScriptEnv, resolveTarget } from './lib/target.js';
 
 const USAGE = 'Usage: npm run migrate -w @itsadate/api -- [--dry-run] [--verbose] [--db <dbname>]';
@@ -51,6 +52,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((e: unknown) => {
-  console.error(e instanceof Error ? e.message : 'Unexpected error');
+  console.error(describeScriptError(e));
   process.exit(1);
 });

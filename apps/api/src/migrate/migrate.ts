@@ -36,8 +36,10 @@ interface RawUser {
   _id: ObjectId;
   email?: unknown;
   isAdmin?: unknown;
+  role?: unknown;
   /** Computed in the projection: `password` or `isAdmin` present. The hash is never loaded. */
   legacy: boolean;
+  hasPassword: boolean;
 }
 interface RawDate {
   _id: ObjectId;
@@ -83,6 +85,8 @@ interface Snapshot {
   dates: RawDate[] | null;
   /** `_id`s of dates that already exist in `ideas`. */
   copiedIdeaIds: Set<string>;
+  /** Docs in `ratings` without an `idea` field (legacy Ratings.js shape). */
+  legacyRatings: number;
 }
 
 async function collectionExists(db: mongo.Db, name: string): Promise<boolean> {
@@ -99,20 +103,24 @@ async function takeSnapshot(db: mongo.Db): Promise<Snapshot> {
         projection: {
           email: 1,
           isAdmin: 1,
+          role: 1,
           legacy: { $or: [present('$password'), present('$isAdmin')] },
+          hasPassword: present('$password'),
         },
       },
     )
     .toArray();
+  const legacyRatings = await db.collection('ratings').countDocuments({ idea: { $exists: false } });
   if (!(await collectionExists(db, 'dates'))) {
-    return { tags, users, dates: null, copiedIdeaIds: new Set() };
+    return { tags, users, dates: null, copiedIdeaIds: new Set(), legacyRatings };
   }
   const dates = await db.collection<RawDate>('dates').find({}).toArray();
   const copied = await db
     .collection('ideas')
     .find({ _id: { $in: dates.map((d) => d._id) } }, { projection: { _id: 1 } })
     .toArray();
-  return { tags, users, dates, copiedIdeaIds: new Set(copied.map((d) => hex(d._id))) };
+  const copiedIdeaIds = new Set(copied.map((d) => hex(d._id)));
+  return { tags, users, dates, copiedIdeaIds, legacyRatings };
 }
 
 interface TagOut {
@@ -212,6 +220,9 @@ function planTags(snap: Snapshot, problems: string[]) {
 function planUsers(snap: Snapshot, problems: string[]) {
   const groups = new Map<string, RawUser[]>();
   for (const u of snap.users) {
+    if (u.legacy && !u.hasPassword) {
+      problems.push(`user ${hex(u._id)}: legacy account without a password`);
+    }
     if (!nonEmpty(u.email)) {
       problems.push(`user ${hex(u._id)}: missing email`);
       continue;
@@ -226,18 +237,21 @@ function planUsers(snap: Snapshot, problems: string[]) {
   const creatorMap = new Map<string, ObjectId>();
   const mergedEmailGroupSizes: number[] = [];
   const convert: Plan['users']['convert'] = [];
+  let demoted = 0;
 
   for (const [email, members] of groups) {
     members.sort(oldestFirst);
-    const modern = members.filter((u) => !u.legacy);
-    if (modern.length > 1) {
+    // A group mixing migrated and legacy accounts can only come from writes outside the migration
+    // (e.g. a sign-up on the new API before it ran). Which account to keep is the owner's call.
+    if (members.length > 1 && members.some((u) => !u.legacy)) {
+      const ids = members.map((u) => `${hex(u._id)}${u.legacy ? '' : ' (migrated)'}`);
       problems.push(
-        `users ${modern.map((u) => hex(u._id)).join(', ')}: migrated accounts share an email`,
+        `users ${ids.join(', ')}: share an email but are not all legacy; merge by hand`,
       );
       continue;
     }
-    // Oldest account wins; an account already in the new shape is never touched, so it wins too.
-    const keeper = (modern[0] ?? members[0]) as RawUser;
+    // The oldest account wins, with its password hash.
+    const keeper = members[0] as RawUser;
     const dups = members.filter((u) => u !== keeper);
     if (dups.length) {
       mergedEmailGroupSizes.push(members.length);
@@ -247,7 +261,11 @@ function planUsers(snap: Snapshot, problems: string[]) {
         creatorMap.set(hex(u._id), keeper._id);
       }
     }
-    if (keeper.legacy) convert.push({ _id: keeper._id, email });
+    if (keeper.legacy) {
+      convert.push({ _id: keeper._id, email });
+      // The legacy flag is dropped; a role create-admin already set is kept (see apply()).
+      if (keeper.isAdmin === true && keeper.role !== 'admin') demoted++;
+    }
   }
 
   return {
@@ -255,7 +273,7 @@ function planUsers(snap: Snapshot, problems: string[]) {
       converted: legacy.length,
       merged: mergedEmailGroupSizes.length,
       deleted: deleteIds.length,
-      demoted: legacy.filter((u) => u.isAdmin === true).length,
+      demoted,
     },
     ops: { repoint, deleteIds, convert },
     creatorMap,
@@ -319,6 +337,11 @@ async function plan(db: mongo.Db): Promise<Plan> {
   const tags = planTags(snap, problems);
   const users = planUsers(snap, problems);
   const ideas = planIdeas(snap, tags.bySlug, users.creatorMap, problems);
+  if (snap.legacyRatings) {
+    problems.push(
+      `ratings: ${snap.legacyRatings} legacy rating docs (no "idea" field); move or drop them first`,
+    );
+  }
   if (problems.length) {
     throw new Error(
       `Legacy data needs fixing first, nothing was written:\n- ${problems.join('\n- ')}`,
@@ -397,12 +420,8 @@ async function apply(db: mongo.Db, p: Plan): Promise<void> {
   }
   for (const u of p.users.convert) {
     await users.updateOne({ _id: u._id, ...LEGACY_USER }, [
-      { $set: { passwordHash: '$password' } },
-      ...convertPipeline(u._id, { email: u.email, role: 'user' }, [
-        'password',
-        'isAdmin',
-        'personalRates',
-      ]),
+      { $set: { passwordHash: '$password', role: { $ifNull: ['$role', 'user'] } } },
+      ...convertPipeline(u._id, { email: u.email }, ['password', 'isAdmin', 'personalRates']),
     ]);
   }
 
