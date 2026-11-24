@@ -12,5 +12,8 @@ export const SAMPLE_USERS: SeedUser[] = [
   { name: 'Hannah Kim', email: 'hannah@example.com' },
 ];
 
-/** The author of the curated ideas in prod. `.invalid` can never receive mail or be registered. */
+/**
+ * The author of the curated ideas in prod. `.invalid` can never receive mail; registration
+ * rejects reserved domains and the seed refuses to adopt a same-email account it did not create.
+ */
 export const TEAM_USER: SeedUser = { name: "It's a Date team", email: 'team@itsadate.invalid' };

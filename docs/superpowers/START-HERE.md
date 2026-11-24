@@ -44,6 +44,8 @@ Last updated: 2026-11-25 (Phase 2 built, PR pending). Read this first in a new s
 - Phase 6a (ratings and saves):
   - The rating and save routes are not built yet. They must recompute with `ratingsRepository.statsForIdea` and `savesRepository.countForIdea`, then store with `ideasRepository.setRatingStats` and `ideasRepository.setSaveCount`.
   - Unique indexes on (idea, user) for ratings and (user, idea) for saves already exist.
+  - Admin `DELETE` of an idea currently deletes the idea first. Delete its ratings and saves before the idea.
+  - `GET /me/saved` must skip saves whose idea is gone.
 - Phase 7 cutover runbook:
   - Order: back up, deploy, and let the API take no writes. Then run `migrate --dry-run --db ItsADate`, `migrate --db ItsADate`, `create-admin --db ItsADate` and `seed --mode prod --db ItsADate`.
   - `migrate` must run before `create-admin`; otherwise an admin role on a duplicate account can be lost.
@@ -52,6 +54,11 @@ Last updated: 2026-11-25 (Phase 2 built, PR pending). Read this first in a new s
   - Migrated and seeded ideas have `image: null` and keep their legacy `_id`s, which the photo list needs. Images stay null until Cloudinary exists.
   - New ideas can't be created until uploads exist: `isOwnImage` needs `CLOUDINARY_CLOUD_NAME`.
   - The prod to dev refresh for the rehearsal uses `mongodump` and `mongorestore` (`copy-to-dev` is gone).
+  - Verify `req.ip` behind Vercel and Render (`TRUST_PROXY`) and consider `skipSuccessfulRequests` for the login rate limit.
+  - In the rehearsal, log in as the owner on the migrated prod copy. No password-reset tool exists, and `create-admin` never changes a password.
+  - Asset deletion must check that no other idea uses the same `publicId` (`isOwnImage` accepts any image in our folder).
+  - The seed uses `$setOnInsert`, so adding photos to already-seeded ideas needs an explicit update step.
+  - `seedKey`s are frozen literals in `apps/api/src/seed/ideas.ts`. Never edit them.
 - Phase 0 findings now resolved: unapproved ideas readable by id now return 404; `register` returns a `UserDTO` only, never the hash; tokens now expire after 7 days.
 
 **Phase 1 is done: merged into `modernize` on 2026-11-23 (PR #3), CI green.**

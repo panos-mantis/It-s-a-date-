@@ -43,6 +43,11 @@ describe('SEED_IDEAS', () => {
     expect(new Set(SEED_IDEAS.map((i) => i.title.toLowerCase())).size).toBe(SEED_IDEAS.length);
   });
 
+  it('has frozen kebab-case literal seedKeys', () => {
+    for (const i of SEED_IDEAS) expect(i.seedKey).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+    expect(new Set(SEED_IDEAS.map((i) => i.seedKey)).size).toBe(SEED_IDEAS.length);
+  });
+
   it('uses every tag as the first tag of at least 3 ideas', () => {
     for (const t of SEED_TAGS) {
       expect(SEED_IDEAS.filter((i) => i.tags[0] === t.slug).length).toBeGreaterThanOrEqual(3);

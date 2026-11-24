@@ -111,6 +111,18 @@ describe('runSeed prod', () => {
     expect(new Set(ideas.map((i) => i.creator.name))).toEqual(new Set([TEAM_USER.name]));
   });
 
+  it('refuses to adopt a team account the seed did not create', async () => {
+    await UserModel.create({
+      name: 'Mallory',
+      email: TEAM_USER.email,
+      passwordHash: 'x'.repeat(60),
+    });
+    await expect(runSeed({ mode: 'prod' })).rejects.toThrow(
+      `${TEAM_USER.email} exists but was not created by the seed; fix it before seeding`,
+    );
+    expect(await IdeaModel.countDocuments()).toBe(0);
+  });
+
   it('refuses reset', async () => {
     await expect(runSeed({ mode: 'prod', reset: true })).rejects.toThrow();
   });

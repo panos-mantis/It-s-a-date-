@@ -48,6 +48,21 @@ describe('auth', () => {
     expect(bad.status).toBe(422);
   });
 
+  it.each(['a@itsadate.invalid', 'a@x.invalid', 'a@example.com', 'A@Example.org', 'a@example.net'])(
+    'rejects the reserved email %s with 422 at email',
+    async (email) => {
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send({ name: 'Ana', email, password: 'correct-horse' });
+      expect(res.status).toBe(422);
+      expect(errorOf(res).code).toBe('VALIDATION');
+      expect(errorOf(res).details).toEqual({
+        issues: [{ location: 'body', path: 'email', message: 'Use a real email address' }],
+      });
+      expect(await UserModel.countDocuments()).toBe(0);
+    },
+  );
+
   it('logs in, with identical 401s for wrong password and unknown email', async () => {
     await request(app).post('/api/v1/auth/register').send(creds);
     const ok = await request(app)

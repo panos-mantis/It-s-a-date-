@@ -38,8 +38,13 @@ const SAVE_SHARE = 0.3;
 
 /** Creates the user if missing, with a random password nobody ever sees. Returns the user id. */
 async function ensureUser(u: SeedUser): Promise<Types.ObjectId> {
-  const existing = await UserModel.findOne({ email: u.email }).select('_id').exec();
-  if (existing) return existing._id;
+  const existing = await UserModel.findOne({ email: u.email }).select('_id name').exec();
+  if (existing) {
+    if (existing.name !== u.name) {
+      throw new Error(`${u.email} exists but was not created by the seed; fix it before seeding`);
+    }
+    return existing._id;
+  }
   const passwordHash = await authService.hashPassword(randomBytes(24).toString('hex'));
   const created = await UserModel.create({ name: u.name, email: u.email, passwordHash });
   return created._id;

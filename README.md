@@ -31,7 +31,7 @@ Start everything with `npm run dev` (API on http://localhost:4000, web on http:/
 
 ### Database scripts
 
-Run from the repo root. Every script targets `itsadate_dev` unless you pass `--db <name>`; targeting `ItsADate` (prod) needs an explicit `--db ItsADate` and a typed confirmation.
+Run from the repo root. Every script targets the database named in `MONGODB_URI` unless you pass `--db <name>`; targeting `ItsADate` (prod) needs an explicit `--db ItsADate` and a typed confirmation.
 
 ```bash
 # Convert the legacy data to the new schema (idempotent; try --dry-run first)

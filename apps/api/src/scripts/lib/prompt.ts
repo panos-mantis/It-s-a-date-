@@ -27,28 +27,40 @@ export function readVisibleLine(input: NodeJS.ReadableStream = process.stdin): P
   });
 }
 
+// CSI (ESC [ params final) and SS3 (ESC O final) sequences: arrows, Home/End, Delete, F-keys.
+// eslint-disable-next-line no-control-regex
+const ESCAPE_SEQUENCE = /\u001b(?:\[[0-?]*[ -/]*[@-~]|O.)/g;
+
+/** Pure key handling for the hidden prompt. Escape sequences never add characters. */
+export function applyKeys(buf: string, chunk: string): { buf: string; done: boolean } {
+  let out = buf;
+  for (const ch of chunk.replace(ESCAPE_SEQUENCE, '')) {
+    if (ch === '\r' || ch === '\n') return { buf: out, done: true };
+    if (ch === '\u007f' || ch === '\b') out = out.slice(0, -1);
+    else if (ch >= ' ') out += ch;
+  }
+  return { buf: out, done: false };
+}
+
 // Hidden line: raw mode, nothing echoed. Enter finishes, Backspace deletes, Ctrl+C quits.
 function readHiddenLine(): Promise<string> {
   return new Promise((resolve) => {
     const stdin = process.stdin;
     let buf = '';
     const onData = (chunk: string) => {
-      for (const ch of chunk) {
-        if (ch === '\r' || ch === '\n') {
-          stdin.removeListener('data', onData);
-          stdin.setRawMode(false);
-          stdin.pause();
-          process.stdout.write('\n');
-          resolve(buf);
-          return;
-        }
-        if (ch === '\u0003') {
-          stdin.setRawMode(false);
-          process.stdout.write('\nCancelled, nothing written\n');
-          process.exit(130);
-        }
-        if (ch === '\u007f' || ch === '\b') buf = buf.slice(0, -1);
-        else if (ch >= ' ') buf += ch;
+      if (chunk.includes('\u0003')) {
+        stdin.setRawMode(false);
+        process.stdout.write('\nCancelled, nothing written\n');
+        process.exit(130);
+      }
+      const next = applyKeys(buf, chunk);
+      buf = next.buf;
+      if (next.done) {
+        stdin.removeListener('data', onData);
+        stdin.setRawMode(false);
+        stdin.pause();
+        process.stdout.write('\n');
+        resolve(buf);
       }
     };
     stdin.setEncoding('utf8');

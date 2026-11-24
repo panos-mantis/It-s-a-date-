@@ -20,10 +20,11 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      # Before `npm ci`: mongodb-memory-server's postinstall downloads mongod into this path.
       - uses: actions/cache@v4
         with:
           path: /home/runner/.cache/mongodb-binaries
           key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - run: npm ci
       - run: npx prettier --check .
       - run: npm run ci
