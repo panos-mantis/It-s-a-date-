@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { UserModel } from '../../models/user.js';
 import { useTestDb } from '../../test/db.js';
-import { createAdmin } from './create-admin.js';
+import { createAdmin, passwordIssues } from './create-admin.js';
 
 useTestDb();
 
@@ -32,5 +32,12 @@ describe('createAdmin', () => {
       createAdmin({ email: 'new@x.com', name: 'New', password: 'short' }),
     ).rejects.toThrow();
     expect(await UserModel.countDocuments({})).toBe(0);
+  });
+});
+
+describe('passwordIssues', () => {
+  it('explains a rejected password and accepts a good one', () => {
+    expect(passwordIssues('short').length).toBeGreaterThan(0);
+    expect(passwordIssues('long-enough-pw')).toEqual([]);
   });
 });

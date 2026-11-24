@@ -15,12 +15,14 @@ async function nextPipedLine(): Promise<string> {
 
 // Visible line: the console echoes typing itself; readline gets no output stream, so it can't
 // redraw (and erase) the prompt label.
-function readVisibleLine(): Promise<string> {
+export function readVisibleLine(input: NodeJS.ReadableStream = process.stdin): Promise<string> {
   return new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, terminal: false });
+    const rl = readline.createInterface({ input, terminal: false });
+    // EOF (Ctrl+D) closes without a line: settle with '' so callers fail instead of hanging.
+    rl.once('close', () => resolve(''));
     rl.once('line', (line) => {
-      rl.close();
       resolve(line);
+      rl.close();
     });
   });
 }

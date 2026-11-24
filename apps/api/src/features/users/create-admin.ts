@@ -4,6 +4,12 @@ import type { UserDoc } from '../../models/user.js';
 import { authService } from '../auth/auth.service.js';
 import { usersRepository } from './users.repository.js';
 
+/** Human-readable problems with a candidate admin password (empty when it is acceptable). */
+export function passwordIssues(password: string): string[] {
+  const result = registerSchema.shape.password.safeParse(password);
+  return result.success ? [] : result.error.issues.map((i) => i.message);
+}
+
 export interface CreateAdminResult {
   action: 'created' | 'promoted' | 'unchanged';
   user: UserDoc;
