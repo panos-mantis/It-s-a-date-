@@ -20,8 +20,8 @@ try {
       `Missing indexes: ${list}. Run \`npm run migrate -w @itsadate/api\` to build them.`,
     );
   }
-} catch {
-  logger.warn('Could not check indexes');
+} catch (e) {
+  logger.warn(`Could not check indexes: ${e instanceof Error ? e.message : 'unknown error'}`);
 }
 
 const server = app.listen(env.PORT, () => {

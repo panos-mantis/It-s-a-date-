@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import type { Types } from 'mongoose';
+import mongoose, { type Types } from 'mongoose';
 import { authService } from '../features/auth/auth.service.js';
 import { ideasRepository } from '../features/ideas/ideas.repository.js';
 import { ratingsRepository } from '../features/ratings/ratings.repository.js';
@@ -55,6 +55,36 @@ async function upsertTags(): Promise<Map<string, Types.ObjectId>> {
   return new Map(tags.map((t) => [t.slug, t._id]));
 }
 
+/** Recomputes the stored aggregates of the given ideas from the ratings and saves collections. */
+async function refreshAggregates(ids: Iterable<Types.ObjectId>): Promise<void> {
+  for (const id of ids) {
+    const stats = await ratingsRepository.statsForIdea(String(id));
+    await ideasRepository.setRatingStats(String(id), stats);
+    await ideasRepository.setSaveCount(String(id), await savesRepository.countForIdea(String(id)));
+  }
+}
+
+/** Dev only. Deletes sample users who own nothing else, plus their activity, and fixes the stats. */
+async function removeSampleUsers(): Promise<void> {
+  const users = await UserModel.find({ email: { $in: SAMPLE_USERS.map((u) => u.email) } })
+    .select('_id')
+    .exec();
+  for (const user of users) {
+    if ((await IdeaModel.countDocuments({ creator: user._id }).exec()) > 0) continue;
+    const touched = new Map<string, Types.ObjectId>();
+    for (const r of await RatingModel.find({ user: user._id }).select('idea').exec()) {
+      touched.set(String(r.idea), r.idea);
+    }
+    for (const s of await SaveModel.find({ user: user._id }).select('idea').exec()) {
+      touched.set(String(s.idea), s.idea);
+    }
+    await RatingModel.deleteMany({ user: user._id }).exec();
+    await SaveModel.deleteMany({ user: user._id }).exec();
+    await UserModel.deleteOne({ _id: user._id }).exec();
+    await refreshAggregates(touched.values());
+  }
+}
+
 /** Deletes every seeded idea with its ratings and saves, then the seed users. Returns ideas removed. */
 async function removeSeed(mode: 'dev' | 'prod'): Promise<number> {
   const ids = (
@@ -65,7 +95,7 @@ async function removeSeed(mode: 'dev' | 'prod'): Promise<number> {
   await RatingModel.deleteMany({ idea: { $in: ids } }).exec();
   await SaveModel.deleteMany({ idea: { $in: ids } }).exec();
   await IdeaModel.deleteMany({ _id: { $in: ids } }).exec();
-  await UserModel.deleteMany({ email: { $in: SAMPLE_USERS.map((u) => u.email) } }).exec();
+  if (mode === 'dev') await removeSampleUsers();
   if (mode === 'prod') {
     const team = await UserModel.findOne({ email: TEAM_USER.email }).select('_id').exec();
     if (team && (await IdeaModel.countDocuments({ creator: team._id }).exec()) === 0) {
@@ -105,6 +135,14 @@ function planActivity(
 
 export async function runSeed(opts: SeedOptions): Promise<SeedReport> {
   if (opts.reset && opts.mode === 'prod') throw new Error('--reset is only allowed in dev mode');
+
+  // A migrated-but-not-yet-converted database must go through the migration first.
+  const legacy = await mongoose.connection.db?.listCollections({ name: 'dates' }).toArray();
+  if (legacy && legacy.length > 0) {
+    throw new Error(
+      'This database still has legacy data. Run `npm run migrate -w @itsadate/api` first.',
+    );
+  }
 
   // Connections never build indexes (see connectDb), so a fresh dev DB gets them here.
   await Promise.all(allModels.map((m) => m.syncIndexes()));
@@ -190,11 +228,7 @@ export async function runSeed(opts: SeedOptions): Promise<SeedReport> {
   report.ratings = ratings.length;
   report.saves = saves.length;
 
-  for (const id of ideaIds.values()) {
-    const stats = await ratingsRepository.statsForIdea(String(id));
-    await ideasRepository.setRatingStats(String(id), stats);
-    await ideasRepository.setSaveCount(String(id), await savesRepository.countForIdea(String(id)));
-  }
+  await refreshAggregates(ideaIds.values());
   return report;
 }
 

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { describe, expect, it } from 'vitest';
 import { createTestIdea } from '../test/factories.js';
 import { useTestDb } from '../test/db.js';
@@ -123,5 +124,53 @@ describe('runSeed prod', () => {
     await IdeaModel.deleteMany({});
     await runSeed({ mode: 'prod', remove: true });
     expect(await UserModel.countDocuments({ email: TEAM_USER.email })).toBe(0);
+  });
+});
+
+describe('runSeed remove safety', () => {
+  const maya = SAMPLE_USERS[0]!;
+
+  it('prod remove never touches sample-user accounts', async () => {
+    await UserModel.create({ name: 'Maya', email: maya.email, passwordHash: 'x' });
+    await runSeed({ mode: 'prod' });
+    await runSeed({ mode: 'prod', remove: true });
+    expect(await UserModel.countDocuments({ email: maya.email })).toBe(1);
+  });
+
+  it('dev remove keeps a sample user who owns a non-seed idea', async () => {
+    await runSeed({ mode: 'dev' });
+    const user = await UserModel.findOne({ email: maya.email });
+    await createTestIdea({ creator: user!._id });
+    await runSeed({ mode: 'dev', remove: true });
+    expect(await UserModel.countDocuments({ email: maya.email })).toBe(1);
+    expect(await UserModel.countDocuments()).toBe(1);
+  });
+
+  it('removes a sample user activity on real ideas and recomputes their stats', async () => {
+    await runSeed({ mode: 'dev' });
+    const real = await UserModel.create({ name: 'R', email: 'r@real.test', passwordHash: 'x' });
+    const idea = await createTestIdea({ creator: real._id });
+    const users = await UserModel.find({ email: { $in: SAMPLE_USERS.map((u) => u.email) } });
+    await RatingModel.create({ idea: idea._id, user: users[0]!._id, value: 5 });
+    await RatingModel.create({ idea: idea._id, user: users[1]!._id, value: 3 });
+    await SaveModel.create({ idea: idea._id, user: users[0]!._id });
+    await IdeaModel.updateOne({ _id: idea._id }, { ratingAvg: 4, ratingCount: 2, saveCount: 1 });
+    await runSeed({ mode: 'dev', remove: true });
+    const after = await IdeaModel.findById(idea._id);
+    expect(after).toMatchObject({ ratingAvg: 0, ratingCount: 0, saveCount: 0 });
+    expect(await RatingModel.countDocuments()).toBe(0);
+    expect(await SaveModel.countDocuments()).toBe(0);
+  });
+});
+
+describe('runSeed legacy guard', () => {
+  it('refuses when a legacy dates collection exists, before any write', async () => {
+    await mongoose.connection.db!.collection('dates').insertOne({ tittle: 'x' });
+    try {
+      await expect(runSeed({ mode: 'dev' })).rejects.toThrow(/legacy data.*migrate/);
+      expect(await TagModel.countDocuments()).toBe(0);
+    } finally {
+      await mongoose.connection.db!.collection('dates').drop();
+    }
   });
 });

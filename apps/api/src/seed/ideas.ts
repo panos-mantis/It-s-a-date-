@@ -91,9 +91,9 @@ const DRAFTS: Draft[] = [
     duration: 'full-day',
   },
   {
-    title: 'Weekend away by train',
+    title: 'Day trip by train',
     description:
-      'Choose a town you have never visited, book one night and pack light. Leave the itinerary open, walk everywhere and let the trip surprise you.',
+      'Choose a town you have never visited and take the morning train out. Leave the itinerary open, walk everywhere, have lunch wherever smells best and catch the last train home.',
     tags: ['adventure'],
     placeType: 'none',
     budget: 3,
@@ -167,7 +167,7 @@ const DRAFTS: Draft[] = [
     duration: 'short',
   },
   {
-    title: 'A neighbourhood you never visit',
+    title: 'A neighborhood you never visit',
     description:
       'Choose a part of town you usually skip and walk it with no destination. Duck into the shops that catch your eye and have a snack wherever you end up.',
     tags: ['self-date', 'adventure'],
@@ -283,7 +283,7 @@ const DRAFTS: Draft[] = [
   {
     title: 'Sunset beach walk',
     description:
-      'Take your shoes off and walk the waterline as the light goes soft. Collect one shell each, say nothing for a while and stay until the sky changes colour.',
+      'Take your shoes off and walk the waterline as the light goes soft. Collect one shell each, say nothing for a while and stay until the sky changes color.',
     tags: ['self-care'],
     placeType: 'beach',
     budget: 1,
@@ -314,7 +314,7 @@ const DRAFTS: Draft[] = [
     description:
       'Sign up for a hands-on cooking class: fresh pasta, dumplings or bread. You will make a mess, learn a real technique and sit down to eat what you made.',
     tags: ['learning', 'food'],
-    placeType: 'restaurant',
+    placeType: 'none',
     budget: 3,
     duration: 'half-day',
   },
@@ -322,7 +322,7 @@ const DRAFTS: Draft[] = [
     title: 'Beginner improv workshop',
     description:
       'Join a one-off improv class where nobody is watching but the other beginners. Say yes to everything, play along and enjoy how quickly strangers become friends.',
-    tags: ['learning', 'dancing'],
+    tags: ['learning'],
     placeType: 'theatre',
     budget: 2,
     duration: 'short',
