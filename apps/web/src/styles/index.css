@@ -1,0 +1,66 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-*: initial;
+  --color-bg: #fbf6f0;
+  --color-surface: #fffdf9;
+  --color-surface-sunk: #f4ebe0;
+  --color-fg: #2a1a14;
+  --color-muted: #6e5d52;
+  --color-border: #e6d9cb;
+  --color-accent: #f06a4c;
+  --color-accent-on: #2a1a14;
+  --color-accent-hover: #f4826a;
+  --color-accent-ink: #b23e23;
+  --color-accent-soft: #fde7de;
+  --color-success: #2e7d4f;
+  --color-warn: #9a6400;
+  --color-danger: #b42c2c;
+  --color-overlay: rgba(255, 253, 249, 0.94);
+
+  --font-display: 'Fraunces Variable', 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'DM Sans Variable', 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.375rem;
+  --text-4xl: 3rem;
+
+  --leading-body: 1.55;
+  --leading-tight: 1.08;
+  --tracking-display: -0.025em;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --shadow-raised: 0 1px 2px rgba(42, 26, 20, 0.06), 0 8px 24px rgba(42, 26, 20, 0.08);
+  --shadow-search: 0 1px 2px rgba(42, 26, 20, 0.08), 0 6px 18px rgba(42, 26, 20, 0.07);
+
+  --container-page: 1200px;
+
+  --ease-friendly: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@utility font-soft {
+  font-variation-settings:
+    'SOFT' 100,
+    'WONK' 0;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-fg font-body leading-body antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-soft;
+  }
+}
