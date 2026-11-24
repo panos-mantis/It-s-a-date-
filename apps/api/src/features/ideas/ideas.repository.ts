@@ -13,7 +13,7 @@ export interface IdeaFilter {
   creatorId?: string;
 }
 
-export type IdeaSort = 'new' | 'top';
+export type IdeaSort = 'new' | 'top' | 'oldest';
 
 /** An idea with `tags` and `creator` populated. `creator` is null if the user is gone. */
 export type PopulatedIdea = Omit<IdeaDoc, 'tags' | 'creator'> & {
@@ -23,6 +23,7 @@ export type PopulatedIdea = Omit<IdeaDoc, 'tags' | 'creator'> & {
 
 const SORTS: Record<IdeaSort, Record<string, SortOrder>> = {
   new: { createdAt: -1, _id: -1 },
+  oldest: { createdAt: 1, _id: 1 },
   top: { ratingAvg: -1, ratingCount: -1, createdAt: -1, _id: -1 },
 };
 
