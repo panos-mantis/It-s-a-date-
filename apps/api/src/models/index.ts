@@ -14,6 +14,7 @@ export * from './user.js';
 export interface AnyModel {
   readonly modelName: string;
   syncIndexes(): Promise<unknown>;
+  diffIndexes(): Promise<{ toCreate: Record<string, unknown>[] }>;
   deleteMany(filter: Record<string, never>): PromiseLike<unknown>;
 }
 

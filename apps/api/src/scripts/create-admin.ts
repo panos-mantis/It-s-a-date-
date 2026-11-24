@@ -5,6 +5,7 @@ import { connectDb, disconnectDb } from '../db/connect.js';
 import { createAdmin, passwordIssues } from '../features/users/create-admin.js';
 import { usersRepository } from '../features/users/users.repository.js';
 import { parseArgs, type ParsedArgs } from './lib/args.js';
+import { describeScriptError } from './lib/describe-error.js';
 import { askHidden } from './lib/prompt.js';
 import { confirmTarget, loadScriptEnv, resolveTarget } from './lib/target.js';
 
@@ -35,7 +36,7 @@ function describeError(e: unknown): string {
       ?.issues;
     if (issues?.length) return issues.map((i) => `${i.path}: ${i.message}`).join('\n');
   }
-  return e instanceof Error ? e.message : 'Unexpected error';
+  return describeScriptError(e);
 }
 
 async function main(): Promise<void> {
