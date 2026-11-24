@@ -33,9 +33,8 @@ export const tagsRepository = {
 
   /** Deletes the tag and removes it from every idea. Returns false if it did not exist. */
   async remove(id: string): Promise<boolean> {
-    const deleted = await TagModel.findByIdAndDelete(id).exec();
-    if (!deleted) return false;
+    // Pull first: a failure between the steps must not leave dangling tag ids on ideas.
     await IdeaModel.updateMany({ tags: id }, { $pull: { tags: id } }).exec();
-    return true;
+    return (await TagModel.findByIdAndDelete(id).exec()) !== null;
   },
 };

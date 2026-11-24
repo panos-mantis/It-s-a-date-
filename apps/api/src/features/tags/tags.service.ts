@@ -1,10 +1,20 @@
 import type { TagCreateInput, TagUpdateInput } from '@itsadate/shared';
-import { conflict, notFound } from '../../lib/errors.js';
+import { conflict, notFound, validationError } from '../../lib/errors.js';
 import { slugify } from '../../lib/slug.js';
 import type { TagDoc } from '../../models/tag.js';
 import { tagsRepository } from './tags.repository.js';
 
 const NAME_TAKEN = 'A tag with this name already exists';
+
+function slugOf(name: string): string {
+  const slug = slugify(name);
+  if (slug === '') {
+    throw validationError({
+      issues: [{ location: 'body', path: 'name', message: 'Use at least one letter or number' }],
+    });
+  }
+  return slug;
+}
 
 const isDuplicateKey = (err: unknown) => (err as { code?: unknown } | null)?.code === 11000;
 
@@ -14,7 +24,7 @@ export const tagsService = {
   },
 
   async create(input: TagCreateInput): Promise<TagDoc> {
-    const slug = slugify(input.name);
+    const slug = slugOf(input.name);
     if (await tagsRepository.findBySlug(slug)) throw conflict(NAME_TAKEN);
     try {
       return await tagsRepository.create({ name: input.name, slug, icon: input.icon });
@@ -29,7 +39,7 @@ export const tagsService = {
     if (input.icon !== undefined) patch.icon = input.icon;
     if (input.name !== undefined) {
       patch.name = input.name;
-      patch.slug = slugify(input.name);
+      patch.slug = slugOf(input.name);
       const clash = await tagsRepository.findBySlug(patch.slug);
       if (clash && clash.id !== id) throw conflict(NAME_TAKEN);
     }

@@ -4,6 +4,7 @@ import type { TagDTO } from '@itsadate/shared';
 import { describe, expect, it } from 'vitest';
 import { createApp } from '../../app.js';
 import { IdeaModel } from '../../models/idea.js';
+import { TagModel } from '../../models/tag.js';
 import { createTestUser } from '../../test/auth.js';
 import { useTestDb } from '../../test/db.js';
 import { testEnv } from '../../test/env.js';
@@ -104,6 +105,26 @@ describe('tags', () => {
     expect(
       (await request(app).delete('/api/v1/admin/tags/not-an-id').set('Cookie', admin)).status,
     ).toBe(422);
+  });
+
+  it('rejects names with no letters or digits with 422 on create and update', async () => {
+    const { cookie: admin } = await createTestUser({ role: 'admin' });
+    const bad = await request(app)
+      .post('/api/v1/admin/tags')
+      .set('Cookie', admin)
+      .send({ name: '!!', icon: 'x' });
+    expect(bad.status).toBe(422);
+    expect(errorOf(bad).details).toEqual({
+      issues: [{ location: 'body', path: 'name', message: 'Use at least one letter or number' }],
+    });
+    const tag = await createTestTag({ name: 'Food', slug: 'food' });
+    const res = await request(app)
+      .patch(`/api/v1/admin/tags/${tag.id as string}`)
+      .set('Cookie', admin)
+      .send({ name: '日本' });
+    expect(res.status).toBe(422);
+    const after = await TagModel.findById(tag._id);
+    expect([after?.name, after?.slug]).toEqual(['Food', 'food']);
   });
 
   it('guards every admin tag route with 401 and 403', async () => {
