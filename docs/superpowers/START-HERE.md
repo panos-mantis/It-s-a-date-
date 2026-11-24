@@ -72,7 +72,7 @@ Last updated: 2026-11-25 (Phase 2 built, PR pending). Read this first in a new s
 - Atlas DB password and JWT secret were rotated on 2026-11-20. Render has them as env vars.
 
 **Local setup (the owner's PC):**
-- `Its a date BACKEND/.env` is untracked and git-ignored. It was recreated on 2026-11-23 and points at **`itsadate_dev`** (verified: 20 ideas, 1 admin, the dev test account "Owner"). It has `DNS_SERVERS=1.1.1.1,8.8.8.8`, because Node can't resolve `mongodb+srv` on this PC, and `PORT=4200`. Its `JWT_SECRET` is local-only and differs from production.
+- `apps/api/.env` is untracked and git-ignored (the legacy copy at `apps/api/legacy/.env` is an untracked backup). It points at **`itsadate_dev`**. It has `DNS_SERVERS=1.1.1.1,8.8.8.8`, because Node can't resolve `mongodb+srv` on this PC. Its `JWT_SECRET` is local-only and differs from production.
 - **This `.env` is irreplaceable without the owner**: only the owner has the DB password. Never delete, print or stage it. The live copy is `apps/api/.env`; `apps/api/legacy/.env` is a backup.
 - **Never check out a commit from before Phase 0** (`e1cf2fe` or older). It overwrites, then deletes, the local `.env` and `node_modules`. This happened on 2026-11-22. To update a stale branch, use `git fetch` and `git branch -f`.
 - Prod and dev share one cluster and one DB user. Only the database name at the end of `MONGODB_URI` differs: `/ItsADate` exists only in Render's env vars, and `/itsadate_dev` is in the local `.env`. Scripts reach prod only with an explicit `--db ItsADate` and a typed confirmation.

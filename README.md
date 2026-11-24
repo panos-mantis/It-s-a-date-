@@ -22,7 +22,7 @@ cp apps/api/.env.example apps/api/.env
 # Windows PowerShell
 Copy-Item apps/api/.env.example apps/api/.env
 # Windows cmd
-copy appsapi.env.example appsapi.env
+copy apps\api\.env.example apps\api\.env
 ```
 
 `apps/api/.env` holds the Atlas connection string (`MONGODB_URI`) and the JWT secret, so only the owner can fill it in. It is git-ignored; never commit it. Point it at the dev database `itsadate_dev`, never at `ItsADate` (the app refuses prod outside `NODE_ENV=production`).
