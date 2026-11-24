@@ -8,6 +8,7 @@ import type { Logger } from 'pino';
 import type { ApiErrorBody } from '@itsadate/shared';
 import type { Env } from './config/env.js';
 import { createLogger } from './lib/logger.js';
+import { authRoutes } from './features/auth/auth.routes.js';
 import { errorHandler } from './middleware/error.js';
 
 export interface AppDeps {
@@ -50,8 +51,9 @@ export function createApp(deps: AppDeps): Express {
     res.json({ status: 'ok' });
   });
 
-  // Later tasks mount the real routes here.
   const v1 = Router();
+  // Later tasks add one line each here.
+  v1.use('/auth', authRoutes(env));
   deps.extraRoutes?.(v1);
   app.use('/api/v1', v1);
 
