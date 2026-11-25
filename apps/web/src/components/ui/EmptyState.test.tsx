@@ -15,6 +15,13 @@ describe('EmptyState', () => {
     expect(screen.getByRole('button', { name: 'Browse' })).toBeInTheDocument();
   });
 
+  it('renders an h2 by default and an h1 on request', () => {
+    const { rerender } = render(<EmptyState title="Nothing yet" />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Nothing yet' })).toBeInTheDocument();
+    rerender(<EmptyState title="Nothing yet" headingLevel={1} />);
+    expect(screen.getByRole('heading', { level: 1, name: 'Nothing yet' })).toBeInTheDocument();
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(<EmptyState icon={Heart} title="Nothing yet" body="Body" />);
     await expectNoAxeViolations(container);

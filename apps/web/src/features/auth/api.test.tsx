@@ -53,6 +53,29 @@ describe('auth hooks', () => {
     expect(queryClient.getQueryData(authKeys.me)).toBeNull();
   });
 
+  it('login and register clear other users cached data', async () => {
+    authStore.addUser({ name: 'Ana', email: 'ana@x.com', password: 'secret123' });
+    const { wrapper, queryClient } = setup();
+    queryClient.setQueryData(['ideas', 'x'], { owner: 'A' });
+    const login = renderHook(() => useLogin(), { wrapper });
+    await login.result.current.mutateAsync({ email: 'ana@x.com', password: 'secret123' });
+    expect(queryClient.getQueryData(['ideas', 'x'])).toBeUndefined();
+
+    queryClient.setQueryData(['ideas', 'y'], { owner: 'A' });
+    const reg = renderHook(() => useRegister(), { wrapper });
+    await reg.result.current.mutateAsync({ name: 'Bo', email: 'bo@x.com', password: 'secret123' });
+    expect(queryClient.getQueryData(['ideas', 'y'])).toBeUndefined();
+  });
+
+  it('login and register do not keep the password in the mutation cache', async () => {
+    authStore.addUser({ name: 'Ana', email: 'ana@x.com', password: 'secret123' });
+    const { wrapper, queryClient } = setup();
+    const { result, unmount } = renderHook(() => useLogin(), { wrapper });
+    await result.current.mutateAsync({ email: 'ana@x.com', password: 'secret123' });
+    unmount(); // gcTime 0 collects once nothing observes the mutation
+    await waitFor(() => expect(queryClient.getMutationCache().getAll()).toHaveLength(0));
+  });
+
   it('register stores the user as me', async () => {
     const { wrapper, queryClient } = setup();
     const { result } = renderHook(() => useRegister(), { wrapper });

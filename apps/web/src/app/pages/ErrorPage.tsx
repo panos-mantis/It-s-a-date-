@@ -10,6 +10,7 @@ export function ErrorPage() {
     <>
       <title>{"Something went wrong · It's a Date"}</title>
       <EmptyState
+        headingLevel={1}
         title="Something went wrong."
         body="Try again, or head back home."
         action={

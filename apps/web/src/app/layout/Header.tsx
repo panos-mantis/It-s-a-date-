@@ -25,10 +25,10 @@ export function Header() {
         scrolled ? 'border-border' : 'border-transparent',
       )}
     >
-      <div className="mx-auto flex h-16 w-full max-w-page items-center justify-between gap-2 px-4 sm:px-7 lg:px-10">
+      <div className="mx-auto flex h-16 w-full max-w-page items-center justify-between gap-1 px-4 sm:px-7 lg:px-10">
         <Link
           to={paths.home}
-          className="inline-flex items-center gap-1.5 rounded-sm font-display text-[20px] font-medium italic text-fg [font-variation-settings:'SOFT'_100,'WONK'_0] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent/30"
+          className="inline-flex items-center gap-1.5 rounded-sm whitespace-nowrap font-display text-lg font-medium italic font-soft text-fg focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent/30"
         >
           <Heart
             aria-hidden="true"
@@ -49,10 +49,10 @@ export function Header() {
               Share an idea
             </span>
           </Link>
-          {me.isPending || me.isError ? (
-            <Skeleton className="h-10 w-24 rounded-pill" />
-          ) : me.data ? (
+          {me.data ? (
             <AccountMenu user={me.data} />
+          ) : me.isPending ? (
+            <Skeleton className="h-10 w-24 rounded-pill" />
           ) : (
             <>
               <Link to={paths.login} className={buttonClasses({ variant: 'ghost', size: 'sm' })}>

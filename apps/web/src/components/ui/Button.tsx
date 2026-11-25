@@ -13,7 +13,7 @@ const variants: Record<Variant, string> = {
 
 const sizes: Record<Size, string> = {
   md: 'px-6 py-3 text-base',
-  sm: 'px-4 py-2 text-sm',
+  sm: 'px-3 py-2 text-sm sm:px-4',
 };
 
 export function buttonClasses(
@@ -21,7 +21,7 @@ export function buttonClasses(
 ): string {
   const { variant = 'primary', size = 'md', className } = opts;
   return cn(
-    'inline-flex items-center justify-center gap-2 rounded-md border-[1.5px] font-body font-semibold tracking-[0.02em]',
+    'inline-flex items-center whitespace-nowrap justify-center gap-2 rounded-md border-[1.5px] font-body font-semibold tracking-[0.02em]',
     'cursor-pointer motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-friendly',
     'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent/30',
     'disabled:cursor-not-allowed disabled:opacity-60',

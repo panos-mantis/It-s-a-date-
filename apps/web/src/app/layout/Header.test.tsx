@@ -89,20 +89,6 @@ describe('Header', () => {
     expect(router.state.location.search).toBe('');
   });
 
-  it('does not show Log in to a logged-in user when /me fails', async () => {
-    server.use(
-      http.get('*/api/v1/auth/me', () =>
-        HttpResponse.json({ error: { code: 'INTERNAL', message: 'Boom' } }, { status: 500 }),
-      ),
-    );
-    renderApp('/');
-    await screen.findByRole('heading', { level: 1 });
-    await new Promise((r) => setTimeout(r, 50));
-    const header = screen.getByRole('banner');
-    expect(within(header).queryByRole('link', { name: 'Log in' })).not.toBeInTheDocument();
-    expect(within(header).queryByRole('link', { name: 'Sign up' })).not.toBeInTheDocument();
-  });
-
   it('login page shows the retry state, not the form, when /me fails', async () => {
     server.use(
       http.get('*/api/v1/auth/me', () =>

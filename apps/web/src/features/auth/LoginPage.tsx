@@ -49,7 +49,10 @@ export function LoginPage() {
       footer={
         <>
           New here?{' '}
-          <Link to={signupTo} className="font-semibold text-accent-ink underline">
+          <Link
+            to={signupTo}
+            className="rounded-sm font-semibold text-accent-ink underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent/30"
+          >
             Sign up
           </Link>
         </>

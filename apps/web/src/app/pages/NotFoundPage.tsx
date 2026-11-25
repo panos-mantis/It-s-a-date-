@@ -7,6 +7,7 @@ export function NotFoundPage() {
     <>
       <title>{"Page not found · It's a Date"}</title>
       <EmptyState
+        headingLevel={1}
         title="We couldn't find that page."
         body="It may have moved, or the link has a typo."
         action={

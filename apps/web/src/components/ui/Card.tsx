@@ -23,7 +23,7 @@ export function Card({
   action?: ReactNode;
 }) {
   return (
-    <article className="group relative flex flex-col gap-3">
+    <article className="group relative isolate flex flex-col gap-3">
       <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
         {image ? (
           <img

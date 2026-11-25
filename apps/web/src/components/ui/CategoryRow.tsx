@@ -14,7 +14,7 @@ export function CategoryRow({
 }) {
   return (
     <nav aria-label={label ?? 'Categories'} className="overflow-x-auto">
-      <ul className="m-0 flex w-max list-none gap-12 p-0 md:mx-auto">
+      <ul className="m-0 flex w-max list-none gap-12 p-1 md:mx-auto">
         {items.map(({ value, label: text, icon: Icon }) => {
           const isActive = value === active;
           return (

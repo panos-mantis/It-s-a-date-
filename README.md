@@ -51,7 +51,7 @@ The server never builds indexes. Only `migrate` and `seed` do, so run one of the
 `apps/web` is React 19 + Vite + Tailwind v4, with TanStack Query and React Router 7.
 
 - `npm run dev` serves it on http://localhost:5173. Vite proxies `/api` to the API on port 4000. `npm run preview -w @itsadate/web` serves the build on port 4173 with the same proxy.
-- The theme (colours, fonts, radii) lives in `apps/web/src/styles/index.css`. It follows `DESIGN.md` and `tokens.css`.
+- The theme (colours, fonts, radii) lives in `apps/web/src/styles/index.css`. It follows `DESIGN.md` and `.open-design/design-systems/style-tiles-for-it-s-a-date-a-web-app-where-peop/tokens.css`.
 - The UI kit is in `apps/web/src/components/ui/` (list in `index.ts`). The API client and query hooks are in `apps/web/src/lib/` and `apps/web/src/features/*/api.ts`.
 - Tests run with Vitest, Testing Library and MSW: `npm run test -w @itsadate/web`. MSW answers the `/api/v1` calls, so no API or database is needed.
 

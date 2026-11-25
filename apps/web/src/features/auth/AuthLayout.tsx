@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { Container } from '../../components/ui';
 
 export function AuthLayout({
   title,
@@ -11,13 +10,13 @@ export function AuthLayout({
   footer: ReactNode;
 }) {
   return (
-    <Container className="py-10 sm:py-16">
+    <div className="py-10 sm:py-16">
       <section className="mx-auto w-full max-w-[28rem] rounded-lg border border-border bg-surface p-6 sm:p-8">
         <h1 className="font-display text-2xl text-fg">{title}</h1>
         <div className="mt-6">{children}</div>
         <p className="mt-6 text-sm text-muted">{footer}</p>
       </section>
-    </Container>
+    </div>
   );
 }
 

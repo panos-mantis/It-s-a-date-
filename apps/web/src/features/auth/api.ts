@@ -24,8 +24,13 @@ export function useLogin() {
   const queryClient = useQueryClient();
   return useMutation<UserDTO, ApiError, LoginInput>({
     mutationKey: ['auth', 'login'],
+    gcTime: 0, // don't keep the plaintext password around
     mutationFn: (input) => api.post<UserDTO>('/auth/login', input),
-    onSuccess: (user) => queryClient.setQueryData(authKeys.me, user),
+    onSuccess: (user) => {
+      // Per-user data from a previous session must not reach the new user.
+      queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== 'auth' });
+      queryClient.setQueryData(authKeys.me, user);
+    },
   });
 }
 
@@ -33,8 +38,13 @@ export function useRegister() {
   const queryClient = useQueryClient();
   return useMutation<UserDTO, ApiError, RegisterInput>({
     mutationKey: ['auth', 'register'],
+    gcTime: 0, // don't keep the plaintext password around
     mutationFn: (input) => api.post<UserDTO>('/auth/register', input),
-    onSuccess: (user) => queryClient.setQueryData(authKeys.me, user),
+    onSuccess: (user) => {
+      // Per-user data from a previous session must not reach the new user.
+      queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== 'auth' });
+      queryClient.setQueryData(authKeys.me, user);
+    },
   });
 }
 
