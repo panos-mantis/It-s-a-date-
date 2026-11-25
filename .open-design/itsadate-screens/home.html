@@ -160,6 +160,7 @@ button, input, select { font: inherit; color: inherit; }
 }
 .menu-item:hover { background: var(--surface-sunk); }
 .nav-share-short { display: none; }
+.nav-share-short::before { content: "Share"; } /* phone label as CSS content, so the link text reads "Share an idea" */
 /* Phone header: "Your ideas" moves into the account menu; Share keeps a short label as a ghost pill. */
 .site-nav.is-compact .nav-share-label, .site-nav.is-compact .account-name, .site-nav.is-compact .nav-ideas { display: none; }
 .site-nav.is-compact .nav-share-icon, .site-nav.is-compact .nav-share-short { display: block; }
@@ -846,7 +847,7 @@ select.seg-field.is-empty { color: var(--muted); }
             <nav class="site-nav" aria-label="Main (logged out)">
               <a class="wordmark" href="home.html" data-od-goto="home"><svg class="wordmark-heart" aria-hidden="true"><use href="#i-heart"/></svg>It's a Date</a>
               <div class="nav-actions">
-                <a class="btn btn-ghost btn-sm nav-share" href="auth.html" data-od-goto="auth" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-label" aria-hidden="true">Share an idea</span><span class="nav-share-short" aria-hidden="true">Share</span></a>
+                <a class="btn btn-ghost btn-sm nav-share" href="auth.html" data-od-goto="auth" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-label" aria-hidden="true">Share an idea</span><span class="nav-share-short" aria-hidden="true"></span></a>
                 <a class="btn btn-ghost btn-sm" href="auth.html" data-od-goto="auth" data-component="Button">Log in</a>
                 <a class="btn btn-secondary btn-sm" href="auth.html" data-od-goto="auth" data-component="Button">Sign up</a>
               </div>
@@ -989,7 +990,7 @@ select.seg-field.is-empty { color: var(--muted); }
                 <nav class="site-nav is-compact" aria-label="Main (phone)">
                   <a class="wordmark" href="home.html" data-od-goto="home"><svg class="wordmark-heart" aria-hidden="true"><use href="#i-heart"/></svg>It's a Date</a>
                   <div class="nav-actions">
-                    <a class="btn btn-ghost btn-sm nav-share" href="share.html" data-od-goto="share" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-short" aria-hidden="true">Share</span></a>
+                    <a class="btn btn-ghost btn-sm nav-share" href="share.html" data-od-goto="share" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-short" aria-hidden="true"></span></a>
                     <button type="button" class="account-btn" aria-label="Account menu for Maya Chen"><span class="avatar" aria-hidden="true">M</span><svg class="icon icon-muted" aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
                   </div>
                 </nav>

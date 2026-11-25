@@ -17,8 +17,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T18:01:53.319Z",
-  "updatedAt": "2026-11-25T18:01:53.319Z",
+  "createdAt": "2026-11-25T18:07:57.713Z",
+  "updatedAt": "2026-11-25T18:07:57.713Z",
   "sourceSkillId": "od:prototype:app-table",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -167,7 +167,7 @@
             "to": "share"
           },
           {
-            "label": "Profile",
+            "label": "Your ideas",
             "to": "profile"
           }
         ],

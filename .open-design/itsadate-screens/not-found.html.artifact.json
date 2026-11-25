@@ -17,8 +17,8 @@
     "_shared/nav.html",
     "content.md"
   ],
-  "createdAt": "2026-11-25T17:41:15.456Z",
-  "updatedAt": "2026-11-25T17:41:15.456Z",
+  "createdAt": "2026-11-25T18:07:57.769Z",
+  "updatedAt": "2026-11-25T18:07:57.769Z",
   "sourceSkillId": "od:prototype:web-prototype",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -166,7 +166,7 @@
             "to": "share"
           },
           {
-            "label": "Profile",
+            "label": "Your ideas",
             "to": "profile"
           }
         ],
@@ -192,6 +192,12 @@
         ]
       },
       "screenId": "not-found"
+    },
+    "critique": {
+      "verdict": "ship",
+      "findings": [],
+      "at": "2026-11-25T18:07:57.764Z",
+      "checkRunId": "2026-11-25T17-41-18"
     }
   }
 }

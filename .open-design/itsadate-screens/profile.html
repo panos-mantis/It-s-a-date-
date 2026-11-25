@@ -164,6 +164,7 @@ button { font: inherit; color: inherit; }
 }
 .menu-item:hover { background: var(--surface-sunk); }
 .nav-share-short { display: none; }
+.nav-share-short::before { content: "Share"; } /* phone label as CSS content, so the link text reads "Share an idea" */
 /* On this page "Your ideas" is the current place: the same 2px underline Share uses for "Share an idea" */
 .site-nav .nav-ideas[aria-current="page"] { color: var(--fg); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
 .site-nav .menu-item[aria-current="page"] { font-weight: 600; }

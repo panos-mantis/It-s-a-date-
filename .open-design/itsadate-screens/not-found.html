@@ -141,6 +141,7 @@ button { font: inherit; color: inherit; }
 }
 .menu-item:hover { background: var(--surface-sunk); }
 .nav-share-short { display: none; }
+.nav-share-short::before { content: "Share"; } /* phone label as CSS content, so the link text reads "Share an idea" */
 @media (max-width: 639px) {
   .nav-actions { gap: 4px; }
   .site-nav .btn-sm { padding: 0 10px; }
