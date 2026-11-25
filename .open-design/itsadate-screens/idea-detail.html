@@ -425,7 +425,8 @@ button, input, select { font: inherit; color: inherit; }
 .toast.is-success .icon { color: var(--success); }
 .toast.is-error .icon { color: var(--danger); }
 .toast-region { position: fixed; left: 50%; bottom: 24px; z-index: 70; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); }
-.toast-region:empty { display: none; }
+/* The live region stays rendered while empty (an empty fixed box has no size), never display:none, so screen readers already track it when a toast is put in. The toast inside has the box styles. */
+.toast-region:empty { pointer-events: none; }
 
 /* Design states toggle: design-only, closed by default, not part of the real page */
 .design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }

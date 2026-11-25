@@ -357,7 +357,8 @@ textarea.input.is-title { min-height: 0; resize: none; }
 .toast .icon { width: 18px; height: 18px; }
 .toast.is-success .icon { color: var(--success); }
 .toast-region { position: fixed; left: 50%; bottom: 24px; z-index: 70; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); }
-.toast-region:empty { display: none; }
+/* The live region stays rendered while empty (an empty fixed box has no size), never display:none, so screen readers already track it when a toast is put in. The toast inside has the box styles. */
+.toast-region:empty { pointer-events: none; }
 
 /* Design states toggle: design-only, closed by default, not part of the real page */
 .design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }

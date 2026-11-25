@@ -313,7 +313,8 @@ button { font: inherit; color: inherit; }
 .toast-text { min-width: 0; }
 .toast .btn-sm { padding: 0 12px; }
 .toast-region { position: fixed; left: 50%; bottom: 24px; z-index: 70; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); }
-.toast-region:empty { display: none; }
+/* The live region stays rendered while empty (an empty fixed box has no size), never display:none, so screen readers already track it when a toast is put in. The toast inside has the box styles. */
+.toast-region:empty { pointer-events: none; }
 
 /* Design states toggle: design-only, closed by default, not part of the real page */
 .design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }
@@ -584,8 +585,8 @@ button { font: inherit; color: inherit; }
     </div>
   </section>
 
-  <!-- The one toast live region. In the DOM before anything is announced; after the tab panels so
-       Undo is the next stop after the cards. -->
+  <!-- The one toast live region. Rendered from page load and never display:none (empty, it is a zero-size
+       box), so screen readers already track it when a toast goes in. After the tab panels so Undo is the next stop after the cards. -->
   <div class="toast-region" id="toasts" role="status" aria-live="polite"></div>
 
   <!-- ===================== States board (design-only, behind a closed toggle) ===================== -->
@@ -837,7 +838,7 @@ button { font: inherit; color: inherit; }
   var region = document.getElementById('toasts');
   var counts = document.querySelectorAll('[data-saved-count]');
   var summary = document.querySelector('[data-saved-summary]');
-  var removed = null, timer = null, paused = false, left = 0;
+  var removed = null, timer = null, paused = false, dur = 0;
 
   function paint() {
     var n = grid.querySelectorAll('.card').length;
@@ -848,7 +849,8 @@ button { font: inherit; color: inherit; }
     empty.hidden = n !== 0;
   }
   function clearToast() { clearTimeout(timer); region.innerHTML = ''; }
-  function arm(ms) { left = ms; clearTimeout(timer); if (!paused) timer = setTimeout(clearToast, ms); }
+  // Each toast keeps its own length (Undo 8 s, the others 4 s); hover or focus pauses it and leaving starts it again in full.
+  function arm(ms) { dur = ms; clearTimeout(timer); if (!paused) timer = setTimeout(clearToast, ms); }
   function toast(text, undo) {
     clearToast();
     var el = document.createElement('div');
@@ -867,9 +869,9 @@ button { font: inherit; color: inherit; }
     arm(undo ? 8000 : 4000);
   }
   region.addEventListener('mouseenter', function () { paused = true; clearTimeout(timer); });
-  region.addEventListener('mouseleave', function () { paused = false; arm(4000); });
+  region.addEventListener('mouseleave', function () { paused = false; if (region.firstChild) arm(dur); });
   region.addEventListener('focusin', function () { paused = true; clearTimeout(timer); });
-  region.addEventListener('focusout', function () { paused = false; arm(4000); });
+  region.addEventListener('focusout', function () { paused = false; if (region.firstChild) arm(dur); });
   region.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { clearToast(); paused = false; var h = grid.querySelector('.heart'); (h || panel).focus(); }
   });
