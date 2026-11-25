@@ -7,7 +7,7 @@ Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in
 1. Open the folder `C:\Users\manti\Desktop\its-a-date` in VS Code and start a **new** Claude Code conversation.
 2. Phases 2 and 3 are built (PRs pending). Phase 4 is next, and Phase 5 starts after Phases 2, 3 and 4 have merged. Their plans aren't written yet. Each conversation writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below. Then it executes the plan.
    - **Phase 2 (API) is built** on branch `phase-2-api`; merge its PR into `modernize` first.
-   - **Phase 3 (web foundation)** is built and reviewed on `phase-3-web`, but the branch is not pushed and its PR is not opened yet. To finish it, follow the **Status** section at the top of `docs/superpowers/plans/2026-11-25-phase-3-web.md`.
+   - **Phase 3 (web foundation)** is built and reviewed on `phase-3-web`. Its PR is open: https://github.com/panos-mantis/It-s-a-date-/pull/5 (CI green). The owner merges it after the click-test in the PR body.
    - **Phase 4 (designs)** can optionally run in parallel. It needs the owner present to sign off the Home and Idea detail screens. Use the same prompt with "Phase 4", plus the worktree line.
 3. Each phase ends with its own PR into `modernize`. Phase 5 starts after 2, 3 and 4 have merged.
 
@@ -28,7 +28,7 @@ Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in
 
 ## Where things stand
 
-**Phase 3 (web foundation) is built on branch `phase-3-web`. The PR is not opened yet: GitHub returned 500 on the push. Next steps are in the plan's Status section.**
+**Phase 3 (web foundation) is built on branch `phase-3-web`. PR #5 into `modernize` is open (https://github.com/panos-mantis/It-s-a-date-/pull/5), CI green, waiting on the owner's click-test and merge.**
 - Built: Tailwind v4 theme, UI kit, typed API client, auth hooks, router, layout, header with account menu, and the log in and sign up pages. Setup is in `README.md`.
 - Checked against the real API through the Vite proxy (register, me, logout, login, wrong password): all as expected.
 - The throwaway dev user from that check is `phase3-check-1795565405@itsadate-dev.test` (in the dev database, `itsadate_dev`; it was created through the local API, which reads `apps/api/.env`).
