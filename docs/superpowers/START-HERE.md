@@ -1,14 +1,13 @@
 # START HERE — resuming the It's a Date modernization
 
-Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in a new session, then the files it points to.
+Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 in progress, waiting on the owner's sign-off round). Read this first in a new session, then the files it points to.
 
 ## How to resume
 
 1. Open the folder `C:\Users\manti\Desktop\its-a-date` in VS Code and start a **new** Claude Code conversation.
-2. Phases 2 and 3 are built (PRs pending). Phase 4 is next, and Phase 5 starts after Phases 2, 3 and 4 have merged. Their plans aren't written yet. Each conversation writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below. Then it executes the plan.
-   - **Phase 2 (API) is built** on branch `phase-2-api`; merge its PR into `modernize` first.
-   - **Phase 3 (web foundation)** is built and reviewed on `phase-3-web`. Its PR is open: https://github.com/panos-mantis/It-s-a-date-/pull/5 (CI green). The owner merges it after the click-test in the PR body.
-   - **Phase 4 (designs)** can optionally run in parallel. It needs the owner present to sign off the Home and Idea detail screens. Use the same prompt with "Phase 4", plus the worktree line.
+2. Phases 2 and 3 are merged into `modernize` (PR #4 and PR #5). **Phase 4 (designs) is in progress** on branch `phase-4-designs`, which isn't pushed yet. Phase 5 starts after Phase 4 merges. Each later phase writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below, then executes it.
+   - **To continue Phase 4,** follow the **Status** section at the top of `docs/superpowers/plans/2026-11-25-phase-4-designs.md`. Next is the owner round in Task 3 (the agreed changes to Home and Idea detail), then the owner's sign-off, then Tasks 4–8. The owner must be present for the sign-off.
+   - Prompt for a new session: "Read docs/superpowers/START-HERE.md and continue Phase 4 from the plan's Status section."
 3. Each phase ends with its own PR into `modernize`. Phase 5 starts after 2, 3 and 4 have merged.
 
 **Execution method (owner's choice): agent per task.** Use superpowers:subagent-driven-development.
@@ -28,7 +27,12 @@ Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in
 
 ## Where things stand
 
-**Phase 3 (web foundation) is built on branch `phase-3-web`. PR #5 into `modernize` is open (https://github.com/panos-mantis/It-s-a-date-/pull/5), CI green, waiting on the owner's click-test and merge.**
+**Phase 4 (designs) is in progress on `phase-4-designs`.**
+- Home and Idea detail are designed, critiqued and reviewed, in `.open-design/itsadate-screens/`.
+- The owner asked for less scrolling on Idea detail: places collapsed by default, and the States board hidden behind a toggle. That round isn't made yet.
+- Details, rulings and next steps are in the plan's Status section.
+
+**Phase 3 (web foundation) is merged into `modernize` (PR #5, 2026-11-25).** The notes below are kept for Phase 5.
 - Built: Tailwind v4 theme, UI kit, typed API client, auth hooks, router, layout, header with account menu, and the log in and sign up pages. Setup is in `README.md`.
 - Checked against the real API through the Vite proxy (register, me, logout, login, wrong password): all as expected.
 - The throwaway dev user from that check is `phase3-check-1795565405@itsadate-dev.test` (in the dev database, `itsadate_dev`; it was created through the local API, which reads `apps/api/.env`).
@@ -50,7 +54,7 @@ Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in
 - Query keys starting with `'auth'` are exempt from the 401 handling and survive logout. `useLogout` callers must navigate away (the guard sends a successful logout to home). Login and register clear all non-auth queries.
 - `vite preview` now proxies `/api` too (port 4173).
 
-**Phase 2 is built on branch `phase-2-api`; the PR into `modernize` is pending review.**
+**Phase 2 (API) is merged into `modernize` (PR #4).**
 - The API is rebuilt (`/api/v1`, cookie auth, roles, tags, ideas, admin) with `migrate`, `create-admin` and `seed` scripts. The legacy API (`apps/api/legacy/`) is deleted from git, so `reset-admins` and `copy-to-dev` are gone. Setup and script commands are in `README.md`.
 - Dev DB `itsadate_dev` is migrated and seeded (53 ideas). The owner's dev admin `png.mantis@gmail.com` exists.
 - The local env now lives at **`apps/api/.env`** (untracked, ignored). `apps/api/legacy/.env` is kept on disk as a backup (untracked); the owner deletes it after Phase 7.

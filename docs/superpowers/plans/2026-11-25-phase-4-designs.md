@@ -10,6 +10,52 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-20-its-a-date-modernization-design.md` §7, §8.4, §8.6 and §8.7. Style: `DESIGN.md` and `.open-design/design-systems/style-tiles-for-it-s-a-date-a-web-app-where-peop/tokens.css` (the active design system, `user:style-tiles-for-it-s-a-date-a-web-app-where-peop`).
 
+## Status (2026-11-25) — read this first if you're picking the phase up
+
+**Tasks 1 and 2 are built, critiqued and reviewed (both approved). Task 3 (owner sign-off) is in progress: the owner gave feedback, and the agreed changes below aren't made yet.** Don't re-run Tasks 1 or 2.
+
+- **Branch:** `phase-4-designs`, from `modernize` at `dc15757`. Commits: `6357dd8` and `fbb71ed` (this plan), `987314f` and `04ad2cb` (Task 1: content sheet and Home, plus the critic polish), `ea8fd51` and `663fdd3` (Task 2: Idea detail, plus the critic polish), then the commit that added this section. Nothing is pushed.
+- **Screens:** `.open-design/itsadate-screens/home.html` and `idea-detail.html`, with the shared `content.md`, `_shared/data.json` and `_shared/nav.html`.
+- **Last checks:**
+  - Home: run `2026-11-25T03-36-46`. One error and two warnings, all from the deliberate two-line clamp on the 80-character title (R5).
+  - Idea detail: run `2026-11-25T03-53-51`. 0 errors, 0 warnings.
+  - Critic verdict: polish on both, applied once each.
+- **Ledger** (git-ignored, on the original machine only): `.superpowers/sdd/2026-11-25-phase-4-designs/progress.md`. It has the full rulings, the reviewers' minor findings, and the brief, report and critique files for each task.
+
+### What the next agent does
+
+1. Check that `git status` is clean, the branch is `phase-4-designs`, and `git log --oneline -1` is this section's commit or later. Never check out pre-Phase-0 commits, and never touch `apps/api/.env`.
+2. Do the **Task 3 Step 2 owner round**. The exact list is in Task 3, under "Owner round 1 (agreed 2026-11-25)". Dispatch one fresh `itsadate-designer` agent for it, then a critic, then an `itsadate-reviewer`, exactly as for Tasks 1–2 (see the rulings below).
+3. Show the owner the result:
+   - Run `open_open_design_preview` with `entryPath: ".open-design/itsadate-screens/home.html"` and `open: false`, then open the URL it returns with `start "" "<url>"`. The tool can't open a window on this PC by itself.
+   - The URL changes every session; give the owner the new one.
+   - Don't use a Claude artifact link: its viewer blocks the Unsplash photos (R11).
+4. When the owner approves Home and Idea detail in so many words, record it in the ledger and in Task 3 Step 3. Then go on to Tasks 4–8.
+
+### Rulings made during execution (binding unless the owner overturns them)
+
+- R1: The controller owns the ledger. Implementers write a report file instead.
+- R2: The controller runs the critic. The implementer stops after the check and writes `get_open_design_artifact(critique: true)`'s `critiqueInput` to `<ledger dir>/task-N-critique-input.json`. The controller dispatches `open-design:design-critic`, then resumes the implementer for one polish round (register with `critique`, then re-check). The task reviewer runs after that.
+- R3: Auth is one file, `auth.html` (Log in and Sign up together).
+- R4: Commit the kit's own state, `.open-design/history.json` and `.open-design/sources/`, with each task.
+- R5: The remaining `overflow` error on the two-line clamp of the 80-character card title is accepted. Phase 5 uses `line-clamp`.
+- R6: Photo credits give the Unsplash id and the licence, without the photographer's name (the lookup was blocked). Complete them before Phase 7.
+- R7: Cards leave the rating out when `ratingCount` is 0. The detail page says "No ratings yet. Be the first."
+- R8: The header gets "Your ideas" (a desktop link, and the first item in the account menu, to `profile.html#ideas`) and a "+ Share" pill on phones. Phase 5 restyles the Phase 3 header to match.
+- R9: Idea 5's numbers follow `content.md` ("$", Sam Okafor, 4.7 · 89), not Task 2's example values.
+- R10: `data.json` now has Maya's `myRating: 4` on idea 5 and a 7-item `places` list.
+- R11: Owner previews use the local Open Design preview, not a Claude artifact.
+- Admin (Task 6) needs its own header variant, because `_shared/nav.html` has Maya's avatar menu.
+
+### Reviewer minors parked for Task 7's `HANDOFF.md` (not for the owner round)
+
+- Long title links carry a `title=` attribute that repeats the visible text.
+- The phone search sheet preview has no focus trap and doesn't return focus. The real sheet needs both, and must make the page behind it inert.
+- Photographer credits are missing (R6).
+- Arrow keys on the rating radios would save on every step. Phase 6a should commit on Enter, Space or blur, or debounce.
+- The 5 km and 10 km place counts (14 and 20) are illustrative only.
+- The board's static toasts carry `role="status"`. Don't copy them as they are.
+
 ## Scope
 
 **In:** Home, Idea detail, Share an idea, Log in and Sign up, Profile, Admin, and 404, each at desktop and phone width. This includes the phone search sheet that Phase 3 left for this phase. Also in: the content sheet, the flow plan, the collection check, the critic on every screen, owner sign-off on Home and Idea detail, and a hand-off sheet for Phase 5.
@@ -110,19 +156,19 @@
 - Also produces two sample users: "Maya Chen" (user) and the owner as "Panos" (admin, only in Admin screens). Every later screen reuses these, so they show the same data.
 - Produces the header markup and the card markup that later screens copy (`data-component` attributes as in Global Constraints).
 
-- [ ] **Step 1: Branch and ledger**
+- [x] **Step 1: Branch and ledger**
 
 The branch `phase-4-designs` already exists (the controller created it and committed this plan at `6357dd8`); work on it. Create the ledger with a row per task (status, screen path, check result, critic verdict, notes).
 
-- [ ] **Step 2: Write `content.md`**
+- [x] **Step 2: Write `content.md`**
 
 Check every photo URL with `curl -sI <url>` and keep only 200s. Expected: 12 ideas, every Review Focus item present, a credit for every photo.
 
-- [ ] **Step 3: Prepare the brief**
+- [x] **Step 3: Prepare the brief**
 
 `prepare_open_design_brief` with `skillId: "od:prototype:web-prototype"`, the collection fields, `screenRole: "home"`, `screenTotal: 7`, the flow plan, the prototype answers, `sources: [".open-design/itsadate-screens/content.md", "DESIGN.md"]`. Brief, in substance: the Home page per spec §8.4. Sticky header. Hero headline "Plans worth *saying yes* to." The sticky pill search bar What / Vibe / Budget with a Filters pill (duration). The centred category row of the 8 tags, with "All" first and active. A sort toggle New / Top rated. A 4/3/2/1-column grid of 12 cards: 4:3 photo, overlay badge "New" on the newest, heart top-right, Fraunces title, rating "4.6 (128)" right-aligned, meta "$$ · Half day", tag chip. A "Show more" button for the next page (page size 24).
 
-- [ ] **Step 4: Write `home.html`, with the States board below it**
+- [x] **Step 4: Write `home.html`, with the States board below it**
 
 The States board shows, each labelled with an eyebrow:
 1. logged-out header
@@ -135,15 +181,15 @@ The States board shows, each labelled with an eyebrow:
 
 Filters are written as URL query state. Note it in a comment: `?q=&tag=&budget=&duration=&sort=`.
 
-- [ ] **Step 5: Register and check**
+- [x] **Step 5: Register and check**
 
 `register_open_design_artifact` (`kind: "html"`, title "Home", the collection fields, `flow`, `sources`, `brief`). Then `check_open_design_artifact` with the Global Constraints viewports. Expected: 0 errors, `horizontal-scroll` 0 at 360. Fix and re-check (two rounds max).
 
-- [ ] **Step 6: Critic**
+- [x] **Step 6: Critic**
 
 Run `open-design:open-design-critique` on `home.html`. Apply the one polish round if needed, then register with `critique` and re-check. Record the verdict in the ledger.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add .open-design/itsadate-screens docs/superpowers/plans/2026-11-25-phase-4-designs.md
@@ -161,11 +207,11 @@ git commit -m "design: content sheet and home screen"
 - Consumes: `content.md`, and the header and card markup from `home.html` (Task 1).
 - Produces: the rating, save and places patterns Phase 6a and 6b build: `StarRatingInput` (5 × 24px star buttons, "Your rating"), the save heart with its count, and the places panel (button, list, map, fallback).
 
-- [ ] **Step 1: Prepare the brief** (`screenRole: "idea-detail"`, `skillId: "od:prototype:web-prototype"`)
+- [x] **Step 1: Prepare the brief** (`screenRole: "idea-detail"`, `skillId: "od:prototype:web-prototype"`)
 
 The idea is "Golden-hour viewpoint drive" from `content.md`. Desktop shows the large 4:3 photo (20px radius) with the heart. Then the title, the tag chips, "$$ · Half day", "Shared by Maya Chen" and the rating summary "4.6 · 128 ratings". Then the description (max 65ch) and the rating input "Your rating" (the logged-in user's 4 stars, with "Remove rating" as a ghost button). Then the places section: "Find places near me" (one coral fill), which leads to a list of up to 20 places (name, distance "1.2 km", address, website link) next to a static map panel with numbered markers and "© OpenStreetMap contributors". A radius control: 3 km default, widen to 5 or 10 km. A back link "All ideas". Phone: photo full-width, the sections stack, the map sits above the list.
 
-- [ ] **Step 2: Write `idea-detail.html` with its States board**
+- [x] **Step 2: Write `idea-detail.html` with its States board**
 
 1. logged out: the heart leads to log in, the rating shows "Log in to rate" (link to auth)
 2. no photo (`image: null`, the sunk placeholder with the tag icon) and no ratings: "No ratings yet. Be the first."
@@ -179,13 +225,13 @@ The idea is "Golden-hour viewpoint drive" from `content.md`. Desktop shows the l
 10. idea not found or not approved: "We couldn't find that idea." with "Back to all ideas"
 11. a rating saved toast: "Rating saved"
 
-- [ ] **Step 3: Register, check, fix** (as Task 1 Step 5, title "Idea detail")
+- [x] **Step 3: Register, check, fix** (as Task 1 Step 5, title "Idea detail")
 
 Expected: 0 errors, and at most two coral fills in every state (the places button and at most one other).
 
-- [ ] **Step 4: Critic** (as Task 1 Step 6)
+- [x] **Step 4: Critic** (as Task 1 Step 6)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add .open-design/itsadate-screens
@@ -200,11 +246,41 @@ Not an agent task. The owner must approve these two before the other screens cop
 
 - [ ] **Step 1: Show them**
 
-`open_open_design_preview` on `home.html`. Also publish a private preview of each with `publish_open_design_artifact` (`provider: "claude-artifact"`), and give the owner both links.
+`open_open_design_preview` on `home.html` (the preview is a clickable prototype: cards lead to Idea detail). Give the owner the URL. Don't publish a Claude artifact: its viewer blocks the Unsplash photos (R11).
+
+- [x] **Step 1 done:** The local preview was shown (R11).
 
 - [ ] **Step 2: Collect feedback**
 
-Take comments from chat or the preview's Comment pins (`get_open_design_artifact` → `openComments`). Apply them in a fresh `itsadate-designer` agent (register with `resolvedCommentIds`, re-check), then re-publish the previews. Repeat until the owner says yes.
+Take comments from chat or the preview's Comment pins (`get_open_design_artifact` → `openComments`). Apply them in a fresh `itsadate-designer` agent (register with `resolvedCommentIds`, re-check), then show the preview again. Repeat until the owner says yes.
+
+**Owner round 1 (agreed 2026-11-25).** The owner asked, "When it comes to an idea, do we want the user to scroll that much?" They agreed to these changes:
+
+1. **Idea detail: places collapsed by default.**
+   - The main view shows only a compact places card: the heading, one line of explanation, and "Find places near me", the screen's one coral fill.
+   - The opened results (list and map) move to the States board as their own frame, "Places found".
+   - The real page then ends after the description, rating and places card.
+2. **Idea detail on phones: a shorter results view.**
+   - The map is 4:3, not square.
+   - The list shows at most 5 places, then a "Show all 7" button.
+   - Keep the 24px pins and the hidden street labels from the critic fix.
+3. **Both screens: the States board hidden by default.**
+   - Put it behind a "Show design states" toggle under the page: a `<details>`/`<summary>` element, closed by default, labelled as design-only.
+   - Everything stays inside it for Phase 5.
+   - The check must still see the states: either check once with the board open, or note in the report how the check ran.
+4. **Reviewer minors, in the same round:**
+   - Remove the dead `data-od-allow="overflow"` from every `.card-title` (Home).
+   - Move the two inline `style="margin-bottom:8px"` into a class (Home, about lines 1116 and 1124).
+   - The phone loading frame shows at least 3 skeletons, not 1 (Home; 7 of the 8 are `hide-sm`).
+   - Empty stars use `--muted`, not `--border` (1.3:1 fails WCAG 1.4.11) (Idea detail).
+   - Drop `autocomplete="postal-code"` on the "City or postcode" field (Idea detail).
+   - "Remove rating" shows only while a rating exists (Idea detail).
+   - Remove the dead class `meta-sep` (Idea detail).
+   - Use `content.md`'s alt text verbatim for the idea 5 photo (Idea detail).
+
+**Offered and not decided:** a shorter phone photo on Idea detail (3:2 instead of 4:3). Ask the owner when showing round 1.
+
+After the round: re-check both screens (same viewports), run the critic once on Idea detail only (it changed the most), run one `itsadate-reviewer` over the round's diff, and show the owner the preview again.
 
 - [ ] **Step 3: Record the sign-off**
 
