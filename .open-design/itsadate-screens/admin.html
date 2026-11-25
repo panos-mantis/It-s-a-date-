@@ -2039,7 +2039,8 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
     var b = e.target.closest('button[data-act]');
     if (!b) return;
     var tr = b.closest('tr');
-    var name = tr.querySelector('.row-name').textContent;
+    var nameEl = tr.querySelector('.row-name'); // not there while the row is being renamed
+    var name = nameEl ? nameEl.textContent : '';
     var act = b.getAttribute('data-act');
     if (act === 'delete-tag') {
       ask({ title: 'Delete "' + name + '"?', body: 'It comes off every idea that has it, and the ' + name + ' button leaves Home. An idea tagged only ' + name + ' is left with no tag until someone edits it. This can’t be undone.', ok: 'Delete tag',
@@ -2051,7 +2052,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
         } }, b);
     }
     if (act === 'rename') startRename(tr);
-    if (act === 'cancel-rename') endRename(tr, false);
+    if (act === 'cancel-rename') endRename(tr);
   });
   function startRename(tr) {
     var cell = tr.querySelector('.col-tag');
@@ -2082,10 +2083,10 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
     tr.querySelector('[data-act="save-rename"]').addEventListener('click', save);
     form.addEventListener('keydown', function (ev) {
       if (ev.key === 'Enter') { ev.preventDefault(); save(); }
-      if (ev.key === 'Escape') { ev.preventDefault(); endRename(tr, true); }
+      if (ev.key === 'Escape') { ev.preventDefault(); endRename(tr); }
     });
   }
-  function endRename(tr, focus) {
+  function endRename(tr) {
     tr.querySelector('.col-tag').innerHTML = tr._saved.cell;
     tr.querySelector('.col-actions').innerHTML = tr._saved.actions;
     tr.querySelector('[data-act="rename"]').focus();
@@ -2143,7 +2144,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
         var admins = uBody.querySelectorAll('tr[data-role="admin"]').length;
         if (admins <= 1) {
           // POST /admin/users/:id/role answers 409 "You can't remove the last admin"
-          uErr.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><span><strong>You can’t remove the last admin.</strong> Make someone else an admin first, then try again.</span>';
+          uErr.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><span><strong>You can\'t remove the last admin.</strong> Make someone else an admin first, then try again.</span>';
           return b;
         }
         var btn = setRole(row, 'user');
