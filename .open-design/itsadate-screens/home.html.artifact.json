@@ -18,8 +18,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T03:36:37.806Z",
-  "updatedAt": "2026-11-25T03:36:37.806Z",
+  "createdAt": "2026-11-25T11:30:52.889Z",
+  "updatedAt": "2026-11-25T11:30:52.889Z",
   "sourceSkillId": "od:prototype:web-prototype",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -28,7 +28,7 @@
   "sources": [
     {
       "path": ".open-design/itsadate-screens/content.md",
-      "sha256": "1a620bab3e4d6066e8ce3a617f89a3631d55fc1a0cdd70589e9c33707a573a6e"
+      "sha256": "8cd1059e2d39d8eab6e9a318d516e117818f808edc0d374210ae7e1775261d8c"
     },
     {
       "path": "DESIGN.md",
@@ -37,7 +37,7 @@
   ],
   "metadata": {
     "brief": {
-      "text": "The Home page of It's a Date per spec 8.4: sticky header, hero 'Plans worth saying yes to.', sticky What / Vibe / Budget search bar with a Filters pill (duration), category row, New / Top rated sort, 12 idea cards, Show more, and a States board.",
+      "text": "The Home page of It's a Date per spec 8.4: sticky header, hero 'Plans worth saying yes to.', sticky What / Vibe / Budget search bar with a Filters pill (duration), category row, New / Top rated sort, 12 idea cards, Show more, and a States board behind a 'Show design states' toggle.",
       "answers": {
         "purpose": "Explaining a product or service",
         "theme": "Light",
@@ -48,7 +48,8 @@
         "Logged in as Maya Chen on the main view; logged-out header shown on the States board",
         "Search segments are What / Vibe / Budget plus a Filters pill for duration, never Where / When",
         "12 sample ideas from the content sheet, more available via Show more",
-        "Photos are checked Unsplash URLs; one idea has no photo and shows the sunk placeholder"
+        "Photos are checked Unsplash URLs; one idea has no photo and shows the sunk placeholder",
+        "States board is design-only, in a closed details toggle under the page (owner round 1)"
       ]
     },
     "flow": {

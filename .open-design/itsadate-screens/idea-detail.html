@@ -8,7 +8,11 @@
 <!--
   It's a Date · Idea detail (screen 2 of 7, collection itsadate-screens)
   Route: /ideas/:id. Data: _shared/data.json and content.md (idea 5, "Golden-hour viewpoint drive").
-  Main view: logged in as Maya Chen, who has saved this idea and rated it 4, after "Find places near me" ran.
+  Main view: logged in as Maya Chen, who has saved this idea and rated it 4, before any places search.
+  Places start collapsed: a compact card with "Find places near me" (the page's one coral fill). The
+  results (list and map) are the "Places found" frame on the States board.
+  The States board sits in a closed <details> ("Show design states") under the page. It is design-only
+  and not part of the real page: Phase 5 ports the frames, not the toggle.
   Places (spec 8.6): GET /places?lat=&lng=&type=viewpoint&radius=3000 returns
     { name, lat, lng, distanceM, address?, website? }[] sorted by distance, at most 20 (PLACES_RESULTS_MAX).
     radius 3000 (PLACES_RADIUS_DEFAULT_M), 5000, 10000 (PLACES_RADIUS_MAX_M).
@@ -111,6 +115,7 @@ button, input, select { font: inherit; color: inherit; }
 .btn-ghost { background: transparent; color: var(--accent-ink); }
 .btn-ghost:hover { text-decoration: underline; }
 .btn.btn-flush { padding-inline: 0; }
+.btn[hidden] { display: none; }
 
 /* Header (matches apps/web Header.tsx + AccountMenu.tsx; same as home.html) */
 .site-header {
@@ -186,6 +191,8 @@ button, input, select { font: inherit; color: inherit; }
   .detail-media { position: sticky; top: calc(var(--header-h) + 24px); }
 }
 .media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-sunk); }
+/* Phones: a shorter 3:2 photo (and the same box for the no-photo placeholder); desktop keeps 4:3 */
+@media (max-width: 639px) { .media { aspect-ratio: 3 / 2; } }
 .media img { width: 100%; height: 100%; object-fit: cover; }
 .photo-empty { width: 100%; height: 100%; display: grid; place-items: center; color: var(--muted); }
 .photo-empty .icon { width: 40px; height: 40px; }
@@ -239,7 +246,7 @@ button, input, select { font: inherit; color: inherit; }
 .rate-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .stars { display: flex; gap: 0; margin-left: -10px; }
 .star { position: relative; display: grid; place-items: center; width: 44px; height: 44px; cursor: pointer; }
-.star .icon { width: 24px; height: 24px; color: var(--border); border-radius: 4px; transition: color 150ms var(--ease), fill 150ms var(--ease); }
+.star .icon { width: 24px; height: 24px; color: var(--muted); border-radius: 4px; transition: color 150ms var(--ease), fill 150ms var(--ease); }
 .star.is-on .icon { color: var(--fg); fill: var(--fg); }
 .star.is-preview .icon { color: var(--fg); fill: none; }
 .star input:focus-visible + .icon { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
@@ -247,11 +254,18 @@ button, input, select { font: inherit; color: inherit; }
 .rate-note strong { color: var(--fg); font-weight: 600; }
 .rate.is-quiet { gap: 8px; align-items: flex-start; }
 
-/* Places */
-.places { border-top: 1px solid var(--border); padding: 48px 0 64px; }
+/* Places, collapsed: the compact card at the end of the page (before any search) */
+.places-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+.places-card h2 { font-size: 20px; line-height: 1.2; letter-spacing: -0.01em; }
+.places-card-note { margin-top: 4px; font-size: 14px; color: var(--muted); }
+
+/* Places found (States board frame): list and map */
 .places-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; margin-bottom: 24px; }
-.places-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; }
-.places-head h2 em { font-style: italic; font-weight: 400; }
+.places-head h3 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; }
+.places-head h3 em { font-style: italic; font-weight: 400; }
 .places-sub { margin-top: 8px; color: var(--muted); }
 .places-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
 .toggle {
@@ -293,10 +307,17 @@ button, input, select { font: inherit; color: inherit; }
 .place-link:hover { text-decoration: underline; }
 .place-link .icon { width: 14px; height: 14px; }
 .places-foot { margin-top: 16px; font-size: 12px; color: var(--muted); max-width: 65ch; }
+.places-more { display: none; }
+@media (max-width: 639px) {
+  /* Phones: the nearest 5, then "Show all 7" */
+  .places-more { display: inline-flex; margin-top: 8px; }
+  .place-list:not(.is-expanded) .place.is-extra { display: none; }
+}
 
 /* Static map panel (Phase 6b: react-leaflet with OSM tiles in the same box).
-   The drawing is an 800x600 canvas (1 km = 77 units, so the 3 km ring has r=231). The canvas is always
-   4:3 and centred, so in a taller box (1:1 on phones) its sides are cropped and the middle stays.
+   The drawing is an 800x600 canvas (1 km = 77 units, so the 3 km ring has r=231). The box and the
+   canvas are both 4:3. On phones the canvas is zoomed 1.25x onto canvas x 150-790, y 70-550, which
+   holds every pin, the "you" dot and the scale bar, so the pins keep apart.
    Pins and the "you" dot are HTML badges placed in canvas percentages (x/800, y/600), so they keep
    a fixed 24px size at every width, as Leaflet markers do. */
 .map { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-sunk); border: 1px solid var(--border); }
@@ -337,10 +358,10 @@ button, input, select { font: inherit; color: inherit; }
 }
 .you-dot { width: 12px; height: 12px; border-radius: var(--radius-pill); background: var(--accent-ink); box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent-ink); }
 @media (max-width: 639px) {
-  /* Phones: a square map so the pins spread out; street names would be too small, so they go. */
-  .map { aspect-ratio: 1 / 1; }
+  /* Phones: a 4:3 map zoomed 1.25x (left -150/640, top -70/480); street names would be too small, so they go. */
+  .map-canvas { top: -14.583%; left: -23.4375%; height: 125%; transform: none; }
   .map-label { display: none; }
-  .map-scale text { font-size: 24px; }
+  .map-scale text { font-size: 26px; }
   .map-scale line { stroke-width: 4; }
 }
 
@@ -405,8 +426,27 @@ button, input, select { font: inherit; color: inherit; }
 .toast-region { position: fixed; left: 50%; bottom: 24px; z-index: 70; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); }
 .toast-region:empty { display: none; }
 
+/* Design states toggle: design-only, closed by default, not part of the real page */
+.design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }
+.design-states-summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  width: 100%; max-width: 1200px; margin-inline: auto; padding: 12px var(--gutter);
+  list-style: none; cursor: pointer;
+}
+.design-states-summary::-webkit-details-marker { display: none; }
+.design-states-label {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 600;
+}
+.design-states-label .icon { width: 18px; height: 18px; transition: transform 150ms var(--ease); }
+.design-states[open] .design-states-label .icon { transform: rotate(180deg); }
+.design-states-note { font-size: 14px; color: var(--muted); }
+.design-states .when-open, .design-states[open] .when-closed { display: none; }
+.design-states[open] .when-open { display: inline; }
+/* Closed: no box at all (Chromium otherwise keeps the hidden board laid out at zero size) */
+.design-states:not([open]) > .board { display: none; }
+
 /* States board */
-.board { background: var(--surface-sunk); border-top: 1px solid var(--border); padding: 64px 0 96px; }
+.board { background: var(--surface-sunk); padding: 24px 0 96px; }
 .board-head { max-width: 65ch; }
 .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .board-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; margin-top: 8px; }
@@ -435,9 +475,9 @@ button, input, select { font: inherit; color: inherit; }
 .rate-row > .rate { flex: 1 1 240px; }
 .toast-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 @media (max-width: 767px) {
-  .board { padding: 48px 0 64px; }
+  .board { padding: 16px 0 64px; }
   .frame-pad { padding: 16px; }
-  .places-head h2 { font-size: 24px; }
+  .places-head h3 { font-size: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -484,7 +524,7 @@ button, input, select { font: inherit; color: inherit; }
   <article class="container detail" data-od-id="idea" aria-labelledby="idea-title">
     <div class="detail-media">
       <div class="media">
-        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="A mountain valley lookout framed by pine trees" width="800" height="600" data-od-bind-src="ideas[4].image.url">
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="Mountain valley lookout with pines" width="800" height="600" data-od-bind-src="ideas[4].image.url">
         <button type="button" class="save" aria-pressed="true" data-save data-count="276" aria-label="Saved. 276 people saved Golden-hour viewpoint drive"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span class="save-count" aria-hidden="true">276</span></button>
       </div>
     </div>
@@ -526,150 +566,32 @@ button, input, select { font: inherit; color: inherit; }
           </div>
         </fieldset>
       </form>
+
+      <!-- Places, collapsed. Nothing asks for location until the button is pressed. The heading names the
+           idea's place type (viewpoint: "Viewpoints near you"; sushi: "Sushi near you"). placeType "none"
+           leaves this card out. The results are the "Places found" frame on the States board. -->
+      <section class="places-card" id="places" data-od-id="places" aria-labelledby="places-title">
+        <div>
+          <h2 id="places-title">Viewpoints near you</h2>
+          <p class="places-card-note">See lookouts close by. Your location is used only for this search.</p>
+        </div>
+        <button type="button" class="btn btn-primary btn-md" data-find-places data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg>Find places near me</button>
+      </section>
     </div>
   </article>
 
-  <!-- ===================== Places (after "Find places near me" ran) ===================== -->
-  <section class="places" id="places" data-od-id="places" aria-labelledby="places-title">
-    <div class="container">
-      <div class="places-head">
-        <div>
-          <h2 id="places-title">Viewpoints <em>near you</em></h2>
-          <p class="places-sub" data-radius-sub>7 places within 3 km of your location, nearest first.</p>
-        </div>
-        <div class="places-controls">
-          <div class="toggle" role="group" aria-label="Search radius" data-single data-required data-radius>
-            <button type="button" aria-pressed="true" data-km="3">3 km</button>
-            <button type="button" aria-pressed="false" data-km="5">5 km</button>
-            <button type="button" aria-pressed="false" data-km="10">10 km</button>
-          </div>
-          <button type="button" class="btn btn-ghost btn-sm" data-component="Button">Use a different place</button>
-        </div>
-      </div>
-
-      <div class="places-body">
-        <figure class="map" data-od-id="map">
-          <div class="map-canvas">
-            <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="map-label">
-              <title id="map-label">Map of the 7 viewpoints within 3 km of your location, numbered as in the list</title>
-              <!-- parks -->
-              <path class="map-park" d="M372 232h52v40h-52z"/>
-              <path class="map-park" d="M462 392c20-16 70-14 86 4 14 16 4 44-24 50-30 6-72-6-74-26-1-12 4-20 12-28z"/>
-              <path class="map-park" d="M222 330c14-22 58-28 74-6 12 18 0 52-28 58-30 6-58-24-46-52z"/>
-              <path class="map-park" d="M312 172c10-12 34-12 40 4 6 14-6 30-22 30-18 0-26-20-18-34z"/>
-              <path class="map-park" d="M268 186c8-8 26-6 30 6 3 12-8 22-20 20-12-2-16-16-10-26z"/>
-              <path class="map-park" d="M330 392c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
-              <path class="map-park" d="M286 272c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
-              <!-- minor streets -->
-              <g class="map-street" stroke-width="4">
-                <path d="M430 40v540M470 40v540M550 40v540M590 40v540M630 40v540M670 40v540M390 120v440"/>
-                <path d="M360 90h440M360 150h440M360 210h440M360 270h440M380 330h420M380 390h420M560 450h240M380 510h420"/>
-                <path d="M300 120c-20 40-40 70-30 110M240 250c40 10 80 0 120 20M200 440c40-20 100-20 160 10M260 520c30-30 60-40 120-50"/>
-              </g>
-              <!-- major streets -->
-              <g class="map-street" stroke-width="9">
-                <path d="M510 20v580"/>
-                <path d="M360 470h440"/>
-                <path d="M180 300 L420 80 L520 -10"/>
-                <path d="M120 470c60-40 120-70 180-90s90-60 120-110"/>
-              </g>
-              <text class="map-label" x="518" y="80">Mission St</text>
-              <text class="map-label" x="600" y="462">Cesar Chavez St</text>
-              <text class="map-label" x="372" y="64" transform="rotate(-42 372 64)">Market St</text>
-              <!-- 3 km radius -->
-              <circle class="map-radius" cx="470" cy="330" r="231"/>
-              <!-- 1 km scale bar, in map units (77 units = 1 km), inside the part a square phone map keeps -->
-              <g class="map-scale" aria-hidden="true">
-                <text x="124" y="556">1 km</text>
-                <line x1="124" y1="572" x2="201" y2="572"/>
-                <line x1="124" y1="564" x2="124" y2="572"/>
-                <line x1="201" y1="564" x2="201" y2="572"/>
-              </g>
-            </svg>
-            <div class="map-pins" aria-hidden="true">
-              <span class="map-you"></span>
-              <span class="map-pin is-active" data-pin="1">1</span>
-              <span class="map-pin" data-pin="2">2</span>
-              <span class="map-pin" data-pin="3">3</span>
-              <span class="map-pin" data-pin="4">4</span>
-              <span class="map-pin" data-pin="5">5</span>
-              <span class="map-pin" data-pin="6">6</span>
-              <span class="map-pin" data-pin="7">7</span>
-            </div>
-          </div>
-          <span class="map-legend"><span class="you-dot" aria-hidden="true"></span>You are here</span>
-          <figcaption class="map-attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</figcaption>
-        </figure>
-
-        <div>
-          <ol class="place-list" data-place-list>
-            <li class="place is-active" data-place="1">
-              <span class="pin-num" aria-hidden="true">1</span>
-              <div class="place-body">
-                <div class="place-top"><h3 class="place-name">Bernal Heights Summit</h3><span class="place-dist">1.2 km</span></div>
-                <p class="place-addr">Bernal Heights Blvd, San Francisco, CA 94110</p>
-                <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
-              </div>
-            </li>
-            <li class="place" data-place="2">
-              <span class="pin-num" aria-hidden="true">2</span>
-              <div class="place-body">
-                <div class="place-top"><h3 class="place-name">Mission Dolores Park</h3><span class="place-dist">1.4 km</span></div>
-                <p class="place-addr">Dolores St &amp; 19th St, San Francisco, CA 94114</p>
-                <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
-              </div>
-            </li>
-            <li class="place" data-place="3">
-              <span class="pin-num" aria-hidden="true">3</span>
-              <div class="place-body">
-                <div class="place-top"><h3 class="place-name">Billy Goat Hill</h3><span class="place-dist">1.9 km</span></div>
-                <p class="place-addr">Laidley St &amp; 30th St, San Francisco, CA 94131</p>
-              </div>
-            </li>
-            <li class="place" data-place="4">
-              <span class="pin-num" aria-hidden="true">4</span>
-              <div class="place-body">
-                <div class="place-top"><h3 class="place-name">Kite Hill Open Space</h3><span class="place-dist">2.3 km</span></div>
-                <p class="place-addr">Yukon St &amp; 19th St, San Francisco, CA 94114</p>
-              </div>
-            </li>
-            <li class="place" data-place="5">
-              <span class="pin-num" aria-hidden="true">5</span>
-              <div class="place-body">
-                <div class="place-top"><h3 class="place-name">Corona Heights Park</h3><span class="place-dist">2.6 km</span></div>
-                <p class="place-addr">Roosevelt Way &amp; Museum Way, San Francisco, CA 94114</p>
-                <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
-              </div>
-            </li>
-            <li class="place" data-place="6">
-              <span class="pin-num" aria-hidden="true">6</span>
-              <div class="place-body">
-                <div class="place-top"><h3 class="place-name">Twin Peaks Summit Overlook</h3><span class="place-dist">2.8 km</span></div>
-                <p class="place-addr">501 Twin Peaks Blvd, San Francisco, CA 94114</p>
-                <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
-              </div>
-            </li>
-            <li class="place" data-place="7">
-              <span class="pin-num" aria-hidden="true">7</span>
-              <div class="place-body">
-                <div class="place-top"><h3 class="place-name">Tank Hill</h3><span class="place-dist">2.9 km</span></div>
-                <!-- No address in OpenStreetMap for this one: the line is left out, never "undefined". -->
-              </div>
-            </li>
-          </ol>
-          <p class="places-foot">Place details come from OpenStreetMap and can be out of date, so check opening times before you head out. Your location is only used for this search.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== States board ===================== -->
+  <!-- ===================== States board (design-only, behind a closed toggle) ===================== -->
+  <details class="design-states" data-od-id="design-states">
+    <summary class="design-states-summary">
+      <span class="design-states-label"><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg><span class="when-closed">Show design states</span><span class="when-open">Hide design states</span></span>
+      <span class="design-states-note">Design only, not part of the real page.</span>
+    </summary>
   <section class="board" data-od-id="states-board" aria-labelledby="board-title">
     <div class="container">
       <div class="board-head">
         <p class="eyebrow">States board</p>
         <h2 id="board-title">Idea detail, in <em>every</em> state</h2>
-        <p>Each frame is one state of this page, for the Phase 5 port and the ratings and places work in Phase 6. The page above is Maya Chen, logged in, after "Find places near me" ran. Places frames show only the places section; the rest of the page stays as it is.</p>
+        <p>Each frame is one state of this page, for the Phase 5 port and the ratings and places work in Phase 6. The page above is Maya Chen, logged in, before she searches for places. Places frames show only what replaces the compact places card; the rest of the page stays as it is.</p>
       </div>
 
       <!-- 1. Logged out -->
@@ -689,7 +611,7 @@ button, input, select { font: inherit; color: inherit; }
           <div class="frame-pad">
             <div class="mini is-wide">
               <div class="media">
-                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="A mountain valley lookout framed by pine trees" width="800" height="600" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="Mountain valley lookout with pines" width="800" height="600" loading="lazy">
                 <a class="save" href="auth.html" data-od-goto="auth" aria-label="Log in to save Golden-hour viewpoint drive. 276 people saved it"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span aria-hidden="true">276</span></a>
               </div>
               <div class="info">
@@ -766,7 +688,7 @@ button, input, select { font: inherit; color: inherit; }
             </div>
           </div>
         </div>
-        <p class="state-note">No photo: the sunk 4:3 placeholder carries the main tag's icon (here Home), and the heart stays. No ratings: the summary reads "No ratings yet. Be the first." (never "0.0 (0)"), and the input is labelled "Rate this idea" until Maya has rated it, then "Your rating".</p>
+        <p class="state-note">No photo: the sunk placeholder (4:3, or 3:2 on phones like the photo) carries the main tag's icon (here Home), and the heart stays. No ratings: the summary reads "No ratings yet. Be the first." (never "0.0 (0)"), and the input is labelled "Rate this idea" until Maya has rated it, then "Your rating".</p>
       </div>
 
       <!-- 3. Budget and duration missing -->
@@ -828,26 +750,9 @@ button, input, select { font: inherit; color: inherit; }
         <p class="state-note">The title wraps in full (no clamp on the detail page). The description keeps its blank-line paragraphs, wraps at 65ch and is never cut or hidden behind "Read more". On desktop the photo stays in view (sticky) while the text scrolls.</p>
       </div>
 
-      <!-- 5. Places, before searching -->
-      <div class="state" data-od-id="state-places-start">
-        <p class="eyebrow">5 · Places, before you search</p>
-        <div class="frame frame-pad">
-          <div class="panel">
-            <svg class="icon" aria-hidden="true"><use href="#i-map-pin"/></svg>
-            <h3>Viewpoints near you</h3>
-            <p>Find lookouts close by for this date. Your browser will ask to share your location once; it's only used for this search and never saved.</p>
-            <div class="panel-actions">
-              <button type="button" class="btn btn-primary btn-md" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg>Find places near me</button>
-              <button type="button" class="btn btn-ghost btn-sm" data-component="Button">Search by city or postcode</button>
-            </div>
-          </div>
-        </div>
-        <p class="state-note">What the places section shows when the page opens. Nothing asks for location until "Find places near me" is pressed. The heading names the idea's place type (<code>viewpoint</code>: "Viewpoints near you"; <code>sushi</code>: "Sushi near you"; <code>climbing_gym</code>: "Climbing gyms near you").</p>
-      </div>
-
-      <!-- 6. Places, waiting -->
+      <!-- 5. Places, waiting -->
       <div class="state" data-od-id="state-places-waiting">
-        <p class="eyebrow">6 · Places, waiting for your location</p>
+        <p class="eyebrow">5 · Places, waiting for your location</p>
         <div class="frame frame-pad" aria-busy="true">
           <p class="status-line" role="status"><span class="spinner" aria-hidden="true"></span>Finding places near you…</p>
           <div class="places-body">
@@ -863,6 +768,143 @@ button, input, select { font: inherit; color: inherit; }
         <p class="state-note">Covers the browser's permission prompt and the request (the API times out at 10 s). After 15 s the status changes to "This is taking longer than usual." with a "Search by city or postcode" button.</p>
       </div>
 
+      <!-- 6. Places found -->
+      <div class="state" id="state-places-found" data-od-id="state-places-found">
+        <p class="eyebrow">6 · Places found</p>
+        <div class="frame frame-pad">
+          <div class="places-head">
+            <div>
+              <h3>Viewpoints <em>near you</em></h3>
+              <p class="places-sub" data-radius-sub>7 places within 3 km of your location, nearest first.</p>
+            </div>
+            <div class="places-controls">
+              <div class="toggle" role="group" aria-label="Search radius" data-single data-required data-radius>
+                <button type="button" aria-pressed="true" data-km="3">3 km</button>
+                <button type="button" aria-pressed="false" data-km="5">5 km</button>
+                <button type="button" aria-pressed="false" data-km="10">10 km</button>
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm" data-component="Button">Use a different place</button>
+            </div>
+          </div>
+
+          <div class="places-body">
+            <figure class="map" data-od-id="map">
+              <div class="map-canvas">
+                <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="map-label">
+                  <title id="map-label">Map of the 7 viewpoints within 3 km of your location, numbered as in the list</title>
+                  <!-- parks -->
+                  <path class="map-park" d="M372 232h52v40h-52z"/>
+                  <path class="map-park" d="M462 392c20-16 70-14 86 4 14 16 4 44-24 50-30 6-72-6-74-26-1-12 4-20 12-28z"/>
+                  <path class="map-park" d="M222 330c14-22 58-28 74-6 12 18 0 52-28 58-30 6-58-24-46-52z"/>
+                  <path class="map-park" d="M312 172c10-12 34-12 40 4 6 14-6 30-22 30-18 0-26-20-18-34z"/>
+                  <path class="map-park" d="M268 186c8-8 26-6 30 6 3 12-8 22-20 20-12-2-16-16-10-26z"/>
+                  <path class="map-park" d="M330 392c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
+                  <path class="map-park" d="M286 272c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
+                  <!-- minor streets -->
+                  <g class="map-street" stroke-width="4">
+                    <path d="M430 40v540M470 40v540M550 40v540M590 40v540M630 40v540M670 40v540M390 120v440"/>
+                    <path d="M360 90h440M360 150h440M360 210h440M360 270h440M380 330h420M380 390h420M560 450h240M380 510h420"/>
+                    <path d="M300 120c-20 40-40 70-30 110M240 250c40 10 80 0 120 20M200 440c40-20 100-20 160 10M260 520c30-30 60-40 120-50"/>
+                  </g>
+                  <!-- major streets -->
+                  <g class="map-street" stroke-width="9">
+                    <path d="M510 20v580"/>
+                    <path d="M360 470h440"/>
+                    <path d="M180 300 L420 80 L520 -10"/>
+                    <path d="M120 470c60-40 120-70 180-90s90-60 120-110"/>
+                  </g>
+                  <text class="map-label" x="518" y="80">Mission St</text>
+                  <text class="map-label" x="600" y="462">Cesar Chavez St</text>
+                  <text class="map-label" x="372" y="64" transform="rotate(-42 372 64)">Market St</text>
+                  <!-- 3 km radius -->
+                  <circle class="map-radius" cx="470" cy="330" r="231"/>
+                  <!-- 1 km scale bar, in map units (77 units = 1 km), inside the part the zoomed phone map keeps (x 150-790, y 70-550) -->
+                  <g class="map-scale" aria-hidden="true">
+                    <text x="176" y="520">1 km</text>
+                    <line x1="176" y1="536" x2="253" y2="536"/>
+                    <line x1="176" y1="528" x2="176" y2="536"/>
+                    <line x1="253" y1="528" x2="253" y2="536"/>
+                  </g>
+                </svg>
+                <div class="map-pins" aria-hidden="true">
+                  <span class="map-you"></span>
+                  <span class="map-pin is-active" data-pin="1">1</span>
+                  <span class="map-pin" data-pin="2">2</span>
+                  <span class="map-pin" data-pin="3">3</span>
+                  <span class="map-pin" data-pin="4">4</span>
+                  <span class="map-pin" data-pin="5">5</span>
+                  <span class="map-pin" data-pin="6">6</span>
+                  <span class="map-pin" data-pin="7">7</span>
+                </div>
+              </div>
+              <span class="map-legend"><span class="you-dot" aria-hidden="true"></span>You are here</span>
+              <figcaption class="map-attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</figcaption>
+            </figure>
+
+            <div>
+              <ol class="place-list" id="place-list" data-place-list>
+                <li class="place is-active" data-place="1">
+                  <span class="pin-num" aria-hidden="true">1</span>
+                  <div class="place-body">
+                    <div class="place-top"><h3 class="place-name">Bernal Heights Summit</h3><span class="place-dist">1.2 km</span></div>
+                    <p class="place-addr">Bernal Heights Blvd, San Francisco, CA 94110</p>
+                    <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+                  </div>
+                </li>
+                <li class="place" data-place="2">
+                  <span class="pin-num" aria-hidden="true">2</span>
+                  <div class="place-body">
+                    <div class="place-top"><h3 class="place-name">Mission Dolores Park</h3><span class="place-dist">1.4 km</span></div>
+                    <p class="place-addr">Dolores St &amp; 19th St, San Francisco, CA 94114</p>
+                    <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+                  </div>
+                </li>
+                <li class="place" data-place="3">
+                  <span class="pin-num" aria-hidden="true">3</span>
+                  <div class="place-body">
+                    <div class="place-top"><h3 class="place-name">Billy Goat Hill</h3><span class="place-dist">1.9 km</span></div>
+                    <p class="place-addr">Laidley St &amp; 30th St, San Francisco, CA 94131</p>
+                  </div>
+                </li>
+                <li class="place" data-place="4">
+                  <span class="pin-num" aria-hidden="true">4</span>
+                  <div class="place-body">
+                    <div class="place-top"><h3 class="place-name">Kite Hill Open Space</h3><span class="place-dist">2.3 km</span></div>
+                    <p class="place-addr">Yukon St &amp; 19th St, San Francisco, CA 94114</p>
+                  </div>
+                </li>
+                <li class="place" data-place="5">
+                  <span class="pin-num" aria-hidden="true">5</span>
+                  <div class="place-body">
+                    <div class="place-top"><h3 class="place-name">Corona Heights Park</h3><span class="place-dist">2.6 km</span></div>
+                    <p class="place-addr">Roosevelt Way &amp; Museum Way, San Francisco, CA 94114</p>
+                    <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+                  </div>
+                </li>
+                <li class="place is-extra" data-place="6">
+                  <span class="pin-num" aria-hidden="true">6</span>
+                  <div class="place-body">
+                    <div class="place-top"><h3 class="place-name">Twin Peaks Summit Overlook</h3><span class="place-dist">2.8 km</span></div>
+                    <p class="place-addr">501 Twin Peaks Blvd, San Francisco, CA 94114</p>
+                    <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+                  </div>
+                </li>
+                <li class="place is-extra" data-place="7">
+                  <span class="pin-num" aria-hidden="true">7</span>
+                  <div class="place-body">
+                    <div class="place-top"><h3 class="place-name">Tank Hill</h3><span class="place-dist">2.9 km</span></div>
+                    <!-- No address in OpenStreetMap for this one: the line is left out, never "undefined". -->
+                  </div>
+                </li>
+              </ol>
+              <button type="button" class="btn btn-secondary btn-sm places-more" aria-expanded="false" aria-controls="place-list" data-places-more data-component="Button">Show all 7</button>
+              <p class="places-foot">Place details come from OpenStreetMap and can be out of date, so check opening times before you head out. Your location is only used for this search.</p>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">After "Find places near me" (or a city or postcode) the compact card opens into this: the list and the map, nearest first, with the 3 / 5 / 10 km toggle. Hovering or focusing a place lights its pin. On phones the map is 4:3 above the list, and the list shows the nearest 5, then "Show all 7" (the button says "Show all 20" when there are 20). The heading names the idea's place type, as on the card.</p>
+      </div>
+
       <!-- 7. Places, location denied -->
       <div class="state" data-od-id="state-places-denied">
         <p class="eyebrow">7 · Places, location turned off</p>
@@ -874,7 +916,7 @@ button, input, select { font: inherit; color: inherit; }
             <form class="locate-form" action="#places">
               <label class="field" data-component="Input">
                 <span class="field-label">City or postcode</span>
-                <input class="input" type="text" name="near" placeholder="For example 94110 or Oakland" autocomplete="postal-code">
+                <input class="input" type="text" name="near" placeholder="For example 94110 or Oakland">
               </label>
               <button type="submit" class="btn btn-primary btn-md" data-component="Button">Search</button>
             </form>
@@ -933,7 +975,7 @@ button, input, select { font: inherit; color: inherit; }
               </div>
               <h3 class="title">Pizza from scratch</h3>
               <div class="facts">
-                <p class="meta">$ · 1–2 hours <span class="meta-sep" aria-hidden="true">·</span> <svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Plan it at home</p>
+                <p class="meta">$ · 1–2 hours <span aria-hidden="true">·</span> <svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Plan it at home</p>
                 <p class="summary" role="img" aria-label="Rated 4.4 out of 5 from 112 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="summary-value">4.4</span><span class="summary-count">· 112 ratings</span></p>
               </div>
               <div class="byline"><span class="avatar" aria-hidden="true">S</span><p class="byline-text">Shared by <span class="byline-name">Sam Okafor</span> <span class="byline-date">· Oct 24, 2026</span></p></div>
@@ -941,7 +983,7 @@ button, input, select { font: inherit; color: inherit; }
             </div>
           </div>
         </div>
-        <p class="state-note"><code>placeType: none</code>: no places section and no "Find places near me" at all; the page ends after the description and the rating. "Plan it at home" joins the meta line instead.</p>
+        <p class="state-note"><code>placeType: none</code>: no places card and no "Find places near me" at all; the page ends after the description and the rating. "Plan it at home" joins the meta line instead.</p>
       </div>
 
       <!-- 11. Not found -->
@@ -989,6 +1031,7 @@ button, input, select { font: inherit; color: inherit; }
       </div>
     </div>
   </section>
+  </details>
 </main>
 
 <div class="toast-region" id="toasts" role="status" aria-live="polite"></div>
@@ -1023,6 +1066,8 @@ button, input, select { font: inherit; color: inherit; }
     var legend = form.querySelector('legend');
     var clear = form.querySelector('[data-rate-clear]');
     form.addEventListener('submit', function (e) { e.preventDefault(); });
+    // "Remove rating" shows only while a rating exists.
+    if (clear) clear.hidden = !(+stars.getAttribute('data-value'));
     stars.querySelectorAll('.star').forEach(function (s, i) {
       s.addEventListener('mouseenter', function () { paint(stars, 0, i + 1); });
     });
@@ -1033,6 +1078,7 @@ button, input, select { font: inherit; color: inherit; }
       paint(stars, v);
       if (legend) legend.textContent = 'Your rating';
       if (note) note.innerHTML = 'You gave it <strong>' + v + ' out of 5</strong>. Pick a star to change it.';
+      if (clear) clear.hidden = false;
       toast('Rating saved');
     });
     if (clear) clear.addEventListener('click', function () {
@@ -1041,6 +1087,9 @@ button, input, select { font: inherit; color: inherit; }
       paint(stars, 0);
       if (note) note.textContent = 'Pick a star to rate it.';
       if (legend) legend.textContent = 'Rate this idea';
+      clear.hidden = true;
+      var first = form.querySelector('input');
+      if (first) first.focus();
       toast('Rating removed');
     });
   });
@@ -1058,6 +1107,24 @@ button, input, select { font: inherit; color: inherit; }
       save.setAttribute('aria-label', (on ? 'Saved. ' : 'Save ') + title + '. ' + n + ' people saved it');
       save.querySelector('.save-count').textContent = n;
       toast(on ? "Saved. You'll find it on your profile." : 'Removed from your saved ideas.');
+      return;
+    }
+    // Prototype only: the results live on the States board, so the button opens it at "Places found".
+    // In the app the compact card opens into the list and map in place.
+    if (e.target.closest('[data-find-places]')) {
+      var board = document.querySelector('.design-states');
+      var found = document.getElementById('state-places-found');
+      if (board) board.open = true;
+      if (found) found.scrollIntoView({ block: 'start' });
+      return;
+    }
+    var more = e.target.closest('[data-places-more]');
+    if (more) {
+      var list = document.getElementById(more.getAttribute('aria-controls'));
+      var expanded = more.getAttribute('aria-expanded') !== 'true';
+      more.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      more.textContent = expanded ? 'Show fewer' : 'Show all 7';
+      if (list) list.classList.toggle('is-expanded', expanded);
       return;
     }
     var radius = e.target.closest('[data-radius] > button');

@@ -18,8 +18,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T03:53:43.153Z",
-  "updatedAt": "2026-11-25T03:53:43.153Z",
+  "createdAt": "2026-11-25T11:32:29.406Z",
+  "updatedAt": "2026-11-25T11:32:29.406Z",
   "sourceSkillId": "od:prototype:web-prototype",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -37,7 +37,7 @@
   ],
   "metadata": {
     "brief": {
-      "text": "The Idea detail page of It's a Date per spec 8.4 and 8.6 for 'Golden-hour viewpoint drive': photo with save heart and count, title, tags, meta, rating summary, description, 'Your rating' input, and places near me (list, static OSM map, 3/5/10 km), plus a States board.",
+      "text": "The Idea detail page of It's a Date per spec 8.4 and 8.6 for 'Golden-hour viewpoint drive': photo with save heart and count, title, tags, meta, rating summary, description, 'Your rating' input, and a compact places card ('Find places near me'); results (list, static OSM map, 3/5/10 km) and other states on a States board behind a 'Show design states' toggle.",
       "answers": {
         "purpose": "Explaining a product or service",
         "theme": "Light",
@@ -46,10 +46,10 @@
       "assumptions": [
         "Light theme only (spec section 4)",
         "Logged in as Maya Chen on the main view, who has saved this idea and rated it 4; logged-out variant on the States board",
-        "Places shown after the search ran, near the Mission in San Francisco; the before-search panel is on the States board",
+        "Places start collapsed (owner round 1): compact card with the one coral fill; 'Places found' is a States board frame",
+        "States board is design-only, in a closed details toggle under the page",
         "The map is a static drawn panel with OSM attribution, no real tiles (Leaflet comes in Phase 6)",
-        "Idea values follow content.md (idea 5: $ · Half day, 4.7 from 89 ratings, Sam Okafor)",
-        "Card and header markup copied from home.html so the screens match"
+        "Idea values follow content.md (idea 5: $ · Half day, 4.7 from 89 ratings, Sam Okafor)"
       ]
     },
     "flow": {

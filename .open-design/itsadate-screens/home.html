@@ -16,6 +16,8 @@
     sort     new (default) | top
   Page size 24 (PAGE_SIZE_DEFAULT). "Show more" loads the next page (&page=2).
   The main grid shows 12 cards to keep this mockup short.
+  The States board sits in a closed <details> ("Show design states") under the page. It is design-only
+  and not part of the real page: Phase 5 ports the frames, not the toggle.
   Kit components carry data-component so the Phase 5 port maps them onto apps/web/src/components/ui/.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -433,8 +435,27 @@ select.seg-field.is-empty { color: var(--muted); }
 .sheet-overlay { position: fixed; inset: 0; z-index: 60; }
 .sheet-overlay[hidden] { display: none; }
 
+/* Design states toggle: design-only, closed by default, not part of the real page */
+.design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }
+.design-states-summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  width: 100%; max-width: 1200px; margin-inline: auto; padding: 12px var(--gutter);
+  list-style: none; cursor: pointer;
+}
+.design-states-summary::-webkit-details-marker { display: none; }
+.design-states-label {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 600;
+}
+.design-states-label .icon { width: 18px; height: 18px; transition: transform 150ms var(--ease); }
+.design-states[open] .design-states-label .icon { transform: rotate(180deg); }
+.design-states-note { font-size: 14px; color: var(--muted); }
+.design-states .when-open, .design-states[open] .when-closed { display: none; }
+.design-states[open] .when-open { display: inline; }
+/* Closed: no box at all (Chromium otherwise keeps the hidden board laid out at zero size) */
+.design-states:not([open]) > .board { display: none; }
+
 /* States board */
-.board { background: var(--surface-sunk); border-top: 1px solid var(--border); padding: 64px 0 96px; }
+.board { background: var(--surface-sunk); padding: 24px 0 96px; }
 .board-head { max-width: 65ch; }
 .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .board-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; margin-top: 8px; }
@@ -470,12 +491,13 @@ select.seg-field.is-empty { color: var(--muted); }
 .menu-demo .account-menu { position: static; }
 .popover-demo { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; width: 360px; max-width: 100%; }
 .popover-demo .popover { position: static; width: 100%; }
+.demo-label { margin-bottom: 8px; }
 .toast-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 
 @media (max-width: 767px) {
   .hero { padding-top: 32px; }
   .hero h1, .hero-title { font-size: 30px; }
-  .board { padding: 48px 0 64px; }
+  .board { padding: 16px 0 64px; }
   .frame-pad { padding: 16px; }
   .hide-sm { display: none; }
 }
@@ -621,7 +643,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Salsa social night"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[0].title">Salsa social night</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[0].title">Salsa social night</a></h3>
               <!-- ratingCount is 0: the rating slot is left out on cards (Idea detail says "No ratings yet") -->
             </div>
             <p class="card-meta">$$ · 1–2 hours</p>
@@ -636,7 +658,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="true" aria-label="Saved: A slow Saturday at the farmers market, then a picnic lunch by the river for two!"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[1].title" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[1].title" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span>
             </div>
             <p class="card-meta">$ · Full day</p>
@@ -651,7 +673,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Dumpling crawl"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[2].title">Dumpling crawl</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[2].title">Dumpling crawl</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 128 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(128)</span></span>
             </div>
             <p class="card-meta">$$ · 1–2 hours</p>
@@ -666,7 +688,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Bookshop and coffee afternoon"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[3].title">Bookshop and coffee afternoon</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[3].title">Bookshop and coffee afternoon</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.9 out of 5 from 57 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.9</span><span class="rating-count">(57)</span></span>
             </div>
             <p class="card-meta">$ · Half day</p>
@@ -681,7 +703,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="true" aria-label="Saved: Golden-hour viewpoint drive"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[4].title">Golden-hour viewpoint drive</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[4].title">Golden-hour viewpoint drive</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.7 out of 5 from 89 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.7</span><span class="rating-count">(89)</span></span>
             </div>
             <p class="card-meta">$ · Half day</p>
@@ -696,7 +718,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Game cafe afternoon"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[5].title">Game cafe afternoon</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[5].title">Game cafe afternoon</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.2 out of 5 from 19 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.2</span><span class="rating-count">(19)</span></span>
             </div>
             <p class="card-meta">$$ · Half day</p>
@@ -711,7 +733,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Dress-up night at a jazz club"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[6].title">Dress-up night at a jazz club</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[6].title">Dress-up night at a jazz club</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.5 out of 5 from 64 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.5</span><span class="rating-count">(64)</span></span>
             </div>
             <p class="card-meta">$$$ · 1–2 hours</p>
@@ -726,7 +748,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Pizza from scratch"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[7].title">Pizza from scratch</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[7].title">Pizza from scratch</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.4 out of 5 from 112 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.4</span><span class="rating-count">(112)</span></span>
             </div>
             <p class="card-meta">$ · 1–2 hours</p>
@@ -741,7 +763,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="true" aria-label="Saved: Couples massage"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[8].title">Couples massage</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[8].title">Couples massage</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 36 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(36)</span></span>
             </div>
             <p class="card-meta">$$$ · Half day</p>
@@ -756,7 +778,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Sushi counter night"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[9].title">Sushi counter night</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[9].title">Sushi counter night</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 73 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(73)</span></span>
             </div>
             <p class="card-meta">$$$ · 1–2 hours</p>
@@ -771,7 +793,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Backyard movie night"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[10].title">Backyard movie night</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[10].title">Backyard movie night</a></h3>
               <span class="rating" role="img" aria-label="Rated 4.3 out of 5 from 41 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.3</span><span class="rating-count">(41)</span></span>
             </div>
             <p class="card-meta">$ · 1–2 hours</p>
@@ -786,7 +808,7 @@ select.seg-field.is-empty { color: var(--muted); }
           <button type="button" class="heart" aria-pressed="false" aria-label="Save Planetarium show"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[11].title">Planetarium show</a></h3>
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[11].title">Planetarium show</a></h3>
               <span class="rating" role="img" aria-label="Rated 3.9 out of 5 from 8 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">3.9</span><span class="rating-count">(8)</span></span>
             </div>
             <!-- budget and duration are null (a migrated idea): the meta line is left out, not "null · null" -->
@@ -802,7 +824,12 @@ select.seg-field.is-empty { color: var(--muted); }
     </section>
   </div>
 
-  <!-- ===================== States board ===================== -->
+  <!-- ===================== States board (design-only, behind a closed toggle) ===================== -->
+  <details class="design-states" data-od-id="design-states">
+    <summary class="design-states-summary">
+      <span class="design-states-label"><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg><span class="when-closed">Show design states</span><span class="when-open">Hide design states</span></span>
+      <span class="design-states-note">Design only, not part of the real page.</span>
+    </summary>
   <section class="board" data-od-id="states-board" aria-labelledby="board-title">
     <div class="container">
       <div class="board-head">
@@ -835,7 +862,7 @@ select.seg-field.is-empty { color: var(--muted); }
                 <a class="heart" href="auth.html" data-od-goto="auth" aria-label="Log in to save Salsa social night"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></a>
                 <div class="card-body">
                   <div class="card-head">
-                    <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail">Salsa social night</a></h3>
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail">Salsa social night</a></h3>
                     <!-- ratingCount is 0: no rating slot -->
                   </div>
                   <p class="card-meta">$$ · 1–2 hours</p>
@@ -849,7 +876,7 @@ select.seg-field.is-empty { color: var(--muted); }
                 <a class="heart" href="auth.html" data-od-goto="auth" aria-label="Log in to save A slow Saturday at the farmers market, then a picnic lunch by the river for two!"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></a>
                 <div class="card-body">
                   <div class="card-head">
-                    <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
                     <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span>
                   </div>
                   <p class="card-meta">$ · Full day</p>
@@ -863,7 +890,7 @@ select.seg-field.is-empty { color: var(--muted); }
                 <a class="heart" href="auth.html" data-od-goto="auth" aria-label="Log in to save Dumpling crawl"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></a>
                 <div class="card-body">
                   <div class="card-head">
-                    <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail">Dumpling crawl</a></h3>
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail">Dumpling crawl</a></h3>
                     <span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 128 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(128)</span></span>
                   </div>
                   <p class="card-meta">$$ · 1–2 hours</p>
@@ -877,7 +904,7 @@ select.seg-field.is-empty { color: var(--muted); }
                 <a class="heart" href="auth.html" data-od-goto="auth" aria-label="Log in to save Bookshop and coffee afternoon"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></a>
                 <div class="card-body">
                   <div class="card-head">
-                    <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail">Bookshop and coffee afternoon</a></h3>
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail">Bookshop and coffee afternoon</a></h3>
                     <span class="rating" role="img" aria-label="Rated 4.9 out of 5 from 57 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.9</span><span class="rating-count">(57)</span></span>
                   </div>
                   <p class="card-meta">$ · Half day</p>
@@ -897,8 +924,8 @@ select.seg-field.is-empty { color: var(--muted); }
           <p class="loading-note" role="status">Loading ideas…</p>
           <div class="grid">
             <div class="skel-card" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
-            <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
-            <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
             <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
             <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
             <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
@@ -906,7 +933,7 @@ select.seg-field.is-empty { color: var(--muted); }
             <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
           </div>
         </div>
-        <p class="state-note">8 card skeletons (CardSkeleton) in the grid's shape, so nothing jumps when ideas arrive. The header, search and categories stay usable. The shimmer stops under reduced motion.</p>
+        <p class="state-note">8 card skeletons (CardSkeleton) in the grid's shape (3 on phones, enough to fill the screen), so nothing jumps when ideas arrive. The header, search and categories stay usable. The shimmer stops under reduced motion.</p>
       </div>
 
       <!-- 3. No results -->
@@ -997,7 +1024,7 @@ select.seg-field.is-empty { color: var(--muted); }
                   <button type="button" class="heart" aria-pressed="true" aria-label="Saved: A slow Saturday at the farmers market, then a picnic lunch by the river for two!"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
                   <div class="card-body">
                     <div class="card-head">
-                      <h3 class="card-title" data-od-allow="overflow"><a href="idea-detail.html" data-od-goto="idea-detail" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
+                      <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
                       <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span>
                     </div>
                     <p class="card-meta">$ · Full day</p>
@@ -1113,7 +1140,7 @@ select.seg-field.is-empty { color: var(--muted); }
               </div>
             </div>
             <div>
-              <p class="helper" style="margin-bottom:8px">Account menu</p>
+              <p class="helper demo-label">Account menu</p>
               <div class="account-menu" role="group" aria-label="Account menu">
                 <a class="menu-item" href="profile.html#ideas" data-od-goto="profile">Your ideas</a>
                 <a class="menu-item" href="profile.html" data-od-goto="profile">Profile</a>
@@ -1121,7 +1148,7 @@ select.seg-field.is-empty { color: var(--muted); }
               </div>
             </div>
             <div>
-              <p class="helper" style="margin-bottom:8px">Account menu, admin account</p>
+              <p class="helper demo-label">Account menu, admin account</p>
               <div class="account-menu" role="group" aria-label="Account menu, admin">
                 <a class="menu-item" href="profile.html#ideas" data-od-goto="profile">Your ideas</a>
                 <a class="menu-item" href="profile.html" data-od-goto="profile">Profile</a>
@@ -1141,6 +1168,7 @@ select.seg-field.is-empty { color: var(--muted); }
       </div>
     </div>
   </section>
+  </details>
 </main>
 
 <div class="sheet-overlay" id="search-sheet" hidden></div>
