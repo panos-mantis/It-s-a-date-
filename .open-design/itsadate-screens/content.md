@@ -11,7 +11,7 @@ Every screen in this collection uses the data below, so the same idea shows the 
 - Sort: `new` = `New`, `top` = `Top rated`
 - Page size: 24 (max 48)
 - Card meta line: `<budget> · <duration>`, e.g. `$$ · Half day`. Hidden entirely when both are null; shows only the one that exists when one is null.
-- Rating: `4.6 (128)` with a dark star; `ratingCount: 0` shows `No ratings yet` (never `0.0 (0)`).
+- Rating: `4.6 (128)` with a dark star. With `ratingCount: 0`, cards leave the rating slot out entirely (no "New" in its place: an older unrated idea has no New badge); Idea detail says `No ratings yet`. Never `0.0 (0)`.
 
 ## Tags (name, slug, Lucide icon)
 
@@ -41,7 +41,7 @@ Sorted by `createdAt`, newest first (the Home "New" order). All are `status: app
 
 | # | Title | Tags | Budget | Duration | Meta line | placeType | Rating | Saves | Creator | createdAt | Photo |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Salsa social night | dancing | 2 | short | $$ · 1–2 hours | bar | No ratings yet (0) | 3 | Jonah Reyes | 2026-11-24 | P1 |
+| 1 | Salsa social night | dancing | 2 | short | $$ · 1–2 hours | bar | none (0 ratings) | 3 | Jonah Reyes | 2026-11-24 | P1 |
 | 2 | A slow Saturday at the farmers market, then a picnic lunch by the river for two! | food, adventure | 1 | full-day | $ · Full day | park | 4.8 (23) | 61 | Maria Fernanda Castellanos-Villalobos y de la Cruz | 2026-11-22 | P2 |
 | 3 | Dumpling crawl | food | 2 | short | $$ · 1–2 hours | restaurant | 4.6 (128) | 342 | Maya Chen | 2026-11-19 | P3 |
 | 4 | Bookshop and coffee afternoon | self-date, learning, food | 1 | half-day | $ · Half day | cafe | 4.9 (57) | 203 | Maya Chen | 2026-11-14 | P4 |
@@ -64,7 +64,7 @@ Maya's state (logged in): she has **saved** ideas 2, 5 and 9 (filled heart) and 
 |---|---|
 | `image: null` (a migrated idea; the card shows the sunk placeholder) | #11 Backyard movie night |
 | `budget` and `duration` null (a migrated idea an admin hasn't filled in; the meta line is hidden) | #12 Planetarium show |
-| `ratingCount: 0` ("No ratings yet") | #1 Salsa social night |
+| `ratingCount: 0` (no rating on the card; "No ratings yet" on Idea detail) | #1 Salsa social night |
 | Three tags | #4 Bookshop and coffee afternoon (self-date, learning, food) |
 | 80-character title (clamps to two lines on cards, wraps in full on detail) | #2 |
 | 50-character creator name | #2, by Maria Fernanda Castellanos-Villalobos y de la Cruz |

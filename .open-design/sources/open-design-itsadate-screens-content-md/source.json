@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "path": ".open-design/itsadate-screens/content.md",
+  "sha256": "1a620bab3e4d6066e8ce3a617f89a3631d55fc1a0cdd70589e9c33707a573a6e",
+  "kind": "markdown",
+  "extractedAt": "2026-11-25T03:36:37.800Z",
+  "markdownPath": ".open-design/sources/open-design-itsadate-screens-content-md/source.md",
+  "lines": 131,
+  "chars": 13281,
+  "sections": [
+    {
+      "heading": "It's a Date screens: shared sample content",
+      "level": 1,
+      "startLine": 1,
+      "endLine": 6,
+      "chars": 479
+    },
+    {
+      "heading": "Labels (from constants.ts, use verbatim)",
+      "level": 2,
+      "startLine": 7,
+      "endLine": 15,
+      "chars": 612
+    },
+    {
+      "heading": "Tags (name, slug, Lucide icon)",
+      "level": 2,
+      "startLine": 16,
+      "endLine": 28,
+      "chars": 366
+    },
+    {
+      "heading": "Users",
+      "level": 2,
+      "startLine": 29,
+      "endLine": 37,
+      "chars": 520
+    },
+    {
+      "heading": "The 12 ideas",
+      "level": 2,
+      "startLine": 38,
+      "endLine": 60,
+      "chars": 2179
+    },
+    {
+      "heading": "Review Focus items",
+      "level": 3,
+      "startLine": 61,
+      "endLine": 74,
+      "chars": 834
+    },
+    {
+      "heading": "Descriptions",
+      "level": 3,
+      "startLine": 75,
+      "endLine": 104,
+      "chars": 4326
+    },
+    {
+      "heading": "Photos",
+      "level": 2,
+      "startLine": 105,
+      "endLine": 128,
+      "chars": 3641
+    },
+    {
+      "heading": "Shared markup",
+      "level": 2,
+      "startLine": 129,
+      "endLine": 132,
+      "chars": 308
+    }
+  ],
+  "assets": [],
+  "warnings": []
+}

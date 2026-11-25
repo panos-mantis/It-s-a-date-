@@ -18,8 +18,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T03:26:56.650Z",
-  "updatedAt": "2026-11-25T03:26:56.650Z",
+  "createdAt": "2026-11-25T03:36:37.806Z",
+  "updatedAt": "2026-11-25T03:36:37.806Z",
   "sourceSkillId": "od:prototype:web-prototype",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -28,7 +28,7 @@
   "sources": [
     {
       "path": ".open-design/itsadate-screens/content.md",
-      "sha256": "56d5eed4567e0e73e69958476e5eda2e10c0ea6e4ffb14bcd26fc705b606e327"
+      "sha256": "1a620bab3e4d6066e8ce3a617f89a3631d55fc1a0cdd70589e9c33707a573a6e"
     },
     {
       "path": "DESIGN.md",
@@ -194,6 +194,43 @@
         ]
       },
       "screenId": "home"
+    },
+    "critique": {
+      "verdict": "polish",
+      "findings": [
+        {
+          "area": "task",
+          "fix": "Make the first menu item \"Your ideas\" (linking to profile.html#ideas) above \"Profile\", or rename the item \"Profile and your ideas\"; better still, put a \"Your ideas\" link in the header next to \"Share an idea\" at desktop width so it takes one click.",
+          "where": "Check on an idea I shared, header account menu (desktop and phone)",
+          "problem": "The only way to your shared ideas is two steps (open the Maya avatar menu, then pick \"Profile\"), and nothing on that path mentions your ideas, so the one-step task fails and the label doesn't say where it leads."
+        },
+        {
+          "area": "task",
+          "fix": "Keep a short visible label at phone width (\"+ Share\" as a 36px ghost pill), or put a full-width \"Share an idea\" button at the end of the grid under Show more, so the task has a labelled control.",
+          "where": "Share an idea, phone header",
+          "problem": "At 360px the share action shrinks to a bare coral \"+\" next to the avatar. Nothing on screen says it shares an idea, and it is easy to read as \"add to saved\" or \"new search\"."
+        },
+        {
+          "area": "layout-rhythm",
+          "fix": "Once the band is stuck, give it a 1px bottom border in the hairline token (or a soft shadow, 0 4px 12px at about 6% ink), plus 8px more bottom padding, so content clearly slides under a surface.",
+          "where": "Sticky search band while scrolling (desktop 2/8, phone 2/9 and 3/9)",
+          "problem": "The stuck search band has the same colour as the page and no edge, so card titles and photos get cut off mid-letter right under it (\"Golden-hour\", \"Game cafe\", \"Dress-up night\"), which looks like a rendering bug."
+        },
+        {
+          "area": "typography",
+          "fix": "Add text-wrap: balance to the h1 (and a non-breaking space between \"yes\" and \"to.\"), so it breaks as \"Plans worth / saying yes to.\".",
+          "where": "Phone hero headline",
+          "problem": "\"Plans worth saying yes / to.\" leaves \"to.\" alone on the second line, which weakens the brand line on the first screen."
+        },
+        {
+          "area": "copy",
+          "fix": "Leave out the rating slot when there are no ratings (the New badge covers it), or swap it for a short muted \"New\". Then the title fits on one line and the meta rows line up across the grid.",
+          "where": "Salsa social night card (first card, desktop and phone)",
+          "problem": "\"No ratings yet\" takes about 90px beside the title, pushing \"Salsa social night\" onto two lines and dropping its meta row below its neighbours, and it repeats what the \"New\" badge on the photo already says."
+        }
+      ],
+      "at": "2026-11-25T03:36:37.795Z",
+      "checkRunId": "2026-11-25T03-30-26"
     }
   }
 }
