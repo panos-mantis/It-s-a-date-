@@ -112,10 +112,7 @@
 
 - [ ] **Step 1: Branch and ledger**
 
-```bash
-git switch -c phase-4-designs modernize
-```
-Create the ledger with a row per task (status, screen path, check result, critic verdict, notes).
+The branch `phase-4-designs` already exists (the controller created it and committed this plan at `6357dd8`); work on it. Create the ledger with a row per task (status, screen path, check result, critic verdict, notes).
 
 - [ ] **Step 2: Write `content.md`**
 
