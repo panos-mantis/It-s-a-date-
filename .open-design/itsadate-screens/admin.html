@@ -241,8 +241,9 @@ code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
 .panel:focus-visible { outline-offset: 8px; border-radius: var(--radius-sm); }
 .panel-bar { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; margin-bottom: 16px; }
 .panel-summary { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.panel-summary strong { font-size: 16px; font-weight: 600; }
-.panel-summary span { font-size: 14px; color: var(--muted); }
+.panel-summary strong, .panel-title { font-family: var(--font-body); font-size: 16px; font-weight: 600; line-height: 1.55; }
+.panel-summary span, .panel-summary p { font-size: 14px; color: var(--muted); }
+.panel-summary .panel-title { color: var(--fg); }
 .panel-foot { margin-top: 12px; font-size: 14px; color: var(--muted); }
 
 /* Tables (admin panels): surface, 20px radius, 1px border, rows split by --border.
@@ -273,15 +274,27 @@ code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
   font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 600;
   font-size: 17px; line-height: 1.25; letter-spacing: -0.01em; overflow-wrap: anywhere;
 }
+.row-title-btn, .row-title-link {
+  display: block; padding: 0; border: 0; background: none; color: var(--fg); text-align: left; text-decoration: none;
+  cursor: pointer; border-radius: 4px;
+}
+.row-title-btn:hover, .row-title-link:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.row-desc {
+  max-width: 52ch; margin-top: 2px; font-size: 13px; line-height: 1.45; color: var(--muted);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
 .row-name { font-weight: 600; overflow-wrap: anywhere; }
-.row-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
-.row-meta.is-missing { color: var(--warn); font-weight: 500; }
-.row-meta .icon { width: 14px; height: 14px; }
+.row-meta { font-size: 13px; color: var(--muted); }
+.row-meta .is-missing { color: var(--warn); font-weight: 500; }
+.row-meta .icon { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
+.card-only { display: none; }
 .col-idea { min-width: 260px; }
+@container atable (min-width: 720px) { .atable-queue .col-idea { min-width: 320px; } }
 .col-by { overflow-wrap: anywhere; min-width: 150px; max-width: 220px; }
 .atable .chip { max-width: 100%; white-space: normal; overflow-wrap: break-word; }
 .col-tags { min-width: 150px; }
 .col-when { white-space: nowrap; color: var(--muted); }
+.saves-n { font-variant-numeric: tabular-nums; }
 .col-actions { width: 1%; }
 .row-actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -313,8 +326,8 @@ code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
   .atable .hide-mid { display: block; }
   .atable td.col-num.hide-mid, .atable td.col-when.hide-mid { display: block; }
   .atable td.col-actions { margin-top: 4px; padding-top: 8px; border-top: 1px solid var(--border); }
-  .row-actions { justify-content: stretch; gap: 8px; }
-  .row-actions .btn-text { flex: 1 1 0; padding: 0 8px; }
+  .row-actions { justify-content: space-between; gap: 4px; }
+  .row-actions .btn-text { flex: 1 1 auto; padding: 0 6px; }
   .atable-users .row-actions, .atable-tags .row-actions { justify-content: flex-start; }
   .atable-users .row-actions .btn-text, .atable-tags .row-actions .btn-text { flex: 0 1 auto; }
   .atable td.col-by { font-weight: 500; }
@@ -330,15 +343,30 @@ code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
   .atable-tags td.col-actions { margin: 0; padding: 0; border: 0; }
   .atable-tags .row-actions .btn-text:first-child { padding-left: 0; }
   .col-idea, .col-by { min-width: 0; }
+  .atable-queue .cell-idea { display: grid; grid-template-columns: 88px minmax(0, 1fr); column-gap: 12px; row-gap: 2px; align-items: start; }
+  .atable-queue .cell-idea .thumb { grid-row: 1 / 3; }
+  .atable-queue .cell-text { display: contents; }
+  .atable-queue .row-title { grid-column: 2; align-self: end; }
+  .atable-queue .row-meta { grid-column: 2; align-self: start; }
+  .atable-queue .row-desc { grid-column: 1 / -1; margin-top: 8px; max-width: none; }
+  /* Line 1: the idea. Line 2: "By …" and the status chip. Line 3: one meta line with Edit at its end. */
+  .atable-all tr { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 0; row-gap: 8px; }
+  .atable-all tr::before { content: ""; order: 3; flex-basis: 100%; height: 0; margin-top: -8px; }
+  .atable-all td.col-idea { order: 0; flex-basis: 100%; }
+  .atable-all td.col-by { order: 1; flex: 1 1 0; padding-right: 8px; }
+  .atable-all td.col-status { order: 2; flex: none; }
+  .atable-all td.col-rating { order: 4; }
+  .atable-all td.col-saves { order: 5; }
+  .atable-all td.col-created { order: 6; }
+  .atable-all td.col-rating, .atable-all td.col-saves, .atable-all td.col-created { flex: none; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .atable-all td.col-rating .rating { font-size: 13px; }
+  .atable-all td.col-saves::before, .atable-all td.col-created::before { content: "\00a0\00b7\00a0"; }
+  .atable-all .card-only { display: inline; }
+  .atable-all td.col-actions { order: 7; margin: 0 0 0 auto; padding: 0; border: 0; }
+  .atable-all .row-actions .btn-text { flex: 0 0 auto; padding: 0 0 0 12px; }
   .thumb { width: 88px; }
 }
 
-/* Very narrow (320 px reflow): the three row actions keep their words and lose their icons */
-@container atable (max-width: 299px) {
-  .row-actions { gap: 4px; }
-  .row-actions .btn-text { padding: 0 4px; min-width: 0; }
-  .row-actions .btn-text .icon { display: none; }
-}
 
 /* Status chips: colour from the status tokens, always with an icon and a word (same labels as Profile) */
 .status-chip {
@@ -642,7 +670,8 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
 @media (max-width: 767px) {
   .board { padding: 16px 0 64px; }
   .frame-pad { padding: 16px; }
-  .phone-frame { padding: 16px; }
+  /* On a phone the board's phone frames are the page width, so their cards are the live cards */
+  .phone-frame { width: 100%; padding: 0; border: 0; background: none; }
   .dialog-stage { padding: 24px 12px; }
 }
 
@@ -683,6 +712,8 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
   <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-user-plus" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></symbol>
+  <symbol id="i-shield-off" viewBox="0 0 24 24"><path d="m2 2 20 20"/><path d="M5 5a1 1 0 0 0-1 1v7c0 5 3.5 7.5 7.67 8.94a1 1 0 0 0 .67.01c2.35-.82 4.48-1.97 5.86-3.71"/><path d="M9.309 3.652A12.252 12.252 0 0 0 11.24 2.28a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1v7a9.784 9.784 0 0 1-.08 1.264"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
 </svg>
 
@@ -735,16 +766,16 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
 
     <!-- ===================== Pending: GET /admin/ideas?status=pending, oldest first ===================== -->
     <div class="panel" role="tabpanel" id="pending" aria-labelledby="tab-pending" tabindex="0" data-od-id="pending">
+      <section data-od-state="default" data-od-slot="content" aria-labelledby="pending-title">
       <div class="panel-bar" data-pending-bar>
-        <p class="panel-summary"><strong data-pending-summary>3 ideas waiting for review</strong><span>Oldest first. Approved ideas go live on Home; not approved ones stay visible to their author only.</span></p>
+        <div class="panel-summary"><h2 class="panel-title" id="pending-title" data-pending-summary>3 ideas waiting for review</h2><p>Oldest first. Approved ideas go live on Home; not approved ones stay visible to their author only.</p></div>
       </div>
-      <section data-od-state="default" data-od-slot="content" aria-label="Queue">
       <div class="table-wrap">
           <table class="atable atable-queue" aria-label="Ideas waiting for review, oldest first">
             <thead><tr><th scope="col">Idea</th><th scope="col">Creator</th><th scope="col">Tags</th><th scope="col"><span class="th-sort">Submitted<svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg></span></th><th scope="col" aria-label="Actions"></th></tr></thead>
             <tbody id="queue-body">
             <tr data-id="16">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><span class="row-title" id="q-t-16" data-od-bind="ideas[15].title">Ice skating and hot chocolate</span><span class="row-meta is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="q-t-16" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[15].title">Ice skating and hot chocolate</button><span class="row-meta">Park · <span class="is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span><span class="row-desc">Go to the outdoor rink when it opens for the winter, hold…</span></span></div></td>
               <td class="col-by" data-label="By"><span data-od-bind="ideas[15].creator.name">Lena Brooks</span></td>
               <td class="col-tags"><span class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></span></td>
               <td class="col-when" data-label="Submitted"><time datetime="2024-03-09">Mar 9, 2024</time></td>
@@ -755,7 +786,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               </div></td>
             </tr>
             <tr data-id="15">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="q-t-15" data-od-bind="ideas[14].title">Pick each other's next read at a secondhand bookshop</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="q-t-15" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[14].title">Pick each other's next read at a secondhand bookshop</button><span class="row-meta">Cafe · $ · 1–2 hours</span><span class="row-desc">Meet at a secondhand bookshop with ten dollars each and…</span></span></div></td>
               <td class="col-by" data-label="By"><span data-od-bind="ideas[14].creator.name">Maria Fernanda Castellanos-Villalobos y de la Cruz</span></td>
               <td class="col-tags"><span class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></span></td>
               <td class="col-when" data-label="Submitted"><time datetime="2026-11-22">3 days ago</time></td>
@@ -766,7 +797,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               </div></td>
             </tr>
             <tr data-id="13">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="q-t-13" data-od-bind="ideas[12].title">Sunday pastry walk</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="q-t-13" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[12].title">Sunday pastry walk</button><span class="row-meta">Cafe · $ · 1–2 hours</span><span class="row-desc">Pick three bakeries within walking distance and buy one…</span></span></div></td>
               <td class="col-by" data-label="By"><span data-od-bind="ideas[12].creator.name">Maya Chen</span></td>
               <td class="col-tags"><span class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></span></td>
               <td class="col-when" data-label="Submitted"><time datetime="2026-11-25">today</time></td>
@@ -787,7 +818,10 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
         <button type="button" class="btn btn-secondary btn-md" data-goto-tab="all" data-component="Button">See all ideas</button>
       </section>
       <!-- Loading: in the app this replaces the queue while GET /admin/ideas?status=pending runs (see board frame 7) -->
-      <section data-od-state="loading" data-od-slot="loading" aria-busy="true" aria-label="Loading the queue" hidden>
+      <section data-od-state="loading" data-od-slot="loading" aria-busy="true" aria-labelledby="pending-loading-title" hidden>
+        <div class="panel-bar">
+          <div class="panel-summary"><h2 class="panel-title" id="pending-loading-title">Ideas waiting for review</h2><p>Oldest first. Approved ideas go live on Home; not approved ones stay visible to their author only.</p></div>
+        </div>
         <p class="loading-note">Loading ideas waiting for review…</p>
         <div class="table-wrap" aria-hidden="true">
           <div class="skel-row" data-component="Skeleton"><div class="skel skel-thumb"></div><div class="skel-lines"><div class="skel skel-line"></div><div class="skel skel-line short"></div></div><div class="skel-btns"><div class="skel skel-btn"></div><div class="skel skel-btn"></div><div class="skel skel-btn"></div></div></div>
@@ -821,147 +855,147 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
           <thead><tr><th scope="col">Idea</th><th scope="col">Creator</th><th scope="col">Status</th><th scope="col" class="col-num">Rating</th><th scope="col" class="col-num hide-mid">Saves</th><th scope="col" class="hide-mid" id="all-sort-th"><span class="th-sort"><span data-sort-label>Created</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-down" data-sort-icon/></svg></span></th><th scope="col" aria-label="Actions"></th></tr></thead>
           <tbody id="all-body">
             <tr data-id="1" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-1" data-od-bind="ideas[0].title">Salsa social night</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-1" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[0].title">Salsa social night</a><span class="row-meta">Bar · $ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Jonah Reyes</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="muted">No ratings yet</span></td>
-              <td class="col-num hide-mid" data-label="Saves">3</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-24">Nov 24, 2026</time></td>
+              <td class="col-num col-rating"><span class="muted">No ratings yet</span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">3</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-24">Nov 24, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-1" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="2" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-2" data-od-bind="ideas[1].title">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</span><span class="row-meta">$ · Full day</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-2" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[1].title">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a><span class="row-meta">Park · $ · Full day</span></span></div></td>
               <td class="col-by" data-label="By">Maria Fernanda Castellanos-Villalobos y de la Cruz</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">61</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-22">Nov 22, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">61</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-22">Nov 22, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-2" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="3" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-3" data-od-bind="ideas[2].title">Dumpling crawl</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-3" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[2].title">Dumpling crawl</a><span class="row-meta">Restaurant · $ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Maya Chen</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 128 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(128)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">342</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-19">Nov 19, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 128 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(128)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">342</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-19">Nov 19, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-3" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="4" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-4" data-od-bind="ideas[3].title">Bookshop and coffee afternoon</span><span class="row-meta">$ · Half day</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-4" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[3].title">Bookshop and coffee afternoon</a><span class="row-meta">Cafe · $ · Half day</span></span></div></td>
               <td class="col-by" data-label="By">Maya Chen</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.9 out of 5 from 57 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.9</span><span class="rating-count">(57)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">203</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-14">Nov 14, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.9 out of 5 from 57 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.9</span><span class="rating-count">(57)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">203</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-14">Nov 14, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-4" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="5" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-5" data-od-bind="ideas[4].title">Golden-hour viewpoint drive</span><span class="row-meta">$ · Half day</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-5" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[4].title">Golden-hour viewpoint drive</a><span class="row-meta">Viewpoint · $ · Half day</span></span></div></td>
               <td class="col-by" data-label="By">Sam Okafor</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.7 out of 5 from 89 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.7</span><span class="rating-count">(89)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">276</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-10">Nov 10, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.7 out of 5 from 89 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.7</span><span class="rating-count">(89)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">276</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-10">Nov 10, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-5" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="6" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-6" data-od-bind="ideas[5].title">Game cafe afternoon</span><span class="row-meta">$ · Half day</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-6" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[5].title">Game cafe afternoon</a><span class="row-meta">Cafe · $ · Half day</span></span></div></td>
               <td class="col-by" data-label="By">Jonah Reyes</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.2 out of 5 from 19 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.2</span><span class="rating-count">(19)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">47</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-06">Nov 6, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.2 out of 5 from 19 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.2</span><span class="rating-count">(19)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">47</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-06">Nov 6, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-6" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="7" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-7" data-od-bind="ideas[6].title">Dress-up night at a jazz club</span><span class="row-meta">$$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-7" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[6].title">Dress-up night at a jazz club</a><span class="row-meta">Bar · $$ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Priya Natarajan</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.5 out of 5 from 64 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.5</span><span class="rating-count">(64)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">190</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-10-30">Oct 30, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.5 out of 5 from 64 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.5</span><span class="rating-count">(64)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">190</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-10-30">Oct 30, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-7" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="8" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-8" data-od-bind="ideas[7].title">Pizza from scratch</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-8" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[7].title">Pizza from scratch</a><span class="row-meta">No place needed · $ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Sam Okafor</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.4 out of 5 from 112 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.4</span><span class="rating-count">(112)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">301</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-10-24">Oct 24, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.4 out of 5 from 112 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.4</span><span class="rating-count">(112)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">301</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-10-24">Oct 24, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-8" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="9" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-9" data-od-bind="ideas[8].title">Couples massage</span><span class="row-meta">$$ · Half day</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-9" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[8].title">Couples massage</a><span class="row-meta">Spa · $$ · Half day</span></span></div></td>
               <td class="col-by" data-label="By">Maya Chen</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 36 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(36)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">154</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-10-15">Oct 15, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 36 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(36)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">154</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-10-15">Oct 15, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-9" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="10" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-10" data-od-bind="ideas[9].title">Sushi counter night</span><span class="row-meta">$$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-10" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[9].title">Sushi counter night</a><span class="row-meta">Sushi · $$ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Priya Natarajan</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 73 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(73)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">219</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-10-08">Oct 8, 2026</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 73 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(73)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">219</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-10-08">Oct 8, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-10" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="11" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><span class="row-title" id="a-t-11" data-od-bind="ideas[10].title">Backyard movie night</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-11" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[10].title">Backyard movie night</a><span class="row-meta">No place needed · $ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Lena Brooks</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 4.3 out of 5 from 41 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.3</span><span class="rating-count">(41)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">88</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2024-06-02">Jun 2, 2024</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 4.3 out of 5 from 41 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.3</span><span class="rating-count">(41)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">88</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2024-06-02">Jun 2, 2024</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-11" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="12" data-status="approved">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-12" data-od-bind="ideas[11].title">Planetarium show</span><span class="row-meta is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><a class="row-title row-title-link" id="a-t-12" href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[11].title">Planetarium show</a><span class="row-meta">Museum · <span class="is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span></span></div></td>
               <td class="col-by" data-label="By">Daniel Okoye</td>
               <td class="col-status"><span class="status-chip is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="rating" role="img" aria-label="Rated 3.9 out of 5 from 8 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">3.9</span><span class="rating-count">(8)</span></span></td>
-              <td class="col-num hide-mid" data-label="Saves">12</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2024-02-17">Feb 17, 2024</time></td>
+              <td class="col-num col-rating"><span class="rating" role="img" aria-label="Rated 3.9 out of 5 from 8 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">3.9</span><span class="rating-count">(8)</span></span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">12</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2024-02-17">Feb 17, 2024</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-12" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="16" data-status="pending" hidden>
-              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><span class="row-title" id="a-t-16" data-od-bind="ideas[15].title">Ice skating and hot chocolate</span><span class="row-meta is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="a-t-16" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[15].title">Ice skating and hot chocolate</button><span class="row-meta">Park · <span class="is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span></span></div></td>
               <td class="col-by" data-label="By">Lena Brooks</td>
               <td class="col-status"><span class="status-chip is-pending" data-component="Chip" data-variant="pending"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Pending review</span></td>
-              <td class="col-num" data-label="Rating"><span class="muted">Not public</span></td>
-              <td class="col-num hide-mid" data-label="Saves">0</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2024-03-09">Mar 9, 2024</time></td>
+              <td class="col-num col-rating"><span class="muted">Not public</span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">0</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2024-03-09">Mar 9, 2024</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-16" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="15" data-status="pending" hidden>
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-15" data-od-bind="ideas[14].title">Pick each other's next read at a secondhand bookshop</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="a-t-15" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[14].title">Pick each other's next read at a secondhand bookshop</button><span class="row-meta">Cafe · $ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Maria Fernanda Castellanos-Villalobos y de la Cruz</td>
               <td class="col-status"><span class="status-chip is-pending" data-component="Chip" data-variant="pending"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Pending review</span></td>
-              <td class="col-num" data-label="Rating"><span class="muted">Not public</span></td>
-              <td class="col-num hide-mid" data-label="Saves">0</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-22">Nov 22, 2026</time></td>
+              <td class="col-num col-rating"><span class="muted">Not public</span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">0</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-22">Nov 22, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-15" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="13" data-status="pending" hidden>
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-13" data-od-bind="ideas[12].title">Sunday pastry walk</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="a-t-13" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[12].title">Sunday pastry walk</button><span class="row-meta">Cafe · $ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Maya Chen</td>
               <td class="col-status"><span class="status-chip is-pending" data-component="Chip" data-variant="pending"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Pending review</span></td>
-              <td class="col-num" data-label="Rating"><span class="muted">Not public</span></td>
-              <td class="col-num hide-mid" data-label="Saves">0</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-25">Nov 25, 2026</time></td>
+              <td class="col-num col-rating"><span class="muted">Not public</span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">0</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-25">Nov 25, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-13" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
             <tr data-id="14" data-status="rejected" hidden>
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="a-t-14" data-od-bind="ideas[13].title">Sushi boat eating contest</span><span class="row-meta">$$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="a-t-14" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[13].title">Sushi boat eating contest</button><span class="row-meta">Sushi · $$ · 1–2 hours</span></span></div></td>
               <td class="col-by" data-label="By">Maya Chen</td>
               <td class="col-status"><span class="status-chip is-rejected" data-component="Chip" data-variant="rejected"><svg class="icon" aria-hidden="true"><use href="#i-circle-x"/></svg>Not approved</span></td>
-              <td class="col-num" data-label="Rating"><span class="muted">Not public</span></td>
-              <td class="col-num hide-mid" data-label="Saves">0</td>
-              <td class="col-when hide-mid" data-label="Created"><time datetime="2026-11-21">Nov 21, 2026</time></td>
+              <td class="col-num col-rating"><span class="muted">Not public</span></td>
+              <td class="col-num col-saves hide-mid"><span class="saves-n">0</span><span class="card-only"> saves</span></td>
+              <td class="col-when col-created hide-mid"><time datetime="2026-11-21">Nov 21, 2026</time></td>
               <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="edit" aria-haspopup="dialog" aria-describedby="a-t-14" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</button></div></td>
             </tr>
           </tbody>
@@ -1105,49 +1139,49 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">P</span><span class="row-name" id="us-n-u-panos"><span data-od-bind="users[1].name">Panos</span> <span class="you">(you)</span></span></span></td>
               <td class="col-email" data-label="Email">panos<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip role-chip" data-component="Chip" data-variant="admin"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Admin</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text is-danger" data-act="demote" aria-haspopup="dialog" aria-describedby="us-n-u-panos" data-component="Button">Remove admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text is-danger" data-act="demote" aria-haspopup="dialog" aria-describedby="us-n-u-panos" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-shield-off"/></svg>Remove admin</button></div></td>
             </tr>
             <tr data-user="u-maya" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">M</span><span class="row-name" id="us-n-u-maya"><span data-od-bind="users[0].name">Maya Chen</span></span></span></td>
               <td class="col-email" data-label="Email">maya<wbr>.chen<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-maya" data-component="Button">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-maya" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             <tr data-user="u-maria" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">M</span><span class="row-name" id="us-n-u-maria"><span data-od-bind="users[7].name">Maria Fernanda Castellanos-Villalobos y de la Cruz</span></span></span></td>
               <td class="col-email" data-label="Email">mariafernanda<wbr>.castellanos<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-maria" data-component="Button">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-maria" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             <tr data-user="u-jonah" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">J</span><span class="row-name" id="us-n-u-jonah"><span data-od-bind="users[2].name">Jonah Reyes</span></span></span></td>
               <td class="col-email" data-label="Email">jonah<wbr>.reyes<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-jonah" data-component="Button">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-jonah" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             <tr data-user="u-priya" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">P</span><span class="row-name" id="us-n-u-priya"><span data-od-bind="users[3].name">Priya Natarajan</span></span></span></td>
               <td class="col-email" data-label="Email">priya<wbr>.natarajan<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-priya" data-component="Button">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-priya" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             <tr data-user="u-sam" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">S</span><span class="row-name" id="us-n-u-sam"><span data-od-bind="users[4].name">Sam Okafor</span></span></span></td>
               <td class="col-email" data-label="Email">sam<wbr>.okafor<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-sam" data-component="Button">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-sam" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             <tr data-user="u-lena" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">L</span><span class="row-name" id="us-n-u-lena"><span data-od-bind="users[5].name">Lena Brooks</span></span></span></td>
               <td class="col-email" data-label="Email">lena<wbr>.brooks<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-lena" data-component="Button">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-lena" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             <tr data-user="u-daniel" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">D</span><span class="row-name" id="us-n-u-daniel"><span data-od-bind="users[6].name">Daniel Okoye</span></span></span></td>
               <td class="col-email" data-label="Email">daniel<wbr>.okoye<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-daniel" data-component="Button">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-u-daniel" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             </tbody>
           </table>
@@ -1184,7 +1218,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               </div>
             </div>
           </div>
-          <p class="state-note">Shown when <code>GET /admin/ideas?status=pending</code> returns no items, and the moment the last row is approved or rejected (try it above: focus then moves to "See all ideas"). The panel bar is hidden and the Pending count reads 0. "See all ideas" opens the All ideas tab on Approved.</p>
+          <p class="state-note">Shown when <code>GET /admin/ideas?status=pending</code> returns no items (the "3 ideas waiting for review" heading belongs to the populated queue, so it goes too), and the moment the last row is approved or rejected (try it above: focus then moves to "See all ideas"). The panel bar is hidden and the Pending count reads 0. "See all ideas" opens the All ideas tab on Approved.</p>
         </div>
 
         <!-- 2. Reject confirm -->
@@ -1236,13 +1270,13 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">P</span><span class="row-name" id="bla-n-u-panos"><span data-od-bind="users[1].name">Panos</span> <span class="you">(you)</span></span></span></td>
               <td class="col-email" data-label="Email">panos<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip role-chip" data-component="Chip" data-variant="admin"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Admin</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text is-danger" data-act="demote" aria-haspopup="dialog" aria-describedby="bla-n-u-panos" data-component="Button" tabindex="-1">Remove admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text is-danger" data-act="demote" aria-haspopup="dialog" aria-describedby="bla-n-u-panos" data-component="Button" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-shield-off"/></svg>Remove admin</button></div></td>
             </tr>
             <tr data-user="u-maya" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">M</span><span class="row-name" id="bla-n-u-maya"><span data-od-bind="users[0].name">Maya Chen</span></span></span></td>
               <td class="col-email" data-label="Email">maya<wbr>.chen<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="bla-n-u-maya" data-component="Button" tabindex="-1">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="bla-n-u-maya" data-component="Button" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             </tbody>
           </table>
@@ -1289,7 +1323,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
             <thead><tr><th scope="col">Idea</th><th scope="col">Creator</th><th scope="col">Tags</th><th scope="col"><span class="th-sort">Submitted<svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg></span></th><th scope="col" aria-label="Actions"></th></tr></thead>
             <tbody>
             <tr data-id="16">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><span class="row-title" id="bt-t-16" data-od-bind="ideas[15].title">Ice skating and hot chocolate</span><span class="row-meta is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="bt-t-16" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[15].title" tabindex="-1">Ice skating and hot chocolate</button><span class="row-meta">Park · <span class="is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span><span class="row-desc">Go to the outdoor rink when it opens for the winter, hold…</span></span></div></td>
               <td class="col-by" data-label="By"><span data-od-bind="ideas[15].creator.name">Lena Brooks</span></td>
               <td class="col-tags"><span class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></span></td>
               <td class="col-when" data-label="Submitted"><time datetime="2024-03-09">Mar 9, 2024</time></td>
@@ -1300,7 +1334,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               </div></td>
             </tr>
             <tr data-id="15">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="bt-t-15" data-od-bind="ideas[14].title">Pick each other's next read at a secondhand bookshop</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="bt-t-15" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[14].title" tabindex="-1">Pick each other's next read at a secondhand bookshop</button><span class="row-meta">Cafe · $ · 1–2 hours</span><span class="row-desc">Meet at a secondhand bookshop with ten dollars each and…</span></span></div></td>
               <td class="col-by" data-label="By"><span data-od-bind="ideas[14].creator.name">Maria Fernanda Castellanos-Villalobos y de la Cruz</span></td>
               <td class="col-tags"><span class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></span></td>
               <td class="col-when" data-label="Submitted"><time datetime="2026-11-22">3 days ago</time></td>
@@ -1327,6 +1361,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
           <div class="frame frame-pad" aria-busy="true">
             <div class="tabs" aria-hidden="true"><span class="tab is-current">Pending</span><span class="tab">All ideas</span><span class="tab">Tags</span><span class="tab">Users</span></div>
             <div class="panel">
+              <div class="panel-bar"><div class="panel-summary"><p class="panel-title">Ideas waiting for review</p><p>Oldest first. Approved ideas go live on Home; not approved ones stay visible to their author only.</p></div></div>
               <p class="loading-note">Loading ideas waiting for review…</p>
               <div class="table-wrap" aria-hidden="true">
                 <div class="skel-row" data-component="Skeleton"><div class="skel skel-thumb"></div><div class="skel-lines"><div class="skel skel-line"></div><div class="skel skel-line short"></div></div><div class="skel-btns"><div class="skel skel-btn"></div><div class="skel skel-btn"></div><div class="skel skel-btn"></div></div></div>
@@ -1335,7 +1370,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               </div>
             </div>
           </div>
-          <p class="state-note">The header, title and tabs render at once; only the panel waits. Three skeleton rows in the row's shape (thumb, two lines, three actions; the actions drop on phones). In the app "Loading ideas waiting for review…" is a <code>role="status"</code> line (here a plain copy); the other tabs say "Loading ideas…", "Loading tags…" and "Loading users…". After 15 seconds the line adds "Still loading. Hang on, or try again." with a Try again button. If the request fails the panel shows "We couldn't load the queue. Check your connection and try again." with Try again, as on Profile. The shimmer stops under reduced motion.</p>
+          <p class="state-note">The header, title and tabs render at once; only the panel waits. Its heading reads "Ideas waiting for review", with no number until the queue arrives. Three skeleton rows in the row's shape (thumb, two lines, three actions; the actions drop on phones). In the app "Loading ideas waiting for review…" is a <code>role="status"</code> line (here a plain copy); the other tabs say "Loading ideas…", "Loading tags…" and "Loading users…". After 15 seconds the line adds "Still loading. Hang on, or try again." with a Try again button. If the request fails the panel shows "We couldn't load the queue. Check your connection and try again." with Try again, as on Profile. The shimmer stops under reduced motion.</p>
         </div>
 
         <!-- 8. Phone stacked rows -->
@@ -1349,7 +1384,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
             <thead><tr><th scope="col">Idea</th><th scope="col">Creator</th><th scope="col">Tags</th><th scope="col"><span class="th-sort">Submitted<svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg></span></th><th scope="col" aria-label="Actions"></th></tr></thead>
             <tbody>
             <tr data-id="16">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><span class="row-title" id="bp-t-16" data-od-bind="ideas[15].title">Ice skating and hot chocolate</span><span class="row-meta is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="bp-t-16" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[15].title" tabindex="-1">Ice skating and hot chocolate</button><span class="row-meta">Park · <span class="is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span></span><span class="row-desc">Go to the outdoor rink when it opens for the winter, hold…</span></span></div></td>
               <td class="col-by" data-label="By"><span data-od-bind="ideas[15].creator.name">Lena Brooks</span></td>
               <td class="col-tags"><span class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></span></td>
               <td class="col-when" data-label="Submitted"><time datetime="2024-03-09">Mar 9, 2024</time></td>
@@ -1360,7 +1395,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               </div></td>
             </tr>
             <tr data-id="15">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="bp-t-15" data-od-bind="ideas[14].title">Pick each other's next read at a secondhand bookshop</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="bp-t-15" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[14].title" tabindex="-1">Pick each other's next read at a secondhand bookshop</button><span class="row-meta">Cafe · $ · 1–2 hours</span><span class="row-desc">Meet at a secondhand bookshop with ten dollars each and…</span></span></div></td>
               <td class="col-by" data-label="By"><span data-od-bind="ideas[14].creator.name">Maria Fernanda Castellanos-Villalobos y de la Cruz</span></td>
               <td class="col-tags"><span class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></span></td>
               <td class="col-when" data-label="Submitted"><time datetime="2026-11-22">3 days ago</time></td>
@@ -1371,7 +1406,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               </div></td>
             </tr>
             <tr data-id="13">
-              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><span class="row-title" id="bp-t-13" data-od-bind="ideas[12].title">Sunday pastry walk</span><span class="row-meta">$ · 1–2 hours</span></span></div></td>
+              <td class="col-idea"><div class="cell-idea"><span class="thumb"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="" width="800" height="600" loading="lazy"></span><span class="cell-text"><button type="button" class="row-title row-title-btn" id="bp-t-13" data-act="edit" aria-haspopup="dialog" data-od-bind="ideas[12].title" tabindex="-1">Sunday pastry walk</button><span class="row-meta">Cafe · $ · 1–2 hours</span><span class="row-desc">Pick three bakeries within walking distance and buy one…</span></span></div></td>
               <td class="col-by" data-label="By"><span data-od-bind="ideas[12].creator.name">Maya Chen</span></td>
               <td class="col-tags"><span class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></span></td>
               <td class="col-when" data-label="Submitted"><time datetime="2026-11-25">today</time></td>
@@ -1395,19 +1430,19 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">P</span><span class="row-name" id="bpu-n-u-panos"><span data-od-bind="users[1].name">Panos</span> <span class="you">(you)</span></span></span></td>
               <td class="col-email" data-label="Email">panos<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip role-chip" data-component="Chip" data-variant="admin"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Admin</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text is-danger" data-act="demote" aria-haspopup="dialog" aria-describedby="bpu-n-u-panos" data-component="Button" tabindex="-1">Remove admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text is-danger" data-act="demote" aria-haspopup="dialog" aria-describedby="bpu-n-u-panos" data-component="Button" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-shield-off"/></svg>Remove admin</button></div></td>
             </tr>
             <tr data-user="u-maya" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">M</span><span class="row-name" id="bpu-n-u-maya"><span data-od-bind="users[0].name">Maya Chen</span></span></span></td>
               <td class="col-email" data-label="Email">maya<wbr>.chen<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="bpu-n-u-maya" data-component="Button" tabindex="-1">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="bpu-n-u-maya" data-component="Button" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             <tr data-user="u-maria" data-role="user">
               <td class="col-user"><span class="user-name"><span class="avatar" aria-hidden="true">M</span><span class="row-name" id="bpu-n-u-maria"><span data-od-bind="users[7].name">Maria Fernanda Castellanos-Villalobos y de la Cruz</span></span></span></td>
               <td class="col-email" data-label="Email">mariafernanda<wbr>.castellanos<wbr><span class="nowrap">@example.com</span></td>
               <td class="col-role"><span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span></td>
-              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="bpu-n-u-maria" data-component="Button" tabindex="-1">Make admin</button></div></td>
+              <td class="col-actions"><div class="row-actions"><button type="button" class="btn-text" data-act="promote" aria-describedby="bpu-n-u-maria" data-component="Button" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button></div></td>
             </tr>
             </tbody>
           </table>
@@ -1520,7 +1555,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
           <fieldset class="field">
             <legend class="field-label">Budget</legend>
             <div class="seg seg-4">
-              <label><input class="sr-only" type="radio" name="ed-budget" value=""><span class="is-unset">Not set</span></label>
+              <label><input class="sr-only" type="radio" name="ed-budget" value=""><span class="is-unset"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Not set</span></label>
               <label><input class="sr-only" type="radio" name="ed-budget" value="1" aria-label="$, low budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$</span></label>
               <label><input class="sr-only" type="radio" name="ed-budget" value="2" aria-label="$$, medium budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$</span></label>
               <label><input class="sr-only" type="radio" name="ed-budget" value="3" aria-label="$$$, high budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$$</span></label>
@@ -1530,7 +1565,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
           <fieldset class="field">
             <legend class="field-label">Duration</legend>
             <div class="seg seg-4">
-              <label><input class="sr-only" type="radio" name="ed-duration" value=""><span class="is-unset">Not set</span></label>
+              <label><input class="sr-only" type="radio" name="ed-duration" value=""><span class="is-unset"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Not set</span></label>
               <label><input class="sr-only" type="radio" name="ed-duration" value="short"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>1–2 hours</span></label>
               <label><input class="sr-only" type="radio" name="ed-duration" value="half-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Half day</span></label>
               <label><input class="sr-only" type="radio" name="ed-duration" value="full-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Full day</span></label>
@@ -1899,8 +1934,11 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
     rowsFor(editing).forEach(function (r) {
       r.querySelector('.row-title').textContent = title;
       var meta = r.querySelector('.row-meta');
-      var parts = [d.budget ? ['', '$', '$$', '$$$'][d.budget] : null, d.duration ? { short: '1–2 hours', 'half-day': 'Half day', 'full-day': 'Full day' }[d.duration] : null].filter(Boolean);
-      if (parts.length) { meta.className = 'row-meta'; meta.textContent = parts.join(' · '); }
+      var parts = [d.placeType ? PLACES[d.placeType] : null, d.budget ? ['', '$', '$$', '$$$'][d.budget] : null, d.duration ? { short: '1\u20132 hours', 'half-day': 'Half day', 'full-day': 'Full day' }[d.duration] : null].filter(Boolean);
+      meta.textContent = parts.join(' \u00b7 ');
+      if (d.budget === null && d.duration === null) meta.insertAdjacentHTML('beforeend', ' \u00b7 <span class="is-missing"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>No budget or duration yet</span>');
+      var desc = r.querySelector('.row-desc');
+      if (desc) { var one = d.description.replace(/\s+/g, ' ').trim(); desc.textContent = one.length <= 60 ? one : one.slice(0, 60).slice(0, one.slice(0, 60).lastIndexOf(' ')).replace(/[,.;:]$/, '') + '…'; }
     });
     var st = eForm.querySelector('input[name="ed-status"]:checked').value;
     var qRow = qBody.querySelector('tr[data-id="' + editing + '"]');
@@ -2080,8 +2118,8 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
       ? '<span class="chip role-chip" data-component="Chip" data-variant="admin"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Admin</span>'
       : '<span class="chip chip-quiet role-chip" data-component="Chip" data-variant="user"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>User</span>';
     row.querySelector('.col-actions .row-actions').innerHTML = role === 'admin'
-      ? '<button type="button" class="btn-text is-danger" data-act="demote" aria-haspopup="dialog" aria-describedby="us-n-' + id + '" data-component="Button">Remove admin</button>'
-      : '<button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-' + id + '" data-component="Button">Make admin</button>';
+      ? '<button type="button" class="btn-text is-danger" data-act="demote" aria-haspopup="dialog" aria-describedby="us-n-' + id + '" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-shield-off"/></svg>Remove admin</button>'
+      : '<button type="button" class="btn-text" data-act="promote" aria-describedby="us-n-' + id + '" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-user-plus"/></svg>Make admin</button>';
     paintUsers();
     return row.querySelector('.col-actions button');
   }
@@ -2089,7 +2127,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
     var b = e.target.closest('button[data-act]');
     if (!b) return;
     var row = b.closest('tr');
-    var name = row.querySelector('[data-od-bind]').textContent;
+    var name = row.querySelector('.row-name [data-od-bind]').textContent;
     uErr.innerHTML = '';
     if (b.getAttribute('data-act') === 'promote') {
       setRole(row, 'admin').focus();

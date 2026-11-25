@@ -117,11 +117,11 @@
       }
     },
     {
-      "entryPath": ".open-design/itsadate-screens/admin.html",
-      "title": "Admin",
-      "skillId": "od:prototype:app-table",
+      "entryPath": ".open-design/itsadate-screens/not-found.html",
+      "title": "Page not found",
+      "skillId": "od:prototype:web-prototype",
       "collectionId": "itsadate-screens",
-      "date": "2026-11-25T17:29:54.336Z",
+      "date": "2026-11-25T17:41:15.466Z",
       "signature": {
         "accent": "#f06a4c",
         "displayFont": "Fraunces",
@@ -131,11 +131,11 @@
       }
     },
     {
-      "entryPath": ".open-design/itsadate-screens/not-found.html",
-      "title": "Page not found",
-      "skillId": "od:prototype:web-prototype",
+      "entryPath": ".open-design/itsadate-screens/admin.html",
+      "title": "Admin",
+      "skillId": "od:prototype:app-table",
       "collectionId": "itsadate-screens",
-      "date": "2026-11-25T17:41:15.466Z",
+      "date": "2026-11-25T17:51:28.472Z",
       "signature": {
         "accent": "#f06a4c",
         "displayFont": "Fraunces",

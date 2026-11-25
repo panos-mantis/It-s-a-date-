@@ -17,8 +17,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T17:29:54.302Z",
-  "updatedAt": "2026-11-25T17:29:54.302Z",
+  "createdAt": "2026-11-25T17:51:28.430Z",
+  "updatedAt": "2026-11-25T17:51:28.430Z",
   "sourceSkillId": "od:prototype:app-table",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -193,6 +193,43 @@
         ]
       },
       "screenId": "admin"
+    },
+    "critique": {
+      "verdict": "polish",
+      "findings": [
+        {
+          "area": "task",
+          "fix": "Under each pending title add a 2-line clamped description excerpt and the place type (\"Park · $ · 1–2 hours\"), make the title a button that opens the Edit panel, and in All ideas make approved titles link to idea-detail.html (same tab, Back returns to the All ideas tab).",
+          "where": "Pending tab, queue rows (desktop table and 360px cards); All ideas titles",
+          "problem": "A pending row shows only title, creator, tags and date, and Approve works in one click, so the admin can approve without reading the description or place type; titles aren't links."
+        },
+        {
+          "area": "layout-rhythm",
+          "fix": "Put the status chip on the \"By …\" line and merge the rest into one muted meta line (\"★ 4.8 (23) · 61 saves · Nov 22, 2026\") with Edit as a 44px text button at its right end; drop the separate action row, about 200px per card.",
+          "where": "All ideas tab, 360px",
+          "problem": "Each card stacks By, Status, Rating, Saves and Created on separate lines plus an Edit row, about 370px per card."
+        },
+        {
+          "area": "states",
+          "fix": "Move the h2 and its description into the default slot; loading shows \"Ideas waiting for review\" with no number; empty shows no heading.",
+          "where": "Pending tab, check frames empty and loading",
+          "problem": "The \"3 ideas waiting for review\" heading sits outside the state slot, so empty and loading frames show a count of 3."
+        },
+        {
+          "area": "states",
+          "fix": "Render the board's phone frames with the same card markup and classes as the live 360px queue, icons included.",
+          "where": "States board, frames 6 and 8, 360px",
+          "problem": "The board's phone cards drop the action icons while the live 360px queue shows them: two versions of one card."
+        },
+        {
+          "area": "fit",
+          "fix": "Give every selected Budget and Duration segment the same leading check as Status; add user-plus to Make admin and shield-off to Remove admin.",
+          "where": "Edit panel (Budget, Duration); Users row actions",
+          "problem": "Selected \"Not set\" has no leading check while Status and tags do; Make admin and Remove admin are the only text buttons without icons."
+        }
+      ],
+      "at": "2026-11-25T17:51:28.421Z",
+      "checkRunId": "2026-11-25T17-39-38"
     }
   }
 }
