@@ -17,7 +17,7 @@ export function AccountMenu({ user }: { user: UserDTO }) {
   const panelId = useId();
   const navigate = useNavigate();
   const toast = useToast();
-  const logout = useLogout();
+  const logout = useLogout({ beforeClear: () => void navigate(paths.home) });
   const firstName = user.name.trim().split(/\s+/)[0] ?? user.name;
   const initial = (firstName[0] ?? '?').toUpperCase();
 
@@ -40,15 +40,16 @@ export function AccountMenu({ user }: { user: UserDTO }) {
     };
   }, [open]);
 
-  function handleLogout() {
+  async function handleLogout() {
     setOpen(false);
-    logout.mutate(undefined, {
-      onSuccess: () => {
-        void navigate(paths.home);
-        toast.show("You're logged out. See you soon.", { tone: 'success' });
-      },
-      onError: () => toast.show("We couldn't log you out. Try again.", { tone: 'error' }),
-    });
+    try {
+      // mutateAsync settles even if this component unmounts when the session clears.
+      await logout.mutateAsync();
+    } catch {
+      toast.show("We couldn't log you out. Try again.", { tone: 'error' });
+      return;
+    }
+    toast.show("You're logged out. See you soon.", { tone: 'success' });
   }
 
   return (
@@ -86,7 +87,7 @@ export function AccountMenu({ user }: { user: UserDTO }) {
               Admin
             </Link>
           )}
-          <button type="button" className={itemClasses} onClick={handleLogout}>
+          <button type="button" className={itemClasses} onClick={() => void handleLogout()}>
             Log out
           </button>
         </div>

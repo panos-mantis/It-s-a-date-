@@ -79,6 +79,41 @@ describe('Header', () => {
     expect(router.state.location.pathname).toBe('/');
   });
 
+  it('logging out from a guarded page lands on home, not the login redirect', async () => {
+    login();
+    const { user, router } = renderApp('/profile');
+    await user.click(await menuButton());
+    await user.click(screen.getByRole('button', { name: 'Log out' }));
+    expect(await screen.findByText("You're logged out. See you soon.")).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.pathname).toBe('/'));
+    expect(router.state.location.search).toBe('');
+  });
+
+  it('does not show Log in to a logged-in user when /me fails', async () => {
+    server.use(
+      http.get('*/api/v1/auth/me', () =>
+        HttpResponse.json({ error: { code: 'INTERNAL', message: 'Boom' } }, { status: 500 }),
+      ),
+    );
+    renderApp('/');
+    await screen.findByRole('heading', { level: 1 });
+    await new Promise((r) => setTimeout(r, 50));
+    const header = screen.getByRole('banner');
+    expect(within(header).queryByRole('link', { name: 'Log in' })).not.toBeInTheDocument();
+    expect(within(header).queryByRole('link', { name: 'Sign up' })).not.toBeInTheDocument();
+  });
+
+  it('login page shows the retry state, not the form, when /me fails', async () => {
+    server.use(
+      http.get('*/api/v1/auth/me', () =>
+        HttpResponse.json({ error: { code: 'INTERNAL', message: 'Boom' } }, { status: 500 }),
+      ),
+    );
+    renderApp('/login');
+    expect(await screen.findByText("We couldn't check your account.")).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+  });
+
   it('stays logged in when logout fails', async () => {
     login();
     server.use(

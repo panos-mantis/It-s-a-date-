@@ -38,12 +38,14 @@ export function useRegister() {
   });
 }
 
-export function useLogout() {
+export function useLogout(opts: { beforeClear?: () => void } = {}) {
   const queryClient = useQueryClient();
   return useMutation<void, ApiError, void>({
     mutationKey: ['auth', 'logout'],
     mutationFn: () => api.post<void>('/auth/logout'),
     onSuccess: () => {
+      // Lets the caller leave a guarded page before the session clears and the guard redirects.
+      opts.beforeClear?.();
       queryClient.setQueryData(authKeys.me, null);
       // Per-user data (myRating, saved) must not leak to the next person on this device.
       queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== 'auth' });

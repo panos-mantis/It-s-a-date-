@@ -1,7 +1,11 @@
-import { screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { createMemoryRouter, RouterProvider } from 'react-router';
+import { describe, expect, it, vi } from 'vitest';
 import { authStore } from '../test/msw/handlers';
-import { renderApp } from '../test/render';
+import { createTestQueryClient, renderApp } from '../test/render';
+import { AppProviders } from './providers';
+import { RootLayout } from './layout/RootLayout';
+import { routes } from './routes';
 
 function login(role: 'user' | 'admin' = 'user') {
   authStore.addUser({ name: 'Ana', email: 'ana@x.com', password: 'secret123', role });
@@ -63,5 +67,41 @@ describe('routes', () => {
       'href',
       '#main',
     );
+  });
+});
+
+describe('error element', () => {
+  function Boom(): never {
+    throw new Error('kaboom');
+  }
+
+  function renderThrowing() {
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: <RootLayout />,
+          errorElement: routes[0]?.errorElement,
+          children: [{ index: true, element: <Boom /> }],
+        },
+      ],
+      { initialEntries: ['/'] },
+    );
+    render(
+      <AppProviders queryClient={createTestQueryClient()}>
+        <RouterProvider router={router} />
+      </AppProviders>,
+    );
+  }
+
+  it('shows a generic error with a way out for non-404 errors', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    renderThrowing();
+    expect(await screen.findByText('Something went wrong.')).toBeInTheDocument();
+    expect(screen.getByText('Try again, or head back home.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to home' })).toHaveAttribute('href', '/');
+    expect(screen.queryByText("We couldn't find that page.")).not.toBeInTheDocument();
+    spy.mockRestore();
   });
 });

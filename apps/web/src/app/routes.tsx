@@ -5,6 +5,7 @@ import { SignupPage } from '../features/auth/SignupPage';
 import { RedirectIfAuthed, RequireAuth, RequireRole } from './guards';
 import { RootLayout } from './layout/RootLayout';
 import { ComingSoonPage } from './pages/ComingSoonPage';
+import { ErrorPage } from './pages/ErrorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export const routes: RouteObject[] = [
@@ -13,7 +14,7 @@ export const routes: RouteObject[] = [
     element: <RootLayout />,
     errorElement: (
       <RootLayout>
-        <NotFoundPage />
+        <ErrorPage />
       </RootLayout>
     ),
     children: [

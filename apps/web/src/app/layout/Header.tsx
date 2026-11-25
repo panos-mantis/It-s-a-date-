@@ -49,7 +49,7 @@ export function Header() {
               Share an idea
             </span>
           </Link>
-          {me.isPending ? (
+          {me.isPending || me.isError ? (
             <Skeleton className="h-10 w-24 rounded-pill" />
           ) : me.data ? (
             <AccountMenu user={me.data} />

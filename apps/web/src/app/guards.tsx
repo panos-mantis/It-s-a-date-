@@ -1,5 +1,6 @@
 import type { Role } from '@itsadate/shared';
-import type { ReactNode } from 'react';
+import { useMutationState } from '@tanstack/react-query';
+import { useState, type ReactNode } from 'react';
 import { Link, Navigate, useLocation } from 'react-router';
 import { Button, buttonClasses, EmptyState, Skeleton } from '../components/ui';
 import { useMe } from '../features/auth/api';
@@ -26,9 +27,18 @@ function GuardError({ onRetry }: { onRetry: () => void }) {
 export function RequireAuth({ children }: { children: ReactNode }) {
   const me = useMe();
   const { pathname, search } = useLocation();
+  // A logout that ran while this guard was mounted is sending the user home; don't bounce to /login.
+  const [mountedAt] = useState(() => Date.now());
+  const loggingOut = useMutationState({
+    filters: { mutationKey: ['auth', 'logout'] },
+    select: (m) =>
+      m.state.status === 'pending' ||
+      (m.state.status === 'success' && m.state.submittedAt >= mountedAt),
+  }).some(Boolean);
 
   if (me.isPending) return <GuardSkeleton />;
   if (me.isError) return <GuardError onRetry={() => void me.refetch()} />;
+  if (!me.data && loggingOut) return <GuardSkeleton />;
   if (!me.data) {
     return <Navigate to={`${paths.login}?next=${encodeURIComponent(pathname + search)}`} replace />;
   }
@@ -58,6 +68,7 @@ export function RequireRole({ role, children }: { role: Role; children: ReactNod
 export function RedirectIfAuthed({ children }: { children: ReactNode }) {
   const me = useMe();
   if (me.isPending) return <GuardSkeleton />;
+  if (me.isError) return <GuardError onRetry={() => void me.refetch()} />;
   if (me.data) return <Navigate to={paths.home} replace />;
   return <>{children}</>;
 }
