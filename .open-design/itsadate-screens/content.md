@@ -56,7 +56,7 @@ Sorted by `createdAt`, newest first (the Home "New" order). All are `status: app
 
 On the Home grid the card's tag chip shows the **first** tag only (the main tag); Idea detail shows all of them.
 
-Maya's state (logged in): she has **saved** ideas 2, 5 and 9 (filled heart) and **rated** idea 3 (her rating 5) and idea 10 (her rating 4).
+Maya's state (logged in): she has **saved** ideas 2, 5 and 9 (filled heart) and **rated** idea 3 (her rating 5), idea 5 (her rating 4) and idea 10 (her rating 4).
 
 ### Review Focus items
 

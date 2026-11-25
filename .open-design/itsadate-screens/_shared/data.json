@@ -250,7 +250,7 @@
       },
       "createdAt": "2026-11-10",
       "status": "approved",
-      "myRating": null,
+      "myRating": 4,
       "saved": true
     },
     {
@@ -438,6 +438,60 @@
       "status": "approved",
       "myRating": null,
       "saved": false
+    }
+  ],
+  "places": [
+    {
+      "name": "Bernal Heights Summit",
+      "lat": 37.743,
+      "lng": -122.4155,
+      "distanceM": 1200,
+      "address": "Bernal Heights Blvd, San Francisco, CA 94110",
+      "website": "https://sfrecpark.org/"
+    },
+    {
+      "name": "Mission Dolores Park",
+      "lat": 37.7596,
+      "lng": -122.4269,
+      "distanceM": 1400,
+      "address": "Dolores St & 19th St, San Francisco, CA 94114",
+      "website": "https://sfrecpark.org/"
+    },
+    {
+      "name": "Billy Goat Hill",
+      "lat": 37.7414,
+      "lng": -122.4327,
+      "distanceM": 1900,
+      "address": "Laidley St & 30th St, San Francisco, CA 94131"
+    },
+    {
+      "name": "Kite Hill Open Space",
+      "lat": 37.7586,
+      "lng": -122.44,
+      "distanceM": 2300,
+      "address": "Yukon St & 19th St, San Francisco, CA 94114"
+    },
+    {
+      "name": "Corona Heights Park",
+      "lat": 37.7653,
+      "lng": -122.4387,
+      "distanceM": 2600,
+      "address": "Roosevelt Way & Museum Way, San Francisco, CA 94114",
+      "website": "https://sfrecpark.org/"
+    },
+    {
+      "name": "Twin Peaks Summit Overlook",
+      "lat": 37.7525,
+      "lng": -122.4476,
+      "distanceM": 2800,
+      "address": "501 Twin Peaks Blvd, San Francisco, CA 94114",
+      "website": "https://sfrecpark.org/"
+    },
+    {
+      "name": "Tank Hill",
+      "lat": 37.7599,
+      "lng": -122.4477,
+      "distanceM": 2900
     }
   ]
 }

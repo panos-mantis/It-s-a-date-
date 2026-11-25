@@ -294,34 +294,55 @@ button, input, select { font: inherit; color: inherit; }
 .place-link .icon { width: 14px; height: 14px; }
 .places-foot { margin-top: 16px; font-size: 12px; color: var(--muted); max-width: 65ch; }
 
-/* Static map panel (Phase 6b: react-leaflet with OSM tiles in the same box) */
+/* Static map panel (Phase 6b: react-leaflet with OSM tiles in the same box).
+   The drawing is an 800x600 canvas (1 km = 77 units, so the 3 km ring has r=231). The canvas is always
+   4:3 and centred, so in a taller box (1:1 on phones) its sides are cropped and the middle stays.
+   Pins and the "you" dot are HTML badges placed in canvas percentages (x/800, y/600), so they keep
+   a fixed 24px size at every width, as Leaflet markers do. */
 .map { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-sunk); border: 1px solid var(--border); }
-.map svg { display: block; width: 100%; height: 100%; }
+.map-canvas { position: absolute; top: 0; left: 50%; height: 100%; aspect-ratio: 4 / 3; transform: translateX(-50%); }
+.map-canvas svg { display: block; width: 100%; height: 100%; }
 .map-street { stroke: var(--surface); fill: none; stroke-linecap: round; }
 .map-park { fill: var(--border); }
-.map-label { fill: var(--muted); font-family: var(--font-body); font-size: 13px; font-weight: 500; }
+.map-label { fill: var(--muted); font-family: var(--font-body); font-size: 15px; font-weight: 500; }
 .map-radius { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 6 6; }
-.map-pin circle { fill: var(--fg); stroke: var(--surface); stroke-width: 2.5; }
-.map-pin text { fill: var(--surface); font-family: var(--font-body); font-size: 13px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
-.map-pin.is-active circle { stroke: var(--accent-ink); stroke-width: 3.5; }
-.map-you-ring { fill: var(--surface); stroke: var(--accent-ink); stroke-width: 2; }
-.map-you-dot { fill: var(--accent-ink); }
+.map-scale line { stroke: var(--fg); stroke-width: 3; stroke-linecap: square; }
+.map-scale text { fill: var(--fg); font-family: var(--font-body); font-size: 15px; font-weight: 600; }
+.map-pin {
+  position: absolute; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: var(--radius-pill);
+  display: grid; place-items: center; background: var(--fg); color: var(--surface);
+  font-size: 12px; font-weight: 600; line-height: 1; box-shadow: 0 0 0 2px var(--surface);
+}
+.map-pin.is-active { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent-ink); z-index: 1; }
+.map-pin[data-pin="1"] { left: 62.5%; top: 69.667%; }
+.map-pin[data-pin="2"] { left: 49.375%; top: 42%; }
+.map-pin[data-pin="3"] { left: 43.125%; top: 67.5%; }
+.map-pin[data-pin="4"] { left: 37.5%; top: 47.5%; }
+.map-pin[data-pin="5"] { left: 41.5%; top: 31.333%; }
+.map-pin[data-pin="6"] { left: 32.25%; top: 60.833%; }
+.map-pin[data-pin="7"] { left: 34.5%; top: 35.667%; }
+.map-you {
+  position: absolute; left: 58.75%; top: 55%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: var(--radius-pill);
+  background: var(--accent-ink); box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent-ink);
+}
 .map-attrib {
   position: absolute; right: 0; bottom: 0; padding: 4px 10px; border-top-left-radius: var(--radius-sm);
   background: var(--overlay); font-size: 12px; color: var(--fg);
 }
 .map-attrib a { color: var(--accent-ink); }
-.map-scale {
-  position: absolute; left: 12px; bottom: 10px; display: flex; flex-direction: column; gap: 2px;
-  font-size: 12px; font-weight: 600; color: var(--fg);
-}
-.map-scale-bar { width: 77px; height: 6px; border: 2px solid var(--fg); border-top: 0; }
 .map-legend {
   position: absolute; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 8px;
   padding: 4px 12px; border-radius: var(--radius-pill); background: var(--overlay); box-shadow: var(--elev-raised);
   font-size: 12px; font-weight: 600;
 }
 .you-dot { width: 12px; height: 12px; border-radius: var(--radius-pill); background: var(--accent-ink); box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent-ink); }
+@media (max-width: 639px) {
+  /* Phones: a square map so the pins spread out; street names would be too small, so they go. */
+  .map { aspect-ratio: 1 / 1; }
+  .map-label { display: none; }
+  .map-scale text { font-size: 24px; }
+  .map-scale line { stroke-width: 4; }
+}
 
 /* Panels for the before, waiting, denied, empty and error states */
 .panel {
@@ -500,7 +521,7 @@ button, input, select { font: inherit; color: inherit; }
             <label class="star"><input class="sr-only" type="radio" name="rating" value="5" aria-label="5 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
           </div>
           <div class="rate-head">
-            <p class="rate-note" data-rate-note>You gave it <strong>4 out of 5</strong>. Tap a star to change it.</p>
+            <p class="rate-note" data-rate-note>You gave it <strong>4 out of 5</strong>. Pick a star to change it.</p>
             <button type="button" class="btn btn-ghost btn-sm btn-flush" data-rate-clear data-component="Button">Remove rating</button>
           </div>
         </fieldset>
@@ -528,48 +549,55 @@ button, input, select { font: inherit; color: inherit; }
 
       <div class="places-body">
         <figure class="map" data-od-id="map">
-          <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="map-label">
-            <title id="map-label">Map of the 7 viewpoints within 3 km of your location, numbered as in the list</title>
-            <!-- parks -->
-            <path class="map-park" d="M372 232h52v40h-52z"/>
-            <path class="map-park" d="M462 392c20-16 70-14 86 4 14 16 4 44-24 50-30 6-72-6-74-26-1-12 4-20 12-28z"/>
-            <path class="map-park" d="M222 330c14-22 58-28 74-6 12 18 0 52-28 58-30 6-58-24-46-52z"/>
-            <path class="map-park" d="M312 172c10-12 34-12 40 4 6 14-6 30-22 30-18 0-26-20-18-34z"/>
-            <path class="map-park" d="M268 186c8-8 26-6 30 6 3 12-8 22-20 20-12-2-16-16-10-26z"/>
-            <path class="map-park" d="M330 392c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
-            <path class="map-park" d="M286 272c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
-            <!-- minor streets -->
-            <g class="map-street" stroke-width="4">
-              <path d="M430 40v540M470 40v540M550 40v540M590 40v540M630 40v540M670 40v540M390 120v440"/>
-              <path d="M360 90h440M360 150h440M360 210h440M360 270h440M380 330h420M380 390h420M560 450h240M380 510h420"/>
-              <path d="M300 120c-20 40-40 70-30 110M240 250c40 10 80 0 120 20M200 440c40-20 100-20 160 10M260 520c30-30 60-40 120-50"/>
-            </g>
-            <!-- major streets -->
-            <g class="map-street" stroke-width="9">
-              <path d="M510 20v580"/>
-              <path d="M360 470h440"/>
-              <path d="M180 300 L420 80 L520 -10"/>
-              <path d="M120 470c60-40 120-70 180-90s90-60 120-110"/>
-            </g>
-            <text class="map-label" x="518" y="80">Mission St</text>
-            <text class="map-label" x="600" y="462">Cesar Chavez St</text>
-            <text class="map-label" x="372" y="64" transform="rotate(-42 372 64)">Market St</text>
-            <!-- 3 km radius -->
-            <circle class="map-radius" cx="470" cy="330" r="231"/>
-            <!-- you -->
-            <circle class="map-you-ring" cx="470" cy="330" r="11"/>
-            <circle class="map-you-dot" cx="470" cy="330" r="6"/>
-            <!-- numbered markers, same order as the list -->
-            <g class="map-pin is-active" data-pin="1"><circle cx="500" cy="418" r="15"/><text x="500" y="418">1</text></g>
-            <g class="map-pin" data-pin="2"><circle cx="395" cy="252" r="15"/><text x="395" y="252">2</text></g>
-            <g class="map-pin" data-pin="3"><circle cx="345" cy="405" r="15"/><text x="345" y="405">3</text></g>
-            <g class="map-pin" data-pin="4"><circle cx="300" cy="285" r="15"/><text x="300" y="285">4</text></g>
-            <g class="map-pin" data-pin="5"><circle cx="332" cy="188" r="15"/><text x="332" y="188">5</text></g>
-            <g class="map-pin" data-pin="6"><circle cx="258" cy="365" r="15"/><text x="258" y="365">6</text></g>
-            <g class="map-pin" data-pin="7"><circle cx="284" cy="204" r="15"/><text x="284" y="204">7</text></g>
-          </svg>
+          <div class="map-canvas">
+            <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="map-label">
+              <title id="map-label">Map of the 7 viewpoints within 3 km of your location, numbered as in the list</title>
+              <!-- parks -->
+              <path class="map-park" d="M372 232h52v40h-52z"/>
+              <path class="map-park" d="M462 392c20-16 70-14 86 4 14 16 4 44-24 50-30 6-72-6-74-26-1-12 4-20 12-28z"/>
+              <path class="map-park" d="M222 330c14-22 58-28 74-6 12 18 0 52-28 58-30 6-58-24-46-52z"/>
+              <path class="map-park" d="M312 172c10-12 34-12 40 4 6 14-6 30-22 30-18 0-26-20-18-34z"/>
+              <path class="map-park" d="M268 186c8-8 26-6 30 6 3 12-8 22-20 20-12-2-16-16-10-26z"/>
+              <path class="map-park" d="M330 392c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
+              <path class="map-park" d="M286 272c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
+              <!-- minor streets -->
+              <g class="map-street" stroke-width="4">
+                <path d="M430 40v540M470 40v540M550 40v540M590 40v540M630 40v540M670 40v540M390 120v440"/>
+                <path d="M360 90h440M360 150h440M360 210h440M360 270h440M380 330h420M380 390h420M560 450h240M380 510h420"/>
+                <path d="M300 120c-20 40-40 70-30 110M240 250c40 10 80 0 120 20M200 440c40-20 100-20 160 10M260 520c30-30 60-40 120-50"/>
+              </g>
+              <!-- major streets -->
+              <g class="map-street" stroke-width="9">
+                <path d="M510 20v580"/>
+                <path d="M360 470h440"/>
+                <path d="M180 300 L420 80 L520 -10"/>
+                <path d="M120 470c60-40 120-70 180-90s90-60 120-110"/>
+              </g>
+              <text class="map-label" x="518" y="80">Mission St</text>
+              <text class="map-label" x="600" y="462">Cesar Chavez St</text>
+              <text class="map-label" x="372" y="64" transform="rotate(-42 372 64)">Market St</text>
+              <!-- 3 km radius -->
+              <circle class="map-radius" cx="470" cy="330" r="231"/>
+              <!-- 1 km scale bar, in map units (77 units = 1 km), inside the part a square phone map keeps -->
+              <g class="map-scale" aria-hidden="true">
+                <text x="124" y="556">1 km</text>
+                <line x1="124" y1="572" x2="201" y2="572"/>
+                <line x1="124" y1="564" x2="124" y2="572"/>
+                <line x1="201" y1="564" x2="201" y2="572"/>
+              </g>
+            </svg>
+            <div class="map-pins" aria-hidden="true">
+              <span class="map-you"></span>
+              <span class="map-pin is-active" data-pin="1">1</span>
+              <span class="map-pin" data-pin="2">2</span>
+              <span class="map-pin" data-pin="3">3</span>
+              <span class="map-pin" data-pin="4">4</span>
+              <span class="map-pin" data-pin="5">5</span>
+              <span class="map-pin" data-pin="6">6</span>
+              <span class="map-pin" data-pin="7">7</span>
+            </div>
+          </div>
           <span class="map-legend"><span class="you-dot" aria-hidden="true"></span>You are here</span>
-          <span class="map-scale" aria-hidden="true">1 km<span class="map-scale-bar"></span></span>
           <figcaption class="map-attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</figcaption>
         </figure>
 
@@ -730,7 +758,7 @@ button, input, select { font: inherit; color: inherit; }
                         <label class="star"><input class="sr-only" type="radio" name="rating-salsa" value="4" aria-label="4 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
                         <label class="star"><input class="sr-only" type="radio" name="rating-salsa" value="5" aria-label="5 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
                       </div>
-                      <p class="rate-note" data-rate-note>Tap a star to rate it.</p>
+                      <p class="rate-note" data-rate-note>Pick a star to rate it.</p>
                     </fieldset>
                   </form>
                 </div>
@@ -1004,14 +1032,14 @@ button, input, select { font: inherit; color: inherit; }
       stars.setAttribute('data-value', v);
       paint(stars, v);
       if (legend) legend.textContent = 'Your rating';
-      if (note) note.innerHTML = 'You gave it <strong>' + v + ' out of 5</strong>. Tap a star to change it.';
+      if (note) note.innerHTML = 'You gave it <strong>' + v + ' out of 5</strong>. Pick a star to change it.';
       toast('Rating saved');
     });
     if (clear) clear.addEventListener('click', function () {
       stars.setAttribute('data-value', 0);
       form.querySelectorAll('input').forEach(function (i) { i.checked = false; });
       paint(stars, 0);
-      if (note) note.textContent = 'Tap a star to rate it.';
+      if (note) note.textContent = 'Pick a star to rate it.';
       if (legend) legend.textContent = 'Rate this idea';
       toast('Rating removed');
     });
