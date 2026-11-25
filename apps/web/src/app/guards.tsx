@@ -1,9 +1,10 @@
 import type { Role } from '@itsadate/shared';
 import { useMutationState } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
-import { Link, Navigate, useLocation } from 'react-router';
+import { Link, Navigate, useLocation, useSearchParams } from 'react-router';
 import { Button, buttonClasses, EmptyState, Skeleton } from '../components/ui';
 import { useMe } from '../features/auth/api';
+import { safeNext } from '../features/auth/safe-next';
 import { paths } from './paths';
 
 function GuardSkeleton() {
@@ -66,9 +67,10 @@ export function RequireRole({ role, children }: { role: Role; children: ReactNod
 }
 
 export function RedirectIfAuthed({ children }: { children: ReactNode }) {
+  const [params] = useSearchParams();
   const me = useMe();
   if (me.isPending) return <GuardSkeleton />;
   if (me.isError) return <GuardError onRetry={() => void me.refetch()} />;
-  if (me.data) return <Navigate to={paths.home} replace />;
+  if (me.data) return <Navigate to={safeNext(params.get('next'))} replace />;
   return <>{children}</>;
 }

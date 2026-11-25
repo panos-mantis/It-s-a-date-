@@ -28,7 +28,7 @@ describe('routes', () => {
 
   it('guard redirects with next', async () => {
     const { router } = renderApp('/share?x=1');
-    expect(await screen.findByRole('heading', { name: 'Log in' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/login');
     expect(router.state.location.search).toBe('?next=%2Fshare%3Fx%3D1');
   });
