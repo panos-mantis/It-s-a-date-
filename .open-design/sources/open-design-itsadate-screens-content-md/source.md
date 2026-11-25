@@ -87,6 +87,35 @@ Only Maya sees these, on Profile > Your ideas. They never show on Home and have 
 13. **Sunday pastry walk.** Pick three bakeries within walking distance and buy one pastry at each. Share everything, score them out of ten on a napkin, and finish with a coffee at the winner.
 14. **Sushi boat eating contest.** Order the biggest sushi boat on the menu and race to see who taps out first. The loser pays and the winner picks dessert.
 
+### The admin queue (Admin screen)
+
+Added for Admin (Task 6), so the pending queue has more than one row. `GET /admin/ideas?status=pending` returns the queue **oldest first**, so Admin shows 16, then 15, then 13.
+
+| # | Title | Tags | Budget | Duration | Meta line | placeType | Status | Creator | createdAt | Photo |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 15 | Pick each other's next read at a secondhand bookshop | learning, food | 1 | short | $ · 1–2 hours | cafe | **pending** | Maria Fernanda Castellanos-Villalobos y de la Cruz | 2026-11-22 ("Submitted 3 days ago") | P15 |
+| 16 | Ice skating and hot chocolate | adventure | **null** | **null** | (hidden) | park | **pending** | Lena Brooks | 2024-03-09 | **null** |
+
+16 is a **migrated** idea: the old app's `review: false` became `status: pending` (`apps/api/src/migrate/migrate.ts`), with no photo, no budget or duration, and the placeType its first tag's default gives it (`adventure` → `park`, `legacy-tags.ts`). Expect the real queue to start with a backlog like it.
+
+15. **Pick each other's next read at a secondhand bookshop.** Meet at a secondhand bookshop with ten dollars each and pick a book for the other person. Swap them over coffee and explain your choice in one sentence, no spoilers.
+16. **Ice skating and hot chocolate.** Go to the outdoor rink when it opens for the winter, hold on to each other for the first wobbly lap, then warm up with the thickest hot chocolate you can find nearby.
+
+### Users on the Admin screen
+
+`GET /admin/users` lists users newest first (name, email, role). Panos is the only admin. Emails other than Maya's and Maria's are placeholders at `example.com`; `panos@example.com` stands in for the owner's real admin email.
+
+| Name | Email | Role |
+|---|---|---|
+| Panos | panos@example.com | admin |
+| Maya Chen | maya.chen@example.com | user |
+| Maria Fernanda Castellanos-Villalobos y de la Cruz | mariafernanda.castellanos@example.com | user |
+| Jonah Reyes | jonah.reyes@example.com | user |
+| Priya Natarajan | priya.natarajan@example.com | user |
+| Sam Okafor | sam.okafor@example.com | user |
+| Lena Brooks | lena.brooks@example.com | user |
+| Daniel Okoye | daniel.okoye@example.com | user |
+
 ### Descriptions
 
 1. **Salsa social night.** Many studios run a beginner lesson before an open social. Learn a basic step, swap partners if you feel brave and stay for the last song.
@@ -138,8 +167,9 @@ Licence: [Unsplash Licence](https://unsplash.com/license) (free to use, no permi
 | P12 | Planetarium show | `https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80&auto=format&fit=crop` | A starry night sky with a shooting star | Unsplash photo-1419242902214-272b3f66ee7a, Unsplash Licence |
 | P13 | Sunday pastry walk (spare "croissants", used on Share) | `https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop` | Croissants on a bakery counter | Unsplash photo-1555507036-ab1f4038808a, Unsplash Licence |
 | P14 | Sushi boat eating contest (spare "sushi") | `https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop` | A wooden sushi boat loaded with maki and nigiri | Unsplash photo-1553621042-f6e147245754, Unsplash Licence |
+| P15 | Pick each other's next read (spare "books on a shelf", used on Admin) | `https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop` | Secondhand books standing in a row on a stall | Unsplash photo-1495446815901-a7297e633e8d, Unsplash Licence |
 
-P13 and P14 were checked again on 2026-11-25 for Profile (HTTP 200, viewed).
+P13 and P14 were checked again on 2026-11-25 for Profile (HTTP 200, viewed). P15 was checked again on 2026-11-25 for Admin (HTTP 200, viewed).
 
 Spare checked photos (200, viewed), for later screens that need one more: croissants `photo-1555507036-ab1f4038808a` (pastry walk), books on a shelf `photo-1495446815901-a7297e633e8d`, sushi `photo-1553621042-f6e147245754`.
 

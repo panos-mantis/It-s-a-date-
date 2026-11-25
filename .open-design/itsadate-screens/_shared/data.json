@@ -30,32 +30,37 @@
     {
       "id": "u-panos",
       "name": "Panos",
-      "email": null,
+      "email": "panos@example.com",
       "role": "admin"
     },
     {
       "id": "u-jonah",
       "name": "Jonah Reyes",
+      "email": "jonah.reyes@example.com",
       "role": "user"
     },
     {
       "id": "u-priya",
       "name": "Priya Natarajan",
+      "email": "priya.natarajan@example.com",
       "role": "user"
     },
     {
       "id": "u-sam",
       "name": "Sam Okafor",
+      "email": "sam.okafor@example.com",
       "role": "user"
     },
     {
       "id": "u-lena",
       "name": "Lena Brooks",
+      "email": "lena.brooks@example.com",
       "role": "user"
     },
     {
       "id": "u-daniel",
       "name": "Daniel Okoye",
+      "email": "daniel.okoye@example.com",
       "role": "user"
     },
     {
@@ -494,6 +499,57 @@
       "status": "rejected",
       "myRating": null,
       "saved": false
+    },
+    {
+      "id": "next-read-bookshop",
+      "title": "Pick each other's next read at a secondhand bookshop",
+      "description": "Meet at a secondhand bookshop with ten dollars each and pick a book for the other person. Swap them over coffee and explain your choice in one sentence, no spoilers.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop",
+        "alt": "Secondhand books standing in a row on a stall",
+        "credit": "Unsplash photo-1495446815901-a7297e633e8d, Unsplash Licence"
+      },
+      "tags": [
+        "learning",
+        "food"
+      ],
+      "placeType": "cafe",
+      "budget": 1,
+      "duration": "short",
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 0,
+      "creator": {
+        "id": "u-maria",
+        "name": "Maria Fernanda Castellanos-Villalobos y de la Cruz"
+      },
+      "createdAt": "2026-11-22",
+      "status": "pending",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "ice-skating-hot-chocolate",
+      "title": "Ice skating and hot chocolate",
+      "description": "Go to the outdoor rink when it opens for the winter, hold on to each other for the first wobbly lap, then warm up with the thickest hot chocolate you can find nearby.",
+      "image": null,
+      "tags": [
+        "adventure"
+      ],
+      "placeType": "park",
+      "budget": null,
+      "duration": null,
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 0,
+      "creator": {
+        "id": "u-lena",
+        "name": "Lena Brooks"
+      },
+      "createdAt": "2024-03-09",
+      "status": "pending",
+      "myRating": null,
+      "saved": false
     }
   ],
   "places": [
@@ -549,5 +605,6 @@
       "lng": -122.4477,
       "distanceM": 2900
     }
-  ]
+  ],
+  "adminNote": "Admin (Task 6): ideas 15 and 16 join 13 in the pending queue, shown oldest first (16, 15, 13). 16 is a migrated idea (review:false became pending): no photo, budget or duration, placeType from its tag default. User emails other than Maya and Maria are placeholders at example.com; panos@example.com stands in for the owner's real admin email."
 }

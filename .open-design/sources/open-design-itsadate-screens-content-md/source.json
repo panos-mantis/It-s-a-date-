@@ -1,12 +1,12 @@
 {
   "version": 1,
   "path": ".open-design/itsadate-screens/content.md",
-  "sha256": "e8138c950fda22937ea9f552c0051e619adf405db920d93c4005d0e74b3356ea",
+  "sha256": "8c0baa0091f0b8f442c91a823a075778254d31ccbf88343f0927e9fa90c820c0",
   "kind": "markdown",
-  "extractedAt": "2026-11-25T12:13:44.882Z",
+  "extractedAt": "2026-11-25T17:29:54.296Z",
   "markdownPath": ".open-design/sources/open-design-itsadate-screens-content-md/source.md",
-  "lines": 150,
-  "chars": 15177,
+  "lines": 180,
+  "chars": 17739,
   "sections": [
     {
       "heading": "It's a Date screens: shared sample content",
@@ -58,24 +58,38 @@
       "chars": 1127
     },
     {
-      "heading": "Descriptions",
+      "heading": "The admin queue (Admin screen)",
       "level": 3,
       "startLine": 90,
-      "endLine": 119,
+      "endLine": 103,
+      "chars": 1472
+    },
+    {
+      "heading": "Users on the Admin screen",
+      "level": 3,
+      "startLine": 104,
+      "endLine": 118,
+      "chars": 733
+    },
+    {
+      "heading": "Descriptions",
+      "level": 3,
+      "startLine": 119,
+      "endLine": 148,
       "chars": 4326
     },
     {
       "heading": "Photos",
       "level": 2,
-      "startLine": 120,
-      "endLine": 147,
-      "chars": 4225
+      "startLine": 149,
+      "endLine": 177,
+      "chars": 4578
     },
     {
       "heading": "Shared markup",
       "level": 2,
-      "startLine": 148,
-      "endLine": 151,
+      "startLine": 178,
+      "endLine": 181,
       "chars": 308
     }
   ],

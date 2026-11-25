@@ -115,6 +115,34 @@
         "theme": "light",
         "hero": "split"
       }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/admin.html",
+      "title": "Admin",
+      "skillId": "od:prototype:app-table",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T17:29:54.336Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/not-found.html",
+      "title": "Page not found",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T17:41:15.466Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
     }
   ]
 }
