@@ -18,8 +18,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T12:16:42.402Z",
-  "updatedAt": "2026-11-25T12:16:42.402Z",
+  "createdAt": "2026-11-25T12:22:13.332Z",
+  "updatedAt": "2026-11-25T12:22:13.332Z",
   "sourceSkillId": "od:prototype:web-prototype",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -195,6 +195,37 @@
         ]
       },
       "screenId": "profile"
+    },
+    "critique": {
+      "verdict": "polish",
+      "findings": [
+        {
+          "area": "purpose-hierarchy",
+          "fix": "Rename the menu item Profile to Saved ideas (profile.html#saved); move aria-current with the selected tab and update the hash.",
+          "where": "Header nav and avatar menu, Saved tab",
+          "problem": "With Saved open the header still marks Your ideas as current; the menu has Your ideas and Profile for the same page and nothing leads to Saved."
+        },
+        {
+          "area": "copy",
+          "fix": "Chip label Not approved (danger, circle-x); add a ghost link Share it again with changes to share.html; show a review note if the API has one.",
+          "where": "Your ideas, the Rejected card",
+          "problem": "The red Rejected chip is harsher than its line and the card is a dead end with no next step."
+        },
+        {
+          "area": "copy",
+          "fix": "Use the heart on a card to take it off this list.",
+          "where": "Saved tab, panel summary",
+          "problem": "Tap a heart... says tap on desktop."
+        },
+        {
+          "area": "layout-rhythm",
+          "fix": "wbr before the @ and dots, or keep the domain nowrap; overflow-wrap anywhere only as a fallback.",
+          "where": "States board frame 5, the long email",
+          "problem": "The email breaks mid-word and looks like a typo."
+        }
+      ],
+      "at": "2026-11-25T12:22:13.327Z",
+      "checkRunId": "2026-11-25T12-17-03"
     }
   }
 }

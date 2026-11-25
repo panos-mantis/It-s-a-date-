@@ -18,8 +18,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T11:36:27.498Z",
-  "updatedAt": "2026-11-25T11:36:27.498Z",
+  "createdAt": "2026-11-25T12:23:14.808Z",
+  "updatedAt": "2026-11-25T12:23:14.808Z",
   "sourceSkillId": "od:prototype:web-prototype",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -28,7 +28,7 @@
   "sources": [
     {
       "path": ".open-design/itsadate-screens/content.md",
-      "sha256": "8cd1059e2d39d8eab6e9a318d516e117818f808edc0d374210ae7e1775261d8c"
+      "sha256": "e8138c950fda22937ea9f552c0051e619adf405db920d93c4005d0e74b3356ea"
     },
     {
       "path": "DESIGN.md",

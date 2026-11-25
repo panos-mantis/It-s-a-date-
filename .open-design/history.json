@@ -47,34 +47,6 @@
       }
     },
     {
-      "entryPath": ".open-design/itsadate-screens/idea-detail.html",
-      "title": "Idea detail",
-      "skillId": "od:prototype:web-prototype",
-      "collectionId": "itsadate-screens",
-      "date": "2026-11-25T11:36:27.541Z",
-      "signature": {
-        "accent": "#f06a4c",
-        "displayFont": "Fraunces",
-        "bodyFont": "DM Sans",
-        "theme": "light",
-        "hero": "centred"
-      }
-    },
-    {
-      "entryPath": ".open-design/itsadate-screens/share.html",
-      "title": "Share an idea",
-      "skillId": "od:prototype:web-prototype",
-      "collectionId": "itsadate-screens",
-      "date": "2026-11-25T12:01:16.322Z",
-      "signature": {
-        "accent": "#f06a4c",
-        "displayFont": "Fraunces",
-        "bodyFont": "DM Sans",
-        "theme": "light",
-        "hero": "split"
-      }
-    },
-    {
       "entryPath": ".open-design/itsadate-screens/auth.html",
       "title": "Log in and sign up",
       "skillId": "od:prototype:flow-sign-in",
@@ -89,11 +61,11 @@
       }
     },
     {
-      "entryPath": ".open-design/itsadate-screens/home.html",
-      "title": "Home",
+      "entryPath": ".open-design/itsadate-screens/profile.html",
+      "title": "Profile",
       "skillId": "od:prototype:web-prototype",
       "collectionId": "itsadate-screens",
-      "date": "2026-11-25T12:01:16.385Z",
+      "date": "2026-11-25T12:22:13.342Z",
       "signature": {
         "accent": "#f06a4c",
         "displayFont": "Fraunces",
@@ -103,17 +75,45 @@
       }
     },
     {
-      "entryPath": ".open-design/itsadate-screens/profile.html",
-      "title": "Profile",
+      "entryPath": ".open-design/itsadate-screens/home.html",
+      "title": "Home",
       "skillId": "od:prototype:web-prototype",
       "collectionId": "itsadate-screens",
-      "date": "2026-11-25T12:16:42.410Z",
+      "date": "2026-11-25T12:23:14.786Z",
       "signature": {
         "accent": "#f06a4c",
         "displayFont": "Fraunces",
         "bodyFont": "DM Sans",
         "theme": "light",
         "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/idea-detail.html",
+      "title": "Idea detail",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T12:23:14.817Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/share.html",
+      "title": "Share an idea",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T12:23:14.843Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "split"
       }
     }
   ]

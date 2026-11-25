@@ -15,9 +15,10 @@
     saved    GET /me/saved  (auth)        approved ideas Maya saved
     un-save  DELETE /ideas/:id/save        the card leaves the Saved grid, with an "Undo" toast
     undo     PUT /ideas/:id/save           puts it back where it was
-  Status chips: Pending = warn, Approved = success, Rejected = danger (tokens only, text on the
+  Status chips: "Pending review" = warn, "Approved" = success, "Not approved" (status rejected) = danger (tokens only, text on the
   94% cream overlay, 4.6:1 or better). Only approved cards link to Idea detail; pending and
-  rejected ideas are not public, so they have no page, no heart and no rating.
+  rejected ideas are not public, so they have no page, no heart and no rating. A not-approved card offers
+  "Share it again with changes" (to share.html); the API has no review note, so the line stays generic.
   Ideas 13 (pending, the one sent in on Share) and 14 (rejected) are in content.md and data.json.
   The States board sits in a closed <details> ("Show design states") under the page. It is design-only
   and not part of the real page: Phase 5 ports the frames, not the toggle.
@@ -270,6 +271,10 @@ button { font: inherit; color: inherit; }
 .card-meta { font-size: 14px; color: var(--muted); }
 .status-line { font-size: 14px; color: var(--muted); }
 .status-line strong { font-weight: 600; color: var(--fg); }
+/* "Share it again with changes" under a not-approved card: a ghost text link, 44px tall, above the card's own link layer */
+.status-action { position: relative; z-index: 2; align-self: flex-start; min-height: 44px; padding: 0; font-size: 14px; margin: -8px 0 -4px; }
+.btn.btn-flush { padding-inline: 0; }
+.nowrap { white-space: nowrap; }
 .card-foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 
 /* Chip (data-component="Chip") */
@@ -425,7 +430,7 @@ button { font: inherit; color: inherit; }
     <!-- Your ideas: GET /me/ideas, every status, newest first -->
     <div class="panel" role="tabpanel" id="ideas" aria-labelledby="tab-ideas" tabindex="0" data-od-id="your-ideas">
       <div class="panel-bar">
-        <p class="panel-summary"><strong>5 ideas, 1 waiting for review</strong><span>Pending and rejected ideas are only visible to you.</span></p>
+        <p class="panel-summary"><strong>5 ideas, 1 waiting for review</strong><span>Only you can see ideas that are pending review or not approved.</span></p>
         <a class="btn btn-secondary btn-sm" href="share.html" data-od-goto="share" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Share an idea</a>
       </div>
 
@@ -434,7 +439,7 @@ button { font: inherit; color: inherit; }
         <article class="card" data-component="Card" data-status="pending">
           <div class="card-media">
             <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="Croissants on a bakery counter" width="800" height="600">
-            <span class="badge status is-pending" data-component="Chip" data-variant="pending"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Pending</span>
+            <span class="badge status is-pending" data-component="Chip" data-variant="pending"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Pending review</span>
           </div>
           <div class="card-body">
             <div class="card-head">
@@ -450,14 +455,15 @@ button { font: inherit; color: inherit; }
         <article class="card" data-component="Card" data-status="rejected">
           <div class="card-media">
             <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop" alt="A wooden sushi boat loaded with maki and nigiri" width="800" height="600">
-            <span class="badge status is-rejected" data-component="Chip" data-variant="rejected"><svg class="icon" aria-hidden="true"><use href="#i-circle-x"/></svg>Rejected</span>
+            <span class="badge status is-rejected" data-component="Chip" data-variant="rejected"><svg class="icon" aria-hidden="true"><use href="#i-circle-x"/></svg>Not approved</span>
           </div>
           <div class="card-body">
             <div class="card-head">
-              <h3 class="card-title" data-od-bind="ideas[13].title">Sushi boat eating contest</h3>
+              <h3 class="card-title" id="rejected-title" data-od-bind="ideas[13].title">Sushi boat eating contest</h3>
             </div>
             <p class="card-meta">$$$ · 1–2 hours</p>
             <p class="status-line">Not approved this time</p>
+            <a class="btn btn-ghost btn-flush status-action" href="share.html" data-od-goto="share" data-component="Button" aria-describedby="rejected-title">Share it again with changes</a>
             <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
           </div>
         </article>
@@ -518,7 +524,7 @@ button { font: inherit; color: inherit; }
     <!-- Saved: GET /me/saved. Tapping a filled heart un-saves and removes the card, with Undo. -->
     <div class="panel" role="tabpanel" id="saved" aria-labelledby="tab-saved" tabindex="0" data-od-id="saved" hidden>
       <div class="panel-bar">
-        <p class="panel-summary"><strong data-saved-summary>3 saved ideas</strong><span>Tap a heart to take an idea off this list.</span></p>
+        <p class="panel-summary"><strong data-saved-summary>3 saved ideas</strong><span>Use the heart on a card to take it off this list.</span></p>
       </div>
 
       <div class="grid" id="saved-grid">
@@ -669,7 +675,7 @@ button { font: inherit; color: inherit; }
               <span class="avatar avatar-lg" aria-hidden="true">M</span>
               <div class="profile-id">
                 <h3 class="long-name" data-od-bind="users[7].name">Maria Fernanda Castellanos-Villalobos y de la Cruz</h3>
-                <p class="profile-email" data-od-bind="users[7].email">mariafernanda.castellanos@example.com</p>
+                <p class="profile-email">mariafernanda<wbr>.castellanos<wbr><span class="nowrap">@example.com</span></p>
               </div>
             </div>
           </div>
@@ -679,12 +685,12 @@ button { font: inherit; color: inherit; }
               <span class="avatar avatar-lg" aria-hidden="true">M</span>
               <div class="profile-id">
                 <h3 class="long-name">Maria Fernanda Castellanos-Villalobos y de la Cruz</h3>
-                <p class="profile-email">mariafernanda.castellanos@example.com</p>
+                <p class="profile-email">mariafernanda<wbr>.castellanos<wbr><span class="nowrap">@example.com</span></p>
               </div>
             </div>
           </div>
         </div>
-        <p class="state-note">The name is never cut: it wraps in full (balanced lines on desktop, four lines at 360 px) and the avatar stays top-aligned beside it. A long email breaks anywhere rather than pushing the page sideways. The avatar shows the first letter of the name. The account button in the header shows the first name only ("Maria").</p>
+        <p class="state-note">The name is never cut: it wraps in full (balanced lines on desktop, four lines at 360 px) and the avatar stays top-aligned beside it. A long email breaks before the "@" (a <code>&lt;wbr&gt;</code> before the "@" and before each "." in the name part, with the domain kept whole); breaking anywhere is only the fallback, so it never pushes the page sideways. The avatar shows the first letter of the name. The account button in the header shows the first name only ("Maria").</p>
       </div>
 
       <!-- 6. Un-saving a card -->
@@ -769,6 +775,19 @@ button { font: inherit; color: inherit; }
     if (focus) tab.focus();
     var id = tab.getAttribute('aria-controls');
     if (location.hash !== '#' + id && history.replaceState) history.replaceState(null, '', '#' + id);
+    markCurrent(id);
+  }
+  // The header's current-page mark follows the tab: "Your ideas" (link and menu item) on #ideas,
+  // the "Saved ideas" menu item on #saved.
+  function markCurrent(id) {
+    document.querySelectorAll('.site-nav a[href^="profile.html"]').forEach(function (a) {
+      if (a.getAttribute('href') === 'profile.html#' + id) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+  }
+  function selectedId() {
+    var t = tabs.filter(function (x) { return x.getAttribute('aria-selected') === 'true'; })[0];
+    return t ? t.getAttribute('aria-controls') : 'ideas';
   }
   tabs.forEach(function (tab, i) {
     tab.addEventListener('click', function () { select(tab, false); });
@@ -788,10 +807,27 @@ button { font: inherit; color: inherit; }
   }
   window.addEventListener('hashchange', fromHash);
   fromHash();
+  markCurrent(selectedId());
   // Opening profile.html#saved focuses the panel (it is the URL's target); keep the place, drop the ring.
   window.addEventListener('load', function () {
     var a = document.activeElement;
     if (a && a.getAttribute('role') === 'tabpanel') a.blur();
+    markCurrent(selectedId());
+  });
+  // A header link to a tab on this page ("Your ideas", "Saved ideas") switches tabs in place,
+  // closes the menu and puts focus on the tab.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('.site-nav a[href^="profile.html#"]');
+    if (!a) return;
+    var id = a.getAttribute('href').split('#')[1];
+    var tab = tabs.filter(function (t) { return t.getAttribute('aria-controls') === id; })[0];
+    if (!tab) return;
+    e.preventDefault();
+    select(tab, false);
+    window.scrollTo(0, 0);
+    var btn = document.querySelector('.account-btn[aria-expanded="true"]');
+    if (btn) { btn.setAttribute('aria-expanded', 'false'); document.getElementById(btn.getAttribute('aria-controls')).hidden = true; }
+    tab.focus();
   });
 
   // ---- Saved: un-save removes the card, with an Undo toast in the one live region.
