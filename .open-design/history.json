@@ -73,6 +73,34 @@
         "theme": "light",
         "hero": "centred"
       }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/share.html",
+      "title": "Share an idea",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T11:54:12.217Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "split"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/auth.html",
+      "title": "Log in and sign up",
+      "skillId": "od:prototype:flow-sign-in",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T11:54:12.245Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
     }
   ]
 }
