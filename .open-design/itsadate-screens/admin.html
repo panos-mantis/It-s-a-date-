@@ -307,7 +307,7 @@ code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
 }
 .tag-icon .icon { width: 18px; height: 18px; }
 .col-email { overflow-wrap: anywhere; color: var(--muted); }
-.col-slug code, .col-iconname code { color: var(--fg); background: var(--bg); padding: 2px 6px; border-radius: 6px; }
+.col-slug code, .col-iconname code { color: var(--fg); background: var(--bg); padding: 2px 6px; border-radius: var(--radius-sm); }
 .atable tr.is-flash td { background: var(--surface-sunk); transition: background-color 200ms var(--ease); }
 
 /* Middle widths: drop the two least-needed columns before the table stacks */
@@ -443,6 +443,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
 }
 .form-error .icon { width: 18px; height: 18px; margin-top: 1px; }
 .form-error span { font-weight: 400; }
+.form-error strong { font-weight: 600; }
 .form-error:empty { padding: 0; margin: 0; border: 0; }
 
 /* Tags: list + the "Add a tag" panel beside it (above it on narrow screens) */
@@ -456,17 +457,35 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
 }
 .add-tag h2 { font-size: 22px; line-height: 1.2; letter-spacing: -0.01em; }
-.icon-field { display: flex; align-items: flex-start; gap: 12px; }
-.icon-field .field { flex: 1; }
+/* Icon picker: a radio group over the curated icon set, the only icons Phase 5's icon map renders */
+.icon-field { min-width: 0; }
+.icon-field > .field-label { display: block; padding: 0; margin-bottom: 6px; }
+.icon-field-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.icon-preview-row { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.icon-field .icon-preview-row code { font-size: 12px; color: var(--muted); background: none; padding: 0; white-space: nowrap; word-break: normal; }
 .icon-preview {
-  width: 44px; height: 44px; margin-top: 27px; flex-shrink: 0; border-radius: var(--radius-pill);
+  width: 36px; height: 36px; flex-shrink: 0; border-radius: var(--radius-pill);
   display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-ink);
 }
-.icon-preview.is-unknown { background: var(--surface-sunk); color: var(--muted); }
-.icon-preview .icon { width: 20px; height: 20px; }
+.icon-preview .icon { width: 18px; height: 18px; }
+.icon-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 4px; margin-top: 8px; }
+.icon-opt { position: relative; display: block; min-width: 0; cursor: pointer; }
+.icon-swatch {
+  display: grid; place-items: center; height: 44px; border-radius: var(--radius-pill);
+  border: 1px solid var(--border); background: var(--surface); color: var(--fg);
+  transition: background-color 150ms var(--ease);
+}
+.icon-swatch .icon { width: 20px; height: 20px; }
+.icon-opt:hover .icon-swatch { background: var(--surface-sunk); }
+.icon-opt input:checked + .icon-swatch, .icon-swatch.is-checked {
+  background: var(--accent-soft); border-color: var(--accent-ink); box-shadow: inset 0 0 0 1px var(--accent-ink); color: var(--accent-ink);
+}
+.icon-opt input:focus-visible + .icon-swatch { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 .add-tag .btn { align-self: flex-start; }
 .rename-form { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
 .rename-form .field { flex: 1 1 160px; }
+.rename-form .icon-field { flex: 1 1 100%; }
+.rename-form .icon-picker { grid-template-columns: repeat(auto-fill, 44px); }
 .rename-form .field-label { font-size: 12px; }
 .rename-form .input { min-height: 44px; font-size: 15px; }
 @media (max-width: 639px) { .add-tag { padding: 16px; } }
@@ -698,6 +717,13 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
   <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
   <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></symbol>
   <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></symbol>
+  <symbol id="i-tent" viewBox="0 0 24 24"><path d="M3.5 21 14 3"/><path d="M20.5 21 10 3"/><path d="M15.5 21 12 15l-3.5 6"/><path d="M2 21h20"/></symbol>
+  <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></symbol>
+  <symbol id="i-wine" viewBox="0 0 24 24"><path d="M8 22h8"/><path d="M7 10h10"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"/><circle cx="12" cy="13" r="3"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
@@ -1022,14 +1048,31 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
             <div class="helper-row"><span class="helper" id="tag-name-help">2–30 characters. Slug: <code data-slug-preview>picnics</code></span></div>
             <p class="error" id="tag-name-error" hidden></p>
           </div>
-          <div class="icon-field">
-            <div class="field" data-component="Input">
-              <label class="field-label" for="tag-icon">Icon</label>
-              <input class="input" id="tag-icon" name="icon" type="text" maxlength="40" placeholder="sparkles" autocomplete="off" spellcheck="false" aria-describedby="tag-icon-help">
-              <span class="helper" id="tag-icon-help">A Lucide icon name, like <code>utensils</code> or <code>music</code>. Find names on lucide.dev.</span>
+          <fieldset class="icon-field" aria-describedby="tag-icon-help">
+            <legend class="field-label">Icon</legend>
+            <div class="icon-field-head">
+              <span class="helper" id="tag-icon-help">Pick the icon people will see on the chip.</span>
+              <span class="icon-preview-row" aria-hidden="true"><span class="icon-preview" data-icon-preview><svg class="icon"><use href="#i-sparkles"/></svg></span><code data-icon-name>sparkles</code></span>
             </div>
-            <span class="icon-preview" data-icon-preview aria-hidden="true"><svg class="icon"><use href="#i-sparkles"/></svg></span>
-          </div>
+            <div class="icon-picker" id="tag-icon-picker">
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="utensils"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg></span><span class="sr-only">utensils</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="mountain"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg></span><span class="sr-only">mountain</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="house"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg></span><span class="sr-only">house</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="heart"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span><span class="sr-only">heart</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="dice-5"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg></span><span class="sr-only">dice-5</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="music"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg></span><span class="sr-only">music</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="flower-2"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg></span><span class="sr-only">flower-2</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="book-open"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><span class="sr-only">book-open</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="coffee"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-coffee"/></svg></span><span class="sr-only">coffee</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="film"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-film"/></svg></span><span class="sr-only">film</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="palette"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-palette"/></svg></span><span class="sr-only">palette</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="tent"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-tent"/></svg></span><span class="sr-only">tent</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="bike"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-bike"/></svg></span><span class="sr-only">bike</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="wine"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-wine"/></svg></span><span class="sr-only">wine</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="camera"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg></span><span class="sr-only">camera</span></label>
+                <label class="icon-opt"><input class="sr-only" type="radio" name="icon" value="sparkles" checked><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span><span class="sr-only">sparkles</span></label>
+            </div>
+          </fieldset>
           <button type="submit" class="btn btn-primary btn-sm" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Add tag</button>
         </form>
 
@@ -1300,11 +1343,29 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
                   <p class="error"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><span>A tag with this name already exists. Pick a different name, or rename "Self-care".</span></p>
                 </div>
                 <div class="icon-field">
-                  <div class="field" data-component="Input">
-                    <span class="field-label">Icon</span>
-                    <span class="input input-demo">flower-2</span>
+                  <span class="field-label">Icon</span>
+                  <div class="icon-field-head">
+                    <span class="helper">Pick the icon people will see on the chip.</span>
+                    <span class="icon-preview-row"><span class="icon-preview"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg></span><code>flower-2</code></span>
                   </div>
-                  <span class="icon-preview" aria-hidden="true"><svg class="icon"><use href="#i-flower"/></svg></span>
+                  <div class="icon-picker">
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch is-checked"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-coffee"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-film"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-palette"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-tent"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-bike"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-wine"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg></span></span>
+                    <span class="icon-opt"><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span></span>
+                  </div>
                 </div>
                 <button type="button" class="btn btn-primary btn-sm" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Add tag</button>
               </div>
@@ -1545,9 +1606,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
           <div class="field" data-component="Input">
             <label class="field-label" for="ed-place">Place type</label>
             <div class="select-wrap">
-              <select class="select" id="ed-place" aria-describedby="ed-place-help">
-                <option value="">Not set</option>
-              </select>
+              <select class="select" id="ed-place" aria-describedby="ed-place-help"></select>
               <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg>
             </div>
             <p class="helper" id="ed-place-help">Used to find places near whoever reads the idea. "No place needed" hides that button.</p>
@@ -1610,7 +1669,8 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
 (function () {
   var EDIT = {"1":{"title":"Salsa social night","description":"Many studios run a beginner lesson before an open social. Learn a basic step, swap partners if you feel brave and stay for the last song.","image":"https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80&auto=format&fit=crop","alt":"A crowded dance floor seen from above in warm light","tags":["dancing"],"placeType":"bar","budget":2,"duration":"short","status":"approved","by":"Jonah Reyes","when":"Shared yesterday","migrated":false},"2":{"title":"A slow Saturday at the farmers market, then a picnic lunch by the river for two!","description":"Get there early, before the crowds and while the bread is still warm. Bring a tote bag each, some cash in small notes and no shopping list at all. The rule for the morning is simple: you each have ten dollars, and you have to buy one thing the other person has never tried.\n\nWalk the whole market once before you buy anything. Taste every sample you are offered, ask the cheese seller what they would take home tonight, and let the person at the flower stall talk you into a small bunch of something bright. If there is a coffee cart, start there. If there is a busker, stop and listen to one full song, even if you have heard it a hundred times.\n\nOn your second lap, start building lunch. A good loaf, something soft to spread on it, a handful of whatever fruit is in season and a jar of something pickled are all you really need. Add a wedge of cheese, a few slices of cured meat or a tub of hummus, and one sweet thing you will argue about splitting. Ask for a paper bag for the tomatoes and keep the berries on top so they survive the walk.\n\nThen head for the river. Find a patch of grass with a bit of shade, spread out a blanket or your jackets, and unpack everything at once like a little feast. Tear the bread by hand. Use a pocket knife for the cheese, or just break it. Take your time: nobody is waiting for the table, and there is no bill to ask for.\n\nAfter lunch, lie back and watch the boats, the joggers and the dogs who think every picnic is for them. Read a few pages of a book out loud, play a round of cards, or close your eyes for twenty minutes. If the weather turns, there is usually a covered bench or a cafe close by, and the picnic simply moves indoors.\n\nBefore you leave, gather every crumb and wrapper and take them with you. Keep the flowers for the kitchen table, in a jar of water by the window, all week. And write down the name of the stall that sold you the best thing you ate, because next Saturday you will want to go back and say thank you, and probably buy double.","image":"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop","alt":"Market stalls piled high with fruit and vegetables","tags":["food","adventure"],"placeType":"park","budget":1,"duration":"full-day","status":"approved","by":"Maria Fernanda Castellanos-Villalobos y de la Cruz","when":"Shared 3 days ago","migrated":false},"3":{"title":"Dumpling crawl","description":"Pick three dumpling spots within walking distance and order one plate at each. Compare the fillings, argue about the dipping sauce, and keep the best place for round two.","image":"https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&q=80&auto=format&fit=crop","alt":"Dumplings on a wooden plate with chopsticks","tags":["food"],"placeType":"restaurant","budget":2,"duration":"short","status":"approved","by":"Maya Chen","when":"Shared 6 days ago","migrated":false},"4":{"title":"Bookshop and coffee afternoon","description":"Browse an independent bookshop until something finds you. Take it to a cafe nearby, order a good coffee and read the first chapter before you head home.","image":"https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop","alt":"Long bookshelves under warm hanging bulbs","tags":["self-date","learning","food"],"placeType":"cafe","budget":1,"duration":"half-day","status":"approved","by":"Maya Chen","when":"Shared 11 days ago","migrated":false},"5":{"title":"Golden-hour viewpoint drive","description":"Chase the last hour of daylight to the best lookout within reach. Bring a thermos, a blanket and a playlist, and stay until the lights come on below you.","image":"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop","alt":"Mountain valley lookout with pines","tags":["adventure"],"placeType":"viewpoint","budget":1,"duration":"half-day","status":"approved","by":"Sam Okafor","when":"Shared 15 days ago","migrated":false},"6":{"title":"Game cafe afternoon","description":"Find a cafe with a shelf of games and ask the staff for something neither of you has played. Order a snack, read the rules together and play the first round slowly.","image":"https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=80&auto=format&fit=crop","alt":"A board game mid-play with dice and wooden pieces","tags":["board-game"],"placeType":"cafe","budget":2,"duration":"half-day","status":"approved","by":"Jonah Reyes","when":"Shared 19 days ago","migrated":false},"7":{"title":"Dress-up night at a jazz club","description":"Wear the outfit you save for special occasions and book a table near the band. Order something good, stay for both sets and slow dance on the way home.","image":"https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800&q=80&auto=format&fit=crop","alt":"A saxophone section playing under stage lights","tags":["dancing"],"placeType":"bar","budget":3,"duration":"short","status":"approved","by":"Priya Natarajan","when":"Shared 26 days ago","migrated":false},"8":{"title":"Pizza from scratch","description":"Make the dough together, then pile on whatever is in the fridge. Stretch it badly, bake it hot and eat it straight off the tray.","image":"https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop","alt":"A home-baked pizza with cherry tomatoes and rosemary","tags":["home","food"],"placeType":"none","budget":1,"duration":"short","status":"approved","by":"Sam Okafor","when":"Shared on Oct 24, 2026","migrated":false},"9":{"title":"Couples massage","description":"Book side-by-side treatments and arrive early enough for tea. The best part is the hour after: nowhere to be and nothing to decide.","image":"https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop","alt":"A relaxing massage at a spa","tags":["self-care"],"placeType":"spa","budget":3,"duration":"half-day","status":"approved","by":"Maya Chen","when":"Shared on Oct 15, 2026","migrated":false},"10":{"title":"Sushi counter night","description":"Grab two seats at the counter and let the chef choose. Ask what is best today, try one thing neither of you would normally order, and take your time.","image":"https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80&auto=format&fit=crop","alt":"Salmon sushi rolls on a counter in low light","tags":["food"],"placeType":"sushi","budget":3,"duration":"short","status":"approved","by":"Priya Natarajan","when":"Shared on Oct 8, 2026","migrated":false},"11":{"title":"Backyard movie night","description":"Hang a sheet, point a projector or a laptop at it and bring out every blanket you own. Make popcorn, dim the lights and let the stars do the rest.","image":null,"alt":"","tags":["home"],"placeType":"none","budget":1,"duration":"short","status":"approved","by":"Lena Brooks","when":"Shared on Jun 2, 2024","migrated":true},"12":{"title":"Planetarium show","description":"Lean back in the dark and let someone else point out the constellations. Afterwards, walk home looking up and see how many you can still find.","image":"https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80&auto=format&fit=crop","alt":"A starry night sky with a shooting star","tags":["learning"],"placeType":"museum","budget":null,"duration":null,"status":"approved","by":"Daniel Okoye","when":"Shared on Feb 17, 2024","migrated":true},"13":{"title":"Sunday pastry walk","description":"Pick three bakeries within walking distance and buy one pastry at each. Share everything, score them out of ten on a napkin, and finish with a coffee at the winner.","image":"https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop","alt":"Croissants on a bakery counter","tags":["food","adventure"],"placeType":"cafe","budget":1,"duration":"short","status":"pending","by":"Maya Chen","when":"Submitted today","migrated":false},"14":{"title":"Sushi boat eating contest","description":"Order the biggest sushi boat on the menu and race to see who taps out first. The loser pays and the winner picks dessert.","image":"https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop","alt":"A wooden sushi boat loaded with maki and nigiri","tags":["food"],"placeType":"sushi","budget":3,"duration":"short","status":"rejected","by":"Maya Chen","when":"Shared 4 days ago","migrated":false},"15":{"title":"Pick each other's next read at a secondhand bookshop","description":"Meet at a secondhand bookshop with ten dollars each and pick a book for the other person. Swap them over coffee and explain your choice in one sentence, no spoilers.","image":"https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop","alt":"Secondhand books standing in a row on a stall","tags":["learning","food"],"placeType":"cafe","budget":1,"duration":"short","status":"pending","by":"Maria Fernanda Castellanos-Villalobos y de la Cruz","when":"Submitted 3 days ago","migrated":false},"16":{"title":"Ice skating and hot chocolate","description":"Go to the outdoor rink when it opens for the winter, hold on to each other for the first wobbly lap, then warm up with the thickest hot chocolate you can find nearby.","image":null,"alt":"","tags":["adventure"],"placeType":"park","budget":null,"duration":null,"status":"pending","by":"Lena Brooks","when":"Submitted on Mar 9, 2024","migrated":true}};
   var PLACES = {"none":"No place needed","restaurant":"Restaurant","sushi":"Sushi","cafe":"Cafe","bar":"Bar","park":"Park","viewpoint":"Viewpoint","museum":"Museum","cinema":"Cinema","theatre":"Theatre","climbing_gym":"Climbing gym","bowling":"Bowling","escape_room":"Escape room","spa":"Spa","beach":"Beach"};
-  var ICONS = {"utensils":"i-utensils","mountain":"i-mountain","house":"i-house","heart":"i-heart","dice-5":"i-dice","music":"i-music","flower-2":"i-flower","book-open":"i-book","sparkles":"i-sparkles"};
+  // The curated icon set: the only names the picker offers and Phase 5's icon map renders. Unknown names from old data get the fallback (i-help).
+  var ICONS = {"utensils":"i-utensils","mountain":"i-mountain","house":"i-house","heart":"i-heart","dice-5":"i-dice","music":"i-music","flower-2":"i-flower","book-open":"i-book","coffee":"i-coffee","film":"i-film","palette":"i-palette","tent":"i-tent","bike":"i-bike","wine":"i-wine","camera":"i-camera","sparkles":"i-sparkles"};
   var TAGS = {"food":{"name":"Food","icon":"i-utensils"},"adventure":{"name":"Adventure","icon":"i-mountain"},"home":{"name":"Home","icon":"i-house"},"self-date":{"name":"Self-date","icon":"i-heart"},"board-game":{"name":"Board games","icon":"i-dice"},"dancing":{"name":"Dancing","icon":"i-music"},"self-care":{"name":"Self-care","icon":"i-flower"},"learning":{"name":"Learning","icon":"i-book"}};
 
   var header = document.getElementById('site-header');
@@ -1910,8 +1970,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
     if (d.image) { var img = prev.querySelector('[data-ed-img]'); img.src = d.image; img.alt = 'Current photo: ' + d.alt.charAt(0).toLowerCase() + d.alt.slice(1); }
     eForm.querySelectorAll('.pick').forEach(function (p) { p.setAttribute('aria-pressed', d.tags.indexOf(p.getAttribute('data-tag')) !== -1 ? 'true' : 'false'); });
     paintPicks();
-    ePlace.value = d.placeType || '';
-    ePlace.options[0].disabled = !!d.placeType;
+    ePlace.value = d.placeType; // never null: the migration sets one from the idea's tag
     setRadio('ed-status', d.status);
     setRadio('ed-budget', d.budget);
     setRadio('ed-duration', d.duration);
@@ -1931,7 +1990,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
     d.title = title; d.description = eDesc.value;
     var b = eForm.querySelector('input[name="ed-budget"]:checked'); d.budget = b && b.value ? Number(b.value) : null;
     var du = eForm.querySelector('input[name="ed-duration"]:checked'); d.duration = du && du.value ? du.value : null;
-    d.placeType = ePlace.value || null;
+    d.placeType = ePlace.value;
     rowsFor(editing).forEach(function (r) {
       r.querySelector('.row-title').textContent = title;
       var meta = r.querySelector('.row-meta');
@@ -1974,7 +2033,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
   var tBody = document.getElementById('tags-body');
   var tForm = document.getElementById('add-tag');
   var tName = document.getElementById('tag-name');
-  var tIcon = document.getElementById('tag-icon');
+  var tPick = document.getElementById('tag-icon-picker');
   var tErr = document.getElementById('tag-name-error');
   var tPrev = document.querySelector('[data-icon-preview]');
   function slugify(s) { return s.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
@@ -1993,15 +2052,24 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
     if (msg) input.setAttribute('aria-invalid', 'true'); else input.removeAttribute('aria-invalid');
   }
   function iconPreview(el, name) {
-    var sym = ICONS[name.trim()];
-    el.classList.toggle('is-unknown', !sym && !!name.trim());
-    el.querySelector('use').setAttribute('href', '#' + (sym || (name.trim() ? 'i-help' : 'i-sparkles')));
+    el.querySelector('use').setAttribute('href', '#' + (ICONS[name] || 'i-help'));
+    var code = document.querySelector('[data-icon-name]');
+    if (code) code.textContent = name;
+  }
+  function pickedIcon(scope, group) {
+    var r = scope.querySelector('input[name="' + group + '"]:checked');
+    return r ? r.value : null;
+  }
+  function iconPickerHTML(group, current) {
+    return Object.keys(ICONS).map(function (n) {
+      return '<label class="icon-opt"><input class="sr-only" type="radio" name="' + group + '" value="' + n + '"' + (n === current ? ' checked' : '') + '><span class="icon-swatch"><svg class="icon" aria-hidden="true"><use href="#' + ICONS[n] + '"/></svg></span><span class="sr-only">' + n + '</span></label>';
+    }).join('');
   }
   tName.addEventListener('input', function () {
     document.querySelector('[data-slug-preview]').textContent = slugify(tName.value) || 'picnics';
     if (!tErr.hidden) showError(tName, tErr, null);
   });
-  tIcon.addEventListener('input', function () { iconPreview(tPrev, tIcon.value); });
+  tPick.addEventListener('change', function () { iconPreview(tPrev, pickedIcon(tPick, 'icon') || 'sparkles'); });
   function tagCount() {
     var n = tBody.querySelectorAll('tr').length;
     document.querySelector('[data-tag-summary]').textContent = plural(n, 'tag', 'tags');
@@ -2026,12 +2094,12 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
   }
   tForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    var name = tName.value.trim(), icon = tIcon.value.trim() || 'sparkles';
+    var name = tName.value.trim(), icon = pickedIcon(tPick, 'icon') || 'sparkles';
     var err = nameError(name);
     if (err) { showError(tName, tErr, err); tName.focus(); return; }
     var tr = buildTagRow(name, icon);
     insertSorted(tr); tagCount();
-    tForm.reset(); iconPreview(tPrev, ''); document.querySelector('[data-slug-preview]').textContent = 'picnics';
+    tForm.reset(); iconPreview(tPrev, 'sparkles'); document.querySelector('[data-slug-preview]').textContent = 'picnics';
     tr.classList.add('is-flash'); setTimeout(function () { tr.classList.remove('is-flash'); }, 1200);
     toast('Tag added: ' + name);
     tName.focus();
@@ -2062,9 +2130,8 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
     var icon = tr.querySelector('.col-iconname code').textContent;
     tr._saved = { cell: cell.innerHTML, actions: tr.querySelector('.col-actions').innerHTML };
     cell.innerHTML = '<form class="rename-form" novalidate><div class="field" data-component="Input"><label class="field-label" for="rn-' + slug + '">New name</label><input class="input" id="rn-' + slug + '" maxlength="30" aria-describedby="rn-err-' + slug + '"><p class="error" id="rn-err-' + slug + '" hidden></p></div>' +
-      '<div class="field" data-component="Input"><label class="field-label" for="ri-' + slug + '">Icon</label><input class="input" id="ri-' + slug + '" maxlength="40" spellcheck="false"></div></form>';
+      '<fieldset class="icon-field"><legend class="field-label">Icon</legend><div class="icon-picker">' + iconPickerHTML('ri-' + slug, icon) + '</div></fieldset></form>';
     cell.querySelector('#rn-' + slug).value = name;
-    cell.querySelector('#ri-' + slug).value = icon;
     tr.querySelector('.col-actions').innerHTML = '<div class="row-actions"><button type="button" class="btn-text is-success" data-act="save-rename" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Save</button><button type="button" class="btn-text" data-act="cancel-rename" data-component="Button">Cancel</button></div>';
     var input = cell.querySelector('input');
     input.focus(); input.select();
@@ -2074,7 +2141,7 @@ textarea.input { min-height: 160px; resize: vertical; line-height: 1.55; }
       var err = nameError(n, slug);
       var errEl = cell.querySelector('.error');
       if (err) { showError(input, errEl, err); input.focus(); return; }
-      var ic = cell.querySelector('#ri-' + slug).value.trim() || icon;
+      var ic = pickedIcon(cell, 'ri-' + slug) || icon;
       var fresh = buildTagRow(n, ic);
       tr.replaceWith(fresh); insertSorted(fresh);
       fresh.querySelector('[data-act="rename"]').focus();

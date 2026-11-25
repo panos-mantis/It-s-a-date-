@@ -31,7 +31,7 @@ Every screen in this collection uses the data below, so the same idea shows the 
 | Name | Role | Email | Avatar initial | Where it appears |
 |---|---|---|---|---|
 | Maya Chen | user | maya.chen@example.com | M | The logged-in user on Home, Idea detail, Share and Profile |
-| Panos | admin | (owner's account) | P | Only on the Admin screen |
+| Panos | admin | panos@example.com (a placeholder for the owner's account) | P | Only on the Admin screen |
 | Maria Fernanda Castellanos-Villalobos y de la Cruz | user | mariafernanda.castellanos@example.com | M | A creator name; also the long-name frame on Profile |
 
 Other creators (sample users who shared ideas; they only appear as a creator name): Jonah Reyes, Priya Natarajan, Sam Okafor, Lena Brooks, Daniel Okoye, and **Maria Fernanda Castellanos-Villalobos y de la Cruz** (50 characters, the long-name test).
