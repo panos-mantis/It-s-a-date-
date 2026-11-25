@@ -250,7 +250,7 @@ Not an agent task. The owner must approve these two before the other screens cop
 
 - [x] **Step 1 done:** The local preview was shown (R11).
 
-- [ ] **Step 2: Collect feedback**
+- [x] **Step 2: Collect feedback** (round 1 done: commits 3b37350, 4af6e2f; critic polish applied; review approved)
 
 Take comments from chat or the preview's Comment pins (`get_open_design_artifact` → `openComments`). Apply them in a fresh `itsadate-designer` agent (register with `resolvedCommentIds`, re-check), then show the preview again. Repeat until the owner says yes.
 
@@ -282,7 +282,7 @@ Take comments from chat or the preview's Comment pins (`get_open_design_artifact
 
 After the round: re-check both screens (same viewports), run the critic once on Idea detail only (it changed the most), run one `itsadate-reviewer` over the round's diff, and show the owner the preview again.
 
-- [ ] **Step 3: Record the sign-off**
+- [x] **Step 3: Record the sign-off** (2026-11-25, owner: "i let you decide im fine with everything"; the owner also delegated the 3:2 phone photo, now in. Final runs: home 2026-11-25T11-37-36, idea-detail 2026-11-25T11-36-46)
 
 Ledger: date, the owner's words, the final check run ids. Commit any changes:
 ```bash
