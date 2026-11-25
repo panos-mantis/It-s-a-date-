@@ -47,11 +47,11 @@
       }
     },
     {
-      "entryPath": ".open-design/itsadate-screens/home.html",
-      "title": "Home",
+      "entryPath": ".open-design/itsadate-screens/idea-detail.html",
+      "title": "Idea detail",
       "skillId": "od:prototype:web-prototype",
       "collectionId": "itsadate-screens",
-      "date": "2026-11-25T11:30:52.903Z",
+      "date": "2026-11-25T11:36:27.541Z",
       "signature": {
         "accent": "#f06a4c",
         "displayFont": "Fraunces",
@@ -61,11 +61,11 @@
       }
     },
     {
-      "entryPath": ".open-design/itsadate-screens/idea-detail.html",
-      "title": "Idea detail",
+      "entryPath": ".open-design/itsadate-screens/home.html",
+      "title": "Home",
       "skillId": "od:prototype:web-prototype",
       "collectionId": "itsadate-screens",
-      "date": "2026-11-25T11:32:29.417Z",
+      "date": "2026-11-25T11:36:38.883Z",
       "signature": {
         "accent": "#f06a4c",
         "displayFont": "Fraunces",

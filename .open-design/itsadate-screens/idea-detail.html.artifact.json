@@ -18,8 +18,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T11:32:29.406Z",
-  "updatedAt": "2026-11-25T11:32:29.406Z",
+  "createdAt": "2026-11-25T11:36:27.498Z",
+  "updatedAt": "2026-11-25T11:36:27.498Z",
   "sourceSkillId": "od:prototype:web-prototype",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -200,26 +200,26 @@
       "verdict": "polish",
       "findings": [
         {
+          "area": "colour-contrast",
+          "fix": "Make .map-pin.is-active a dark ring (0 0 0 2px var(--surface), 0 0 0 4px var(--fg)) so coral-ink means only \"you\", and remove is-active from row 1 and pin 1 in the static frame so nothing is lit until a tap or focus.",
+          "where": "6 · Places found, map and list (phone and desktop)",
+          "problem": "The selected pin 1 has the same coral-ink ring as the \"You are here\" dot (.map-pin.is-active and .you-dot both use --accent-ink), and on phone the two sit side by side; row 1 is also shown lit by default, which on a phone (no hover) reads as a selection."
+        },
+        {
           "area": "typography",
-          "fix": "Keep the pins a fixed size in CSS pixels: draw them as absolutely positioned 24px HTML badges over the map, or counter-scale them with a phone media query. Make the map 1:1 below 640px so it is taller and the pins spread out. Set the street labels to at least 11px, or hide them on phone.",
-          "where": "phone 2/9, places map",
-          "problem": "The map SVG shrinks to about 0.4x on a 360px phone, so the numbered pins end up about 12px wide with roughly 6px numbers, pins 5 and 7 nearly touch, and the street labels (\"Market St\", \"Mission St\", \"Cesar Chavez St\") can't be read. That breaks the link between map and list that the numbers are there to make."
+          "fix": "Use the same heading in both: \"Viewpoints <em>near you</em>\" at the same size (xl 24px), so expanding changes only the content below it.",
+          "where": "Compact places card (desktop 1/9, phone 2/9) vs 6 · Places found heading",
+          "problem": "The compact card says \"Viewpoints near you\" in plain type at about 20px, but the results it opens into say \"Viewpoints <em>near you</em>\" at about 30px, so the heading jumps in size and style when the card expands."
         },
         {
-          "area": "copy",
-          "fix": "Draw the scale bar inside the SVG, in the map's own units (1 km = ring radius / 3, about 61 viewBox units at the current drawing), so it scales with the map. If that isn't possible, drop the bar and let the \"3 km\" ring plus the list distances carry the scale.",
-          "where": "places map scale bar (desktop 2/9 and phone 2/9)",
-          "problem": "The \"1 km\" bar is a fixed 77px (.map-scale-bar) while the map scales. On desktop the dashed 3 km ring has a radius of about 183px, so 1 km is about 61px. On phone the ring is about 93px, so 1 km is about 31px. The bar claims a distance the map doesn't show, and on phone it is 2.4 times too long."
-        },
-        {
-          "area": "copy",
-          "fix": "Say \"Pick a star to change it.\" and \"Pick a star to rate it.\", which work for both mouse and touch.",
-          "where": "Your rating card, desktop 1/9 (and the Salsa frame's \"Tap a star to rate it.\")",
-          "problem": "\"Tap a star to change it.\" is touch wording on a desktop screen where people click."
+          "area": "states",
+          "fix": "On phone, while the list is collapsed, fade pins 6 and 7 to about 40% opacity, and bring them back at full strength when \"Show all 7\" expands the list.",
+          "where": "6 · Places found, phone",
+          "problem": "The map shows all 7 pins while the list shows only the nearest 5, so pins 6 and 7 have no row until \"Show all 7\"."
         }
       ],
-      "at": "2026-11-25T03:53:43.147Z",
-      "checkRunId": "2026-11-25T03-49-17"
+      "at": "2026-11-25T11:36:27.490Z",
+      "checkRunId": "2026-11-25T11-31-47"
     }
   }
 }
