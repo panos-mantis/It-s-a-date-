@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>It's a Date · Idea detail</title>
+<meta name="description" content="Idea detail: read one idea, rate it, save it, find places near me. Screen 2 of 7 in It's a Date screens.">
+<!--
+  It's a Date · Idea detail (screen 2 of 7, collection itsadate-screens)
+  Route: /ideas/:id. Data: _shared/data.json and content.md (idea 5, "Golden-hour viewpoint drive").
+  Main view: logged in as Maya Chen, who has saved this idea and rated it 4, after "Find places near me" ran.
+  Places (spec 8.6): GET /places?lat=&lng=&type=viewpoint&radius=3000 returns
+    { name, lat, lng, distanceM, address?, website? }[] sorted by distance, at most 20 (PLACES_RESULTS_MAX).
+    radius 3000 (PLACES_RADIUS_DEFAULT_M), 5000, 10000 (PLACES_RADIUS_MAX_M).
+    The browser asks for location only after "Find places near me". On denial: city or postcode,
+    geocoded through the API's Nominatim proxy. placeType "none" hides the whole section.
+  The map is a static drawn panel here; Phase 6b swaps in react-leaflet with OSM tiles, same size,
+  same numbered markers and the same attribution.
+  Kit components carry data-component so the Phase 5 port maps them onto apps/web/src/components/ui/.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..600,0..100,0..1;1,9..144,400..600,0..100,0..1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FBF6F0;
+  --surface: #FFFDF9;
+  --surface-sunk: #F4EBE0;
+  --fg: #2A1A14;
+  --muted: #6E5D52;
+  --border: #E6D9CB;
+  --accent: #F06A4C;
+  --accent-hover: #F4826A;
+  --accent-ink: #B23E23;
+  --accent-soft: #FDE7DE;
+  --success: #2E7D4F;
+  --warn: #9A6400;
+  --danger: #B42C2C;
+  --overlay: rgba(255, 253, 249, 0.94);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --soft: "SOFT" 100, "WONK" 0;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --elev-raised: 0 1px 2px rgba(42, 26, 20, 0.06), 0 8px 24px rgba(42, 26, 20, 0.08);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --gutter: 16px;
+  --header-h: 64px;
+}
+@media (min-width: 640px) { :root { --gutter: 28px; } }
+@media (min-width: 1024px) { :root { --gutter: 40px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 500; }
+p, ol, ul, figure, fieldset { margin: 0; }
+fieldset { padding: 0; border: 0; min-width: 0; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+button, input, select { font: inherit; color: inherit; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+.icon-muted { color: var(--muted); }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 50;
+  background: var(--accent); color: var(--fg); font-weight: 600;
+  padding: 8px 16px; border-radius: var(--radius-md); text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+.container { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter); }
+
+/* Buttons (data-component="Button") */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap; border: 1.5px solid transparent; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-weight: 600; letter-spacing: 0.02em;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.btn .icon { width: 18px; height: 18px; }
+.btn-md { padding: 12px 24px; font-size: 16px; min-height: 48px; }
+.btn-sm { padding: 8px 16px; font-size: 14px; min-height: 44px; }
+.btn-primary { background: var(--accent); color: var(--fg); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--fg); }
+.btn-secondary:hover { background: var(--surface-sunk); }
+.btn-ghost { background: transparent; color: var(--accent-ink); }
+.btn-ghost:hover { text-decoration: underline; }
+.btn.btn-flush { padding-inline: 0; }
+
+/* Header (matches apps/web Header.tsx + AccountMenu.tsx; same as home.html) */
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms var(--ease);
+}
+.site-header.is-scrolled, .site-header.is-static { border-bottom-color: var(--border); }
+.site-header.is-static { position: relative; z-index: 2; }
+.site-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  height: var(--header-h); width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter);
+}
+.wordmark {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-family: var(--font-display); font-variation-settings: var(--soft);
+  font-style: italic; font-weight: 500; font-size: 20px; text-decoration: none;
+  border-radius: var(--radius-sm); min-height: 44px;
+}
+.wordmark-heart { width: 16px; height: 16px; fill: var(--accent); stroke: var(--accent); stroke-width: 1.75; stroke-linejoin: round; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-share-icon { display: none; }
+.account { position: relative; }
+.account-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: 4px 12px 4px 4px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+  background: var(--surface); font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.account-btn:hover { background: var(--surface-sunk); }
+.avatar {
+  width: 32px; height: 32px; border-radius: var(--radius-pill); flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 14px; font-weight: 600;
+}
+.account-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 192px;
+  display: flex; flex-direction: column; gap: 4px; padding: 8px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  box-shadow: var(--elev-raised);
+}
+.account-menu[hidden] { display: none; }
+.menu-item {
+  display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: var(--radius-sm);
+  background: none; text-align: left; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.menu-item:hover { background: var(--surface-sunk); }
+.nav-share-short { display: none; }
+@media (max-width: 639px) {
+  .nav-actions { gap: 4px; }
+  .btn-sm { padding: 0 10px; }
+  .wordmark { font-size: 18px; }
+  .frame .site-nav { padding-inline: 8px; flex-wrap: wrap; height: auto; min-height: var(--header-h); padding-block: 8px; }
+  .site-nav .nav-share-label, .site-nav .account-name, .site-nav .nav-ideas { display: none; }
+  .site-nav .nav-share-icon, .site-nav .nav-share-short { display: block; }
+  .site-nav .nav-share-icon { width: 16px; height: 16px; }
+  .site-nav .nav-share { gap: 2px; padding: 0 10px 0 8px; border-color: var(--border); border-width: 1px; border-radius: var(--radius-pill); }
+  .site-nav .account-btn { padding-right: 8px; }
+}
+@media (max-width: 359px) {
+  .site-nav { height: auto; min-height: var(--header-h); flex-wrap: wrap; padding-block: 8px; }
+}
+
+/* Back link */
+.backbar { padding-top: 16px; }
+.back { gap: 6px; }
+
+/* Detail top: photo + info (desktop two columns, phone stacked) */
+.detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 8px; padding-bottom: 48px; }
+@media (min-width: 900px) {
+  .detail { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 48px; align-items: start; }
+  .detail-media { position: sticky; top: calc(var(--header-h) + 24px); }
+}
+.media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-sunk); }
+.media img { width: 100%; height: 100%; object-fit: cover; }
+.photo-empty { width: 100%; height: 100%; display: grid; place-items: center; color: var(--muted); }
+.photo-empty .icon { width: 40px; height: 40px; }
+
+/* Save heart with its count, on the photo */
+.save {
+  position: absolute; right: 12px; top: 12px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px 0 12px;
+  border: 0; border-radius: var(--radius-pill); background: var(--overlay); box-shadow: var(--elev-raised);
+  color: var(--fg); font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.save:hover { background: var(--surface); }
+.save .icon { width: 18px; height: 18px; }
+.save[aria-pressed="true"] .icon { fill: var(--accent-ink); stroke: var(--accent-ink); }
+
+.info { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.title {
+  font-size: 38px; line-height: 1.08; letter-spacing: -0.025em; overflow-wrap: anywhere; text-wrap: balance;
+}
+@media (max-width: 639px) { .title { font-size: 30px; } }
+.facts { display: flex; flex-direction: column; gap: 8px; }
+.meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; font-size: 14px; color: var(--muted); }
+.meta .icon { width: 16px; height: 16px; }
+.byline { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 14px; }
+.byline-text { min-width: 0; overflow-wrap: anywhere; }
+.byline-name { font-weight: 600; }
+.byline-date { color: var(--muted); }
+.summary { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+.summary .icon { width: 16px; height: 16px; fill: var(--fg); stroke: var(--fg); }
+.summary-value { font-weight: 600; }
+.summary-count { color: var(--muted); }
+.summary-empty { font-size: 14px; color: var(--muted); }
+.rule { border: 0; border-top: 1px solid var(--border); margin: 8px 0; width: 100%; }
+
+.section-title { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.01em; }
+.prose { max-width: 65ch; display: flex; flex-direction: column; gap: 16px; overflow-wrap: anywhere; }
+.prose p { line-height: 1.55; }
+
+/* Chip (data-component="Chip") */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: var(--radius-pill);
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.chip .icon { width: 14px; height: 14px; }
+
+/* Rating input (data-component="StarRating", mirrors StarRatingInput: fieldset, legend, radio stars) */
+.rate { display: flex; flex-direction: column; gap: 4px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.rate legend { padding: 0; font-size: 14px; font-weight: 600; }
+.rate-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.stars { display: flex; gap: 0; margin-left: -10px; }
+.star { position: relative; display: grid; place-items: center; width: 44px; height: 44px; cursor: pointer; }
+.star .icon { width: 24px; height: 24px; color: var(--border); border-radius: 4px; transition: color 150ms var(--ease), fill 150ms var(--ease); }
+.star.is-on .icon { color: var(--fg); fill: var(--fg); }
+.star.is-preview .icon { color: var(--fg); fill: none; }
+.star input:focus-visible + .icon { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.rate-note { font-size: 14px; color: var(--muted); }
+.rate-note strong { color: var(--fg); font-weight: 600; }
+.rate.is-quiet { gap: 8px; align-items: flex-start; }
+
+/* Places */
+.places { border-top: 1px solid var(--border); padding: 48px 0 64px; }
+.places-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; margin-bottom: 24px; }
+.places-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; }
+.places-head h2 em { font-style: italic; font-weight: 400; }
+.places-sub { margin-top: 8px; color: var(--muted); }
+.places-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.toggle {
+  display: inline-flex; padding: 4px; gap: 2px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill);
+}
+.toggle button {
+  min-height: 40px; padding: 0 16px; border: 0; border-radius: var(--radius-pill);
+  background: none; color: var(--muted); font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease);
+}
+.toggle button:hover { color: var(--fg); }
+.toggle button[aria-pressed="true"] { background: var(--surface-sunk); color: var(--fg); font-weight: 600; }
+@media (max-width: 639px) { .toggle button { min-height: 44px; } }
+.places-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+@media (min-width: 900px) {
+  .places-body { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px; align-items: start; }
+  .places-body .map { order: 2; position: sticky; top: calc(var(--header-h) + 24px); }
+}
+
+.place-list { list-style: none; padding: 0; display: flex; flex-direction: column; }
+.place { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; padding: 16px 12px; border-radius: var(--radius-md); transition: background-color 150ms var(--ease); }
+.place + .place::before { content: ""; position: absolute; left: 12px; right: 12px; top: 0; height: 1px; background: var(--border); }
+.place.is-active::before, .place.is-active + .place::before, .place:hover::before, .place:hover + .place::before { display: none; }
+.place.is-active, .place:hover { background: var(--surface); }
+.pin-num {
+  width: 28px; height: 28px; border-radius: var(--radius-pill); display: grid; place-items: center;
+  background: var(--fg); color: var(--surface); font-size: 12px; font-weight: 600; margin-top: 1px;
+}
+.place-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.place-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.place-name { font-size: 16px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.place-dist { flex-shrink: 0; font-size: 14px; font-weight: 600; }
+.place-addr { font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.place-link {
+  display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; min-height: 32px;
+  font-size: 14px; font-weight: 600; color: var(--accent-ink); text-decoration: none; border-radius: 6px;
+}
+.place-link:hover { text-decoration: underline; }
+.place-link .icon { width: 14px; height: 14px; }
+.places-foot { margin-top: 16px; font-size: 12px; color: var(--muted); max-width: 65ch; }
+
+/* Static map panel (Phase 6b: react-leaflet with OSM tiles in the same box) */
+.map { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-sunk); border: 1px solid var(--border); }
+.map svg { display: block; width: 100%; height: 100%; }
+.map-street { stroke: var(--surface); fill: none; stroke-linecap: round; }
+.map-park { fill: var(--border); }
+.map-label { fill: var(--muted); font-family: var(--font-body); font-size: 13px; font-weight: 500; }
+.map-radius { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 6 6; }
+.map-pin circle { fill: var(--fg); stroke: var(--surface); stroke-width: 2.5; }
+.map-pin text { fill: var(--surface); font-family: var(--font-body); font-size: 13px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+.map-pin.is-active circle { stroke: var(--accent-ink); stroke-width: 3.5; }
+.map-you-ring { fill: var(--surface); stroke: var(--accent-ink); stroke-width: 2; }
+.map-you-dot { fill: var(--accent-ink); }
+.map-attrib {
+  position: absolute; right: 0; bottom: 0; padding: 4px 10px; border-top-left-radius: var(--radius-sm);
+  background: var(--overlay); font-size: 12px; color: var(--fg);
+}
+.map-attrib a { color: var(--accent-ink); }
+.map-scale {
+  position: absolute; left: 12px; bottom: 10px; display: flex; flex-direction: column; gap: 2px;
+  font-size: 12px; font-weight: 600; color: var(--fg);
+}
+.map-scale-bar { width: 77px; height: 6px; border: 2px solid var(--fg); border-top: 0; }
+.map-legend {
+  position: absolute; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 12px; border-radius: var(--radius-pill); background: var(--overlay); box-shadow: var(--elev-raised);
+  font-size: 12px; font-weight: 600;
+}
+.you-dot { width: 12px; height: 12px; border-radius: var(--radius-pill); background: var(--accent-ink); box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent-ink); }
+
+/* Panels for the before, waiting, denied, empty and error states */
+.panel {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 32px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+.panel > .icon { width: 32px; height: 32px; color: var(--muted); }
+.panel h3 { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
+.panel p { color: var(--muted); max-width: 52ch; }
+.panel-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 4px; }
+@media (max-width: 639px) { .panel { padding: 24px 20px; } }
+
+.locate-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; width: 100%; max-width: 480px; margin-top: 4px; }
+.locate-form .field { flex: 1 1 220px; }
+
+/* Input (data-component="Input") */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 14px; font-weight: 600; }
+.input {
+  width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--muted); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: 16px;
+}
+.input::placeholder { color: var(--muted); opacity: 1; }
+.input:focus-visible { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px rgba(240, 106, 76, 0.3); }
+.helper { font-size: 12px; color: var(--muted); }
+
+/* Skeleton (data-component="Skeleton") */
+.skel { border-radius: var(--radius-md); background: var(--surface-sunk); animation: pulse 1.6s var(--ease) infinite; }
+.skel-row { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; padding: 16px 12px; }
+.skel-row + .skel-row { border-top: 1px solid var(--border); }
+.skel-dot { width: 28px; height: 28px; border-radius: var(--radius-pill); }
+.skel-lines { display: flex; flex-direction: column; gap: 8px; }
+.skel-line { height: 16px; width: 70%; }
+.skel-line.short { height: 12px; width: 45%; }
+.skel-map { aspect-ratio: 4 / 3; border-radius: var(--radius-lg); }
+@keyframes pulse { 50% { opacity: 0.55; } }
+.status-line { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.spinner { width: 16px; height: 16px; border-radius: var(--radius-pill); border: 2px solid var(--border); border-top-color: var(--fg); animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Empty state (data-component="EmptyState") */
+.empty {
+  max-width: 448px; margin-inline: auto; padding: 64px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+}
+.empty > .icon { width: 40px; height: 40px; color: var(--muted); }
+.empty h3 { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
+.empty p { color: var(--muted); }
+.empty .btn { margin-top: 8px; }
+
+/* Toast (data-component="Toast") */
+.toast {
+  display: inline-flex; align-items: center; gap: 12px; max-width: 100%;
+  padding: 12px 16px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--elev-raised); font-size: 14px; font-weight: 500;
+}
+.toast .icon { width: 18px; height: 18px; }
+.toast.is-success .icon { color: var(--success); }
+.toast.is-error .icon { color: var(--danger); }
+.toast-region { position: fixed; left: 50%; bottom: 24px; z-index: 70; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); }
+.toast-region:empty { display: none; }
+
+/* States board */
+.board { background: var(--surface-sunk); border-top: 1px solid var(--border); padding: 64px 0 96px; }
+.board-head { max-width: 65ch; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.board-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; margin-top: 8px; }
+.board-head h2 em { font-style: italic; font-weight: 400; }
+.board-head p { margin-top: 12px; color: var(--muted); }
+.board code {
+  font-family: ui-monospace, Consolas, monospace; font-size: 14px; color: var(--fg);
+  background: var(--bg); padding: 1px 6px; border-radius: 6px; word-break: break-all;
+}
+.state { margin-top: 48px; }
+.state > .eyebrow { margin-bottom: 12px; }
+.state-note { margin-top: 12px; max-width: 65ch; font-size: 14px; color: var(--muted); }
+.frame { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); min-width: 0; }
+.frame > .site-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.frame-pad { padding: 32px; }
+.frame-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+@media (min-width: 900px) { .frame-split { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.frame-split .frame-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
+.mini { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+@media (min-width: 900px) {
+  .mini.is-wide { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px; align-items: start; }
+  .mini.is-wide > .media { position: sticky; top: calc(var(--header-h) + 24px); }
+}
+.mini .title { font-size: 30px; }
+.rate-row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.rate-row > .rate { flex: 1 1 240px; }
+.toast-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+@media (max-width: 767px) {
+  .board { padding: 48px 0 64px; }
+  .frame-pad { padding: 16px; }
+  .places-head h2 { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body data-od-current="idea-detail">
+
+<svg width="0" height="0" class="sr-only" aria-hidden="true" focusable="false">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+  <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+  <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="i-search-x" viewBox="0 0 24 24"><path d="m13.5 8.5-5 5"/><path d="m8.5 8.5 5 5"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+  <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-map-pin-off" viewBox="0 0 24 24"><path d="M12.75 7.09a3 3 0 0 1 2.16 2.16"/><path d="M17.072 17.072c-1.634 2.17-3.527 3.912-4.471 4.727a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 1.432-4.568"/><path d="m2 2 20 20"/><path d="M8.475 2.818A8 8 0 0 1 20 10c0 1.183-.31 2.377-.81 3.533"/><path d="M9.13 9.13a3 3 0 0 0 3.74 3.74"/></symbol>
+  <symbol id="i-locate" viewBox="0 0 24 24"><path d="M2 12h3"/><path d="M19 12h3"/><path d="M12 2v3"/><path d="M12 19v3"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/><circle cx="12" cy="12" r="10"/></symbol>
+</svg>
+
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header class="site-header" id="site-header" data-od-id="header">
+  <template data-od-include="_shared/nav.html"></template>
+</header>
+
+<main id="content" tabindex="-1">
+  <div class="container backbar" data-od-id="back">
+    <a class="btn btn-ghost btn-sm btn-flush back" href="home.html" data-od-goto="home" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>All ideas</a>
+  </div>
+
+  <!-- ===================== Idea ===================== -->
+  <article class="container detail" data-od-id="idea" aria-labelledby="idea-title">
+    <div class="detail-media">
+      <div class="media">
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="A mountain valley lookout framed by pine trees" width="800" height="600" data-od-bind-src="ideas[4].image.url">
+        <button type="button" class="save" aria-pressed="true" data-save data-count="276" aria-label="Saved. 276 people saved Golden-hour viewpoint drive"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span class="save-count" aria-hidden="true">276</span></button>
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="chips">
+        <span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span>
+      </div>
+      <h1 class="title" id="idea-title" data-od-bind="ideas[4].title">Golden-hour viewpoint drive</h1>
+      <div class="facts">
+        <p class="meta">$ · Half day</p>
+        <p class="summary" role="img" aria-label="Rated 4.7 out of 5 from 89 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="summary-value">4.7</span><span class="summary-count">· 89 ratings</span></p>
+      </div>
+      <div class="byline">
+        <span class="avatar" aria-hidden="true">S</span>
+        <p class="byline-text">Shared by <span class="byline-name">Sam Okafor</span> <span class="byline-date">· Nov 10, 2026</span></p>
+      </div>
+
+      <hr class="rule">
+
+      <section class="prose" aria-labelledby="about-title">
+        <h2 class="section-title" id="about-title">About this date</h2>
+        <p data-od-bind="ideas[4].description">Chase the last hour of daylight to the best lookout within reach. Bring a thermos, a blanket and a playlist, and stay until the lights come on below you.</p>
+      </section>
+
+      <form class="rate" data-component="StarRating" data-rate>
+        <fieldset>
+          <legend>Your rating</legend>
+          <div class="stars" data-value="4">
+            <label class="star is-on"><input class="sr-only" type="radio" name="rating" value="1" aria-label="1 star"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+            <label class="star is-on"><input class="sr-only" type="radio" name="rating" value="2" aria-label="2 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+            <label class="star is-on"><input class="sr-only" type="radio" name="rating" value="3" aria-label="3 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+            <label class="star is-on"><input class="sr-only" type="radio" name="rating" value="4" aria-label="4 stars" checked><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+            <label class="star"><input class="sr-only" type="radio" name="rating" value="5" aria-label="5 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+          </div>
+          <div class="rate-head">
+            <p class="rate-note" data-rate-note>You gave it <strong>4 out of 5</strong>. Tap a star to change it.</p>
+            <button type="button" class="btn btn-ghost btn-sm btn-flush" data-rate-clear data-component="Button">Remove rating</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </article>
+
+  <!-- ===================== Places (after "Find places near me" ran) ===================== -->
+  <section class="places" id="places" data-od-id="places" aria-labelledby="places-title">
+    <div class="container">
+      <div class="places-head">
+        <div>
+          <h2 id="places-title">Viewpoints <em>near you</em></h2>
+          <p class="places-sub" data-radius-sub>7 places within 3 km of your location, nearest first.</p>
+        </div>
+        <div class="places-controls">
+          <div class="toggle" role="group" aria-label="Search radius" data-single data-required data-radius>
+            <button type="button" aria-pressed="true" data-km="3">3 km</button>
+            <button type="button" aria-pressed="false" data-km="5">5 km</button>
+            <button type="button" aria-pressed="false" data-km="10">10 km</button>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" data-component="Button">Use a different place</button>
+        </div>
+      </div>
+
+      <div class="places-body">
+        <figure class="map" data-od-id="map">
+          <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="map-label">
+            <title id="map-label">Map of the 7 viewpoints within 3 km of your location, numbered as in the list</title>
+            <!-- parks -->
+            <path class="map-park" d="M372 232h52v40h-52z"/>
+            <path class="map-park" d="M462 392c20-16 70-14 86 4 14 16 4 44-24 50-30 6-72-6-74-26-1-12 4-20 12-28z"/>
+            <path class="map-park" d="M222 330c14-22 58-28 74-6 12 18 0 52-28 58-30 6-58-24-46-52z"/>
+            <path class="map-park" d="M312 172c10-12 34-12 40 4 6 14-6 30-22 30-18 0-26-20-18-34z"/>
+            <path class="map-park" d="M268 186c8-8 26-6 30 6 3 12-8 22-20 20-12-2-16-16-10-26z"/>
+            <path class="map-park" d="M330 392c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
+            <path class="map-park" d="M286 272c8-8 26-6 30 6 2 12-10 20-22 18-12-2-14-16-8-24z"/>
+            <!-- minor streets -->
+            <g class="map-street" stroke-width="4">
+              <path d="M430 40v540M470 40v540M550 40v540M590 40v540M630 40v540M670 40v540M390 120v440"/>
+              <path d="M360 90h440M360 150h440M360 210h440M360 270h440M380 330h420M380 390h420M560 450h240M380 510h420"/>
+              <path d="M300 120c-20 40-40 70-30 110M240 250c40 10 80 0 120 20M200 440c40-20 100-20 160 10M260 520c30-30 60-40 120-50"/>
+            </g>
+            <!-- major streets -->
+            <g class="map-street" stroke-width="9">
+              <path d="M510 20v580"/>
+              <path d="M360 470h440"/>
+              <path d="M180 300 L420 80 L520 -10"/>
+              <path d="M120 470c60-40 120-70 180-90s90-60 120-110"/>
+            </g>
+            <text class="map-label" x="518" y="80">Mission St</text>
+            <text class="map-label" x="600" y="462">Cesar Chavez St</text>
+            <text class="map-label" x="372" y="64" transform="rotate(-42 372 64)">Market St</text>
+            <!-- 3 km radius -->
+            <circle class="map-radius" cx="470" cy="330" r="231"/>
+            <!-- you -->
+            <circle class="map-you-ring" cx="470" cy="330" r="11"/>
+            <circle class="map-you-dot" cx="470" cy="330" r="6"/>
+            <!-- numbered markers, same order as the list -->
+            <g class="map-pin is-active" data-pin="1"><circle cx="500" cy="418" r="15"/><text x="500" y="418">1</text></g>
+            <g class="map-pin" data-pin="2"><circle cx="395" cy="252" r="15"/><text x="395" y="252">2</text></g>
+            <g class="map-pin" data-pin="3"><circle cx="345" cy="405" r="15"/><text x="345" y="405">3</text></g>
+            <g class="map-pin" data-pin="4"><circle cx="300" cy="285" r="15"/><text x="300" y="285">4</text></g>
+            <g class="map-pin" data-pin="5"><circle cx="332" cy="188" r="15"/><text x="332" y="188">5</text></g>
+            <g class="map-pin" data-pin="6"><circle cx="258" cy="365" r="15"/><text x="258" y="365">6</text></g>
+            <g class="map-pin" data-pin="7"><circle cx="284" cy="204" r="15"/><text x="284" y="204">7</text></g>
+          </svg>
+          <span class="map-legend"><span class="you-dot" aria-hidden="true"></span>You are here</span>
+          <span class="map-scale" aria-hidden="true">1 km<span class="map-scale-bar"></span></span>
+          <figcaption class="map-attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</figcaption>
+        </figure>
+
+        <div>
+          <ol class="place-list" data-place-list>
+            <li class="place is-active" data-place="1">
+              <span class="pin-num" aria-hidden="true">1</span>
+              <div class="place-body">
+                <div class="place-top"><h3 class="place-name">Bernal Heights Summit</h3><span class="place-dist">1.2 km</span></div>
+                <p class="place-addr">Bernal Heights Blvd, San Francisco, CA 94110</p>
+                <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+              </div>
+            </li>
+            <li class="place" data-place="2">
+              <span class="pin-num" aria-hidden="true">2</span>
+              <div class="place-body">
+                <div class="place-top"><h3 class="place-name">Mission Dolores Park</h3><span class="place-dist">1.4 km</span></div>
+                <p class="place-addr">Dolores St &amp; 19th St, San Francisco, CA 94114</p>
+                <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+              </div>
+            </li>
+            <li class="place" data-place="3">
+              <span class="pin-num" aria-hidden="true">3</span>
+              <div class="place-body">
+                <div class="place-top"><h3 class="place-name">Billy Goat Hill</h3><span class="place-dist">1.9 km</span></div>
+                <p class="place-addr">Laidley St &amp; 30th St, San Francisco, CA 94131</p>
+              </div>
+            </li>
+            <li class="place" data-place="4">
+              <span class="pin-num" aria-hidden="true">4</span>
+              <div class="place-body">
+                <div class="place-top"><h3 class="place-name">Kite Hill Open Space</h3><span class="place-dist">2.3 km</span></div>
+                <p class="place-addr">Yukon St &amp; 19th St, San Francisco, CA 94114</p>
+              </div>
+            </li>
+            <li class="place" data-place="5">
+              <span class="pin-num" aria-hidden="true">5</span>
+              <div class="place-body">
+                <div class="place-top"><h3 class="place-name">Corona Heights Park</h3><span class="place-dist">2.6 km</span></div>
+                <p class="place-addr">Roosevelt Way &amp; Museum Way, San Francisco, CA 94114</p>
+                <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+              </div>
+            </li>
+            <li class="place" data-place="6">
+              <span class="pin-num" aria-hidden="true">6</span>
+              <div class="place-body">
+                <div class="place-top"><h3 class="place-name">Twin Peaks Summit Overlook</h3><span class="place-dist">2.8 km</span></div>
+                <p class="place-addr">501 Twin Peaks Blvd, San Francisco, CA 94114</p>
+                <a class="place-link" href="https://sfrecpark.org/" target="_blank" rel="noopener" aria-label="sfrecpark.org (opens in a new tab)">sfrecpark.org<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+              </div>
+            </li>
+            <li class="place" data-place="7">
+              <span class="pin-num" aria-hidden="true">7</span>
+              <div class="place-body">
+                <div class="place-top"><h3 class="place-name">Tank Hill</h3><span class="place-dist">2.9 km</span></div>
+                <!-- No address in OpenStreetMap for this one: the line is left out, never "undefined". -->
+              </div>
+            </li>
+          </ol>
+          <p class="places-foot">Place details come from OpenStreetMap and can be out of date, so check opening times before you head out. Your location is only used for this search.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== States board ===================== -->
+  <section class="board" data-od-id="states-board" aria-labelledby="board-title">
+    <div class="container">
+      <div class="board-head">
+        <p class="eyebrow">States board</p>
+        <h2 id="board-title">Idea detail, in <em>every</em> state</h2>
+        <p>Each frame is one state of this page, for the Phase 5 port and the ratings and places work in Phase 6. The page above is Maya Chen, logged in, after "Find places near me" ran. Places frames show only the places section; the rest of the page stays as it is.</p>
+      </div>
+
+      <!-- 1. Logged out -->
+      <div class="state" data-od-id="state-logged-out">
+        <p class="eyebrow">1 · Logged out</p>
+        <div class="frame">
+          <header class="site-header is-static">
+            <nav class="site-nav" aria-label="Main (logged out)">
+              <a class="wordmark" href="home.html" data-od-goto="home"><svg class="wordmark-heart" aria-hidden="true"><use href="#i-heart"/></svg>It's a Date</a>
+              <div class="nav-actions">
+                <a class="btn btn-ghost btn-sm nav-share" href="auth.html" data-od-goto="auth" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-label" aria-hidden="true">Share an idea</span><span class="nav-share-short" aria-hidden="true">Share</span></a>
+                <a class="btn btn-ghost btn-sm" href="auth.html" data-od-goto="auth" data-component="Button">Log in</a>
+                <a class="btn btn-secondary btn-sm" href="auth.html" data-od-goto="auth" data-component="Button">Sign up</a>
+              </div>
+            </nav>
+          </header>
+          <div class="frame-pad">
+            <div class="mini is-wide">
+              <div class="media">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="A mountain valley lookout framed by pine trees" width="800" height="600" loading="lazy">
+                <a class="save" href="auth.html" data-od-goto="auth" aria-label="Log in to save Golden-hour viewpoint drive. 276 people saved it"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span aria-hidden="true">276</span></a>
+              </div>
+              <div class="info">
+                <div class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></div>
+                <h3 class="title">Golden-hour viewpoint drive</h3>
+                <div class="facts">
+                  <p class="meta">$ · Half day</p>
+                  <p class="summary" role="img" aria-label="Rated 4.7 out of 5 from 89 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="summary-value">4.7</span><span class="summary-count">· 89 ratings</span></p>
+                </div>
+                <div class="byline"><span class="avatar" aria-hidden="true">S</span><p class="byline-text">Shared by <span class="byline-name">Sam Okafor</span> <span class="byline-date">· Nov 10, 2026</span></p></div>
+                <div class="rate is-quiet" data-component="StarRating">
+                  <p class="field-label">Your rating</p>
+                  <p class="rate-note">Rate it once you've tried it.</p>
+                  <a class="btn btn-secondary btn-sm" href="auth.html" data-od-goto="auth" data-component="Button">Log in to rate</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Log in and Sign up replace the avatar menu. The heart and its count stay on the photo; for a logged-out visitor the heart is a link to Log in ("Log in to save ideas you like."). "Log in to rate" opens Log in with "Log in to rate this idea." and comes back here. Places need no account, so "Find places near me" works the same.</p>
+      </div>
+
+      <!-- 2. No photo, no ratings -->
+      <div class="state" data-od-id="state-missing">
+        <p class="eyebrow">2 · No photo, and no ratings yet</p>
+        <div class="frame frame-pad">
+          <div class="frame-split">
+            <div>
+              <p class="frame-label"><code>image: null</code> · Backyard movie night (a migrated idea)</p>
+              <div class="mini">
+                <div class="media">
+                  <div class="photo-empty" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg></div>
+                  <button type="button" class="save" aria-pressed="false" data-save data-count="88" aria-label="Save Backyard movie night. 88 people saved it"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span class="save-count" aria-hidden="true">88</span></button>
+                </div>
+                <div class="info">
+                  <div class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</span></div>
+                  <h3 class="title">Backyard movie night</h3>
+                  <div class="facts">
+                    <p class="meta">$ · 1–2 hours · Plan it at home</p>
+                    <p class="summary" role="img" aria-label="Rated 4.3 out of 5 from 41 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="summary-value">4.3</span><span class="summary-count">· 41 ratings</span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="frame-label"><code>ratingCount: 0</code> · Salsa social night</p>
+              <div class="mini">
+                <div class="media">
+                  <img src="https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80&auto=format&fit=crop" alt="A crowded dance floor seen from above in warm light" width="800" height="600" loading="lazy">
+                  <button type="button" class="save" aria-pressed="false" data-save data-count="3" aria-label="Save Salsa social night. 3 people saved it"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span class="save-count" aria-hidden="true">3</span></button>
+                </div>
+                <div class="info">
+                  <div class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</span></div>
+                  <h3 class="title">Salsa social night</h3>
+                  <div class="facts">
+                    <p class="meta">$$ · 1–2 hours</p>
+                    <p class="summary-empty">No ratings yet. Be the first.</p>
+                  </div>
+                  <form class="rate" data-component="StarRating" data-rate>
+                    <fieldset>
+                      <legend>Rate this idea</legend>
+                      <div class="stars" data-value="0">
+                        <label class="star"><input class="sr-only" type="radio" name="rating-salsa" value="1" aria-label="1 star"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+                        <label class="star"><input class="sr-only" type="radio" name="rating-salsa" value="2" aria-label="2 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+                        <label class="star"><input class="sr-only" type="radio" name="rating-salsa" value="3" aria-label="3 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+                        <label class="star"><input class="sr-only" type="radio" name="rating-salsa" value="4" aria-label="4 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+                        <label class="star"><input class="sr-only" type="radio" name="rating-salsa" value="5" aria-label="5 stars"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg></label>
+                      </div>
+                      <p class="rate-note" data-rate-note>Tap a star to rate it.</p>
+                    </fieldset>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">No photo: the sunk 4:3 placeholder carries the main tag's icon (here Home), and the heart stays. No ratings: the summary reads "No ratings yet. Be the first." (never "0.0 (0)"), and the input is labelled "Rate this idea" until Maya has rated it, then "Your rating".</p>
+      </div>
+
+      <!-- 3. Budget and duration missing -->
+      <div class="state" data-od-id="state-no-meta">
+        <p class="eyebrow">3 · Budget and duration missing</p>
+        <div class="frame frame-pad">
+          <div class="mini is-wide">
+            <div class="media">
+              <img src="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80&auto=format&fit=crop" alt="A starry night sky with a shooting star" width="800" height="600" loading="lazy">
+              <button type="button" class="save" aria-pressed="false" data-save data-count="12" aria-label="Save Planetarium show. 12 people saved it"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span class="save-count" aria-hidden="true">12</span></button>
+            </div>
+            <div class="info">
+              <div class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</span></div>
+              <h3 class="title">Planetarium show</h3>
+              <div class="facts">
+                <!-- budget and duration are null: the meta line is not rendered at all -->
+                <p class="summary" role="img" aria-label="Rated 3.9 out of 5 from 8 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="summary-value">3.9</span><span class="summary-count">· 8 ratings</span></p>
+              </div>
+              <div class="byline"><span class="avatar" aria-hidden="true">D</span><p class="byline-text">Shared by <span class="byline-name">Daniel Okoye</span> <span class="byline-date">· Feb 17, 2024</span></p></div>
+              <div class="prose"><p>Lean back in the dark and let someone else point out the constellations. Afterwards, walk home looking up and see how many you can still find.</p></div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note"><code>budget: null</code> and <code>duration: null</code>: the meta line is left out, not "null · null". When only one is missing, the other shows alone ("$$" or "Half day").</p>
+      </div>
+
+      <!-- 4. Long content -->
+      <div class="state" data-od-id="state-long">
+        <p class="eyebrow">4 · An 80-character title, a 50-character name and the 2000-character description</p>
+        <div class="frame frame-pad">
+          <div class="mini is-wide">
+            <div class="media">
+              <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop" alt="Market stalls piled high with fruit and vegetables" width="800" height="600" loading="lazy">
+              <button type="button" class="save" aria-pressed="true" data-save data-count="61" aria-label="Saved. 61 people saved A slow Saturday at the farmers market, then a picnic lunch by the river for two!"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span class="save-count" aria-hidden="true">61</span></button>
+            </div>
+            <div class="info">
+              <div class="chips">
+                <span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span>
+                <span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span>
+              </div>
+              <h3 class="title" data-od-bind="ideas[1].title">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</h3>
+              <div class="facts">
+                <p class="meta">$ · Full day</p>
+                <p class="summary" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="summary-value">4.8</span><span class="summary-count">· 23 ratings</span></p>
+              </div>
+              <div class="byline"><span class="avatar" aria-hidden="true">M</span><p class="byline-text">Shared by <span class="byline-name">Maria Fernanda Castellanos-Villalobos y de la Cruz</span> <span class="byline-date">· Nov 22, 2026</span></p></div>
+              <hr class="rule">
+              <div class="prose">
+                <p>Get there early, before the crowds and while the bread is still warm. Bring a tote bag each, some cash in small notes and no shopping list at all. The rule for the morning is simple: you each have ten dollars, and you have to buy one thing the other person has never tried.</p>
+                <p>Walk the whole market once before you buy anything. Taste every sample you are offered, ask the cheese seller what they would take home tonight, and let the person at the flower stall talk you into a small bunch of something bright. If there is a coffee cart, start there. If there is a busker, stop and listen to one full song, even if you have heard it a hundred times.</p>
+                <p>On your second lap, start building lunch. A good loaf, something soft to spread on it, a handful of whatever fruit is in season and a jar of something pickled are all you really need. Add a wedge of cheese, a few slices of cured meat or a tub of hummus, and one sweet thing you will argue about splitting. Ask for a paper bag for the tomatoes and keep the berries on top so they survive the walk.</p>
+                <p>Then head for the river. Find a patch of grass with a bit of shade, spread out a blanket or your jackets, and unpack everything at once like a little feast. Tear the bread by hand. Use a pocket knife for the cheese, or just break it. Take your time: nobody is waiting for the table, and there is no bill to ask for.</p>
+                <p>After lunch, lie back and watch the boats, the joggers and the dogs who think every picnic is for them. Read a few pages of a book out loud, play a round of cards, or close your eyes for twenty minutes. If the weather turns, there is usually a covered bench or a cafe close by, and the picnic simply moves indoors.</p>
+                <p>Before you leave, gather every crumb and wrapper and take them with you. Keep the flowers for the kitchen table, in a jar of water by the window, all week. And write down the name of the stall that sold you the best thing you ate, because next Saturday you will want to go back and say thank you, and probably buy double.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">The title wraps in full (no clamp on the detail page). The description keeps its blank-line paragraphs, wraps at 65ch and is never cut or hidden behind "Read more". On desktop the photo stays in view (sticky) while the text scrolls.</p>
+      </div>
+
+      <!-- 5. Places, before searching -->
+      <div class="state" data-od-id="state-places-start">
+        <p class="eyebrow">5 · Places, before you search</p>
+        <div class="frame frame-pad">
+          <div class="panel">
+            <svg class="icon" aria-hidden="true"><use href="#i-map-pin"/></svg>
+            <h3>Viewpoints near you</h3>
+            <p>Find lookouts close by for this date. Your browser will ask to share your location once; it's only used for this search and never saved.</p>
+            <div class="panel-actions">
+              <button type="button" class="btn btn-primary btn-md" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg>Find places near me</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-component="Button">Search by city or postcode</button>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">What the places section shows when the page opens. Nothing asks for location until "Find places near me" is pressed. The heading names the idea's place type (<code>viewpoint</code>: "Viewpoints near you"; <code>sushi</code>: "Sushi near you"; <code>climbing_gym</code>: "Climbing gyms near you").</p>
+      </div>
+
+      <!-- 6. Places, waiting -->
+      <div class="state" data-od-id="state-places-waiting">
+        <p class="eyebrow">6 · Places, waiting for your location</p>
+        <div class="frame frame-pad" aria-busy="true">
+          <p class="status-line" role="status"><span class="spinner" aria-hidden="true"></span>Finding places near you…</p>
+          <div class="places-body">
+            <div class="skel skel-map map" data-component="Skeleton" aria-hidden="true"></div>
+            <div aria-hidden="true">
+              <div class="skel-row" data-component="Skeleton"><div class="skel skel-dot"></div><div class="skel-lines"><div class="skel skel-line"></div><div class="skel skel-line short"></div></div></div>
+              <div class="skel-row" data-component="Skeleton"><div class="skel skel-dot"></div><div class="skel-lines"><div class="skel skel-line"></div><div class="skel skel-line short"></div></div></div>
+              <div class="skel-row" data-component="Skeleton"><div class="skel skel-dot"></div><div class="skel-lines"><div class="skel skel-line"></div><div class="skel skel-line short"></div></div></div>
+              <div class="skel-row" data-component="Skeleton"><div class="skel skel-dot"></div><div class="skel-lines"><div class="skel skel-line"></div><div class="skel skel-line short"></div></div></div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Covers the browser's permission prompt and the request (the API times out at 10 s). After 15 s the status changes to "This is taking longer than usual." with a "Search by city or postcode" button.</p>
+      </div>
+
+      <!-- 7. Places, location denied -->
+      <div class="state" data-od-id="state-places-denied">
+        <p class="eyebrow">7 · Places, location turned off</p>
+        <div class="frame frame-pad">
+          <div class="panel">
+            <svg class="icon" aria-hidden="true"><use href="#i-map-pin-off"/></svg>
+            <h3>We can't see your location</h3>
+            <p>Location is blocked for this site in your browser, so we can't search around you. Type a city or postcode and we'll look there instead.</p>
+            <form class="locate-form" action="#places">
+              <label class="field" data-component="Input">
+                <span class="field-label">City or postcode</span>
+                <input class="input" type="text" name="near" placeholder="For example 94110 or Oakland" autocomplete="postal-code">
+              </label>
+              <button type="submit" class="btn btn-primary btn-md" data-component="Button">Search</button>
+            </form>
+            <p class="helper">To use your location next time, allow it in your browser's site settings.</p>
+          </div>
+        </div>
+        <p class="state-note">Also shown for "Search by city or postcode". The API geocodes the text (Nominatim, proxied and cached). If nothing matches, the field shows "We couldn't find "Oaklnd". Check the spelling or try a postcode." and keeps what was typed. Results then read "7 places within 3 km of 94110".</p>
+      </div>
+
+      <!-- 8. Places, no results -->
+      <div class="state" data-od-id="state-places-none">
+        <p class="eyebrow">8 · Places, nothing within 3 km</p>
+        <div class="frame frame-pad">
+          <div class="panel">
+            <svg class="icon" aria-hidden="true"><use href="#i-search-x"/></svg>
+            <h3>No viewpoints within 3 km</h3>
+            <p>Lookouts can be a short drive away. Widen the search and we'll check up to 10 km around you.</p>
+            <div class="panel-actions">
+              <button type="button" class="btn btn-primary btn-md" data-component="Button">Widen to 10 km</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-component="Button">Use a different place</button>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">At 5 km the button still says "Widen to 10 km". At 10 km (the most the API allows) the panel reads "No viewpoints within 10 km" and offers only "Use a different place".</p>
+      </div>
+
+      <!-- 9. Places, error -->
+      <div class="state" data-od-id="state-places-error">
+        <p class="eyebrow">9 · Places, the map service is down</p>
+        <div class="frame frame-pad">
+          <div class="panel" role="alert">
+            <svg class="icon" aria-hidden="true"><use href="#i-wifi-off"/></svg>
+            <h3>We couldn't reach the map service</h3>
+            <p>Try again in a minute. The rest of this idea still works.</p>
+            <div class="panel-actions">
+              <button type="button" class="btn btn-secondary btn-md" data-component="Button">Try again</button>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Shown for a timeout, a 429 from the rate limit or a 502 from Overpass. "Try again" repeats the same search (same location and radius) without asking for location again.</p>
+      </div>
+
+      <!-- 10. At-home idea -->
+      <div class="state" data-od-id="state-at-home">
+        <p class="eyebrow">10 · An at-home idea, no place needed</p>
+        <div class="frame frame-pad">
+          <div class="mini is-wide">
+            <div class="media">
+              <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop" alt="A home-baked pizza with tomatoes and rosemary" width="800" height="600" loading="lazy">
+              <button type="button" class="save" aria-pressed="false" data-save data-count="301" aria-label="Save Pizza from scratch. 301 people saved it"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span class="save-count" aria-hidden="true">301</span></button>
+            </div>
+            <div class="info">
+              <div class="chips">
+                <span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</span>
+                <span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span>
+              </div>
+              <h3 class="title">Pizza from scratch</h3>
+              <div class="facts">
+                <p class="meta">$ · 1–2 hours <span class="meta-sep" aria-hidden="true">·</span> <svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Plan it at home</p>
+                <p class="summary" role="img" aria-label="Rated 4.4 out of 5 from 112 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="summary-value">4.4</span><span class="summary-count">· 112 ratings</span></p>
+              </div>
+              <div class="byline"><span class="avatar" aria-hidden="true">S</span><p class="byline-text">Shared by <span class="byline-name">Sam Okafor</span> <span class="byline-date">· Oct 24, 2026</span></p></div>
+              <div class="prose"><p>Make the dough together, then pile on whatever is in the fridge. Stretch it badly, bake it hot and eat it straight off the tray.</p></div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note"><code>placeType: none</code>: no places section and no "Find places near me" at all; the page ends after the description and the rating. "Plan it at home" joins the meta line instead.</p>
+      </div>
+
+      <!-- 11. Not found -->
+      <div class="state" data-od-id="state-not-found">
+        <p class="eyebrow">11 · Idea not found, or not approved</p>
+        <div class="frame">
+          <div class="empty" data-component="EmptyState">
+            <svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg>
+            <h3>We couldn't find that idea.</h3>
+            <p>It may have been removed, or it isn't public yet.</p>
+            <a class="btn btn-primary btn-md" href="home.html" data-od-goto="home" data-component="Button">Back to all ideas</a>
+          </div>
+        </div>
+        <p class="state-note">Shown when the API answers 404 for <code>/ideas/:id</code>: a wrong id, a deleted idea, or one that is pending or rejected. It replaces the whole page below the header; the header stays.</p>
+      </div>
+
+      <!-- 12. Rating saved, and the input step by step -->
+      <div class="state" data-od-id="state-rating">
+        <p class="eyebrow">12 · Rating saved, and the rating input step by step</p>
+        <div class="frame frame-pad">
+          <div class="rate-row">
+            <div class="rate" data-component="StarRating">
+              <p class="field-label">Rate this idea</p>
+              <div class="stars" aria-hidden="true">
+                <span class="star is-preview"><svg class="icon"><use href="#i-star"/></svg></span><span class="star is-preview"><svg class="icon"><use href="#i-star"/></svg></span><span class="star is-preview"><svg class="icon"><use href="#i-star"/></svg></span><span class="star"><svg class="icon"><use href="#i-star"/></svg></span><span class="star"><svg class="icon"><use href="#i-star"/></svg></span>
+              </div>
+              <p class="rate-note">Hover preview: 3 out of 5</p>
+            </div>
+            <div class="rate" data-component="StarRating" aria-busy="true">
+              <p class="field-label">Your rating</p>
+              <div class="stars" aria-hidden="true">
+                <span class="star is-on"><svg class="icon"><use href="#i-star"/></svg></span><span class="star is-on"><svg class="icon"><use href="#i-star"/></svg></span><span class="star is-on"><svg class="icon"><use href="#i-star"/></svg></span><span class="star is-on"><svg class="icon"><use href="#i-star"/></svg></span><span class="star"><svg class="icon"><use href="#i-star"/></svg></span>
+              </div>
+              <p class="rate-note" role="status">Saving your rating…</p>
+            </div>
+            <div class="toast-stack">
+              <p class="helper">Toasts after rating</p>
+              <div class="toast is-success" role="status" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Rating saved</div>
+              <div class="toast is-success" role="status" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Rating removed</div>
+              <div class="toast is-error" role="status" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>We couldn't save your rating. Try again.</div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Picking a star saves at once (<code>PUT /ideas/:id/rating</code>), so there is no submit button. While saving, the stars stay focusable and keep the new value; on failure they go back to the old value and the error toast shows. The summary ("4.7 · 89 ratings") updates after a save. Toasts sit bottom centre, like Home's.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast-region" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var header = document.getElementById('site-header');
+  function onScroll() { if (header) header.classList.toggle('is-scrolled', window.scrollY > 0); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  var toasts = document.getElementById('toasts');
+  var toastTimer;
+  function toast(text) {
+    if (!toasts) return;
+    toasts.innerHTML = '<div class="toast is-success" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>' + text + '</div>';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toasts.innerHTML = ''; }, 4000);
+  }
+
+  function paint(stars, value, preview) {
+    stars.querySelectorAll('.star').forEach(function (s, i) {
+      s.classList.toggle('is-on', !preview && i < value);
+      s.classList.toggle('is-preview', !!preview && i < preview);
+    });
+  }
+
+  // Star rating input: hover previews, picking saves, "Remove rating" clears.
+  document.querySelectorAll('[data-rate]').forEach(function (form) {
+    var stars = form.querySelector('.stars');
+    var note = form.querySelector('[data-rate-note]');
+    var legend = form.querySelector('legend');
+    var clear = form.querySelector('[data-rate-clear]');
+    form.addEventListener('submit', function (e) { e.preventDefault(); });
+    stars.querySelectorAll('.star').forEach(function (s, i) {
+      s.addEventListener('mouseenter', function () { paint(stars, 0, i + 1); });
+    });
+    stars.addEventListener('mouseleave', function () { paint(stars, +stars.getAttribute('data-value')); });
+    form.addEventListener('change', function (e) {
+      var v = +e.target.value;
+      stars.setAttribute('data-value', v);
+      paint(stars, v);
+      if (legend) legend.textContent = 'Your rating';
+      if (note) note.innerHTML = 'You gave it <strong>' + v + ' out of 5</strong>. Tap a star to change it.';
+      toast('Rating saved');
+    });
+    if (clear) clear.addEventListener('click', function () {
+      stars.setAttribute('data-value', 0);
+      form.querySelectorAll('input').forEach(function (i) { i.checked = false; });
+      paint(stars, 0);
+      if (note) note.textContent = 'Tap a star to rate it.';
+      if (legend) legend.textContent = 'Rate this idea';
+      toast('Rating removed');
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    var save = e.target.closest('button[data-save]');
+    if (save) {
+      var on = save.getAttribute('aria-pressed') !== 'true';
+      var n = +save.getAttribute('data-count') + (on ? 1 : -1);
+      var scope = save.closest('.detail, .mini');
+      var titleEl = scope && scope.querySelector('.title');
+      var title = titleEl ? titleEl.textContent : 'this idea';
+      save.setAttribute('data-count', n);
+      save.setAttribute('aria-pressed', on ? 'true' : 'false');
+      save.setAttribute('aria-label', (on ? 'Saved. ' : 'Save ') + title + '. ' + n + ' people saved it');
+      save.querySelector('.save-count').textContent = n;
+      toast(on ? "Saved. You'll find it on your profile." : 'Removed from your saved ideas.');
+      return;
+    }
+    var radius = e.target.closest('[data-radius] > button');
+    if (radius) {
+      radius.parentElement.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+      radius.setAttribute('aria-pressed', 'true');
+      var sub = document.querySelector('[data-radius-sub]');
+      var km = radius.getAttribute('data-km');
+      var count = { 3: 7, 5: 14, 10: 20 }[km];
+      if (sub) sub.textContent = count + ' places within ' + km + ' km of your location, nearest first.' + (km === '10' ? ' Showing the nearest 20.' : '');
+      return;
+    }
+    var acct = e.target.closest('.account-btn[aria-controls]');
+    if (acct) {
+      var menu = document.getElementById(acct.getAttribute('aria-controls'));
+      var open = acct.getAttribute('aria-expanded') !== 'true';
+      acct.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (menu) menu.hidden = !open;
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.account-btn[aria-expanded="true"]').forEach(function (b) {
+      b.setAttribute('aria-expanded', 'false');
+      var p = document.getElementById(b.getAttribute('aria-controls'));
+      if (p) p.hidden = true;
+    });
+  });
+
+  // List and map stay in step: the hovered or focused place lights up its marker.
+  function activate(n) {
+    document.querySelectorAll('[data-place]').forEach(function (li) { li.classList.toggle('is-active', li.getAttribute('data-place') === n); });
+    document.querySelectorAll('[data-pin]').forEach(function (g) { g.classList.toggle('is-active', g.getAttribute('data-pin') === n); });
+  }
+  document.querySelectorAll('[data-place]').forEach(function (li) {
+    li.addEventListener('mouseenter', function () { activate(li.getAttribute('data-place')); });
+    li.addEventListener('focusin', function () { activate(li.getAttribute('data-place')); });
+  });
+})();
+</script>
+</body>
+</html>
