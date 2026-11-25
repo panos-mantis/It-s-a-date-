@@ -38,7 +38,7 @@ Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 built, PR pending). Rea
 - Read `.open-design/itsadate-screens/HANDOFF.md` first. Per screen, it gives the path, the states and the kit components used. It also lists the new components to build, every change to the Phase 3 kit and header ("Phase 5 restyles"), the API gaps, the parked reviewer notes and the prototype-only behaviour not to copy.
 - Port one screen at a time with `port_open_design_artifact_to_app`. The "Show design states" toggle on each screen is design-only: port the frames inside it, not the toggle.
 - API gaps to close in Phase 5: add `q` to the admin ideas query (R31). Decide whether budget and duration can be cleared to null (R32).
-- `content.md` and `_shared/data.json` in that folder hold the sample content, in the DTO shapes. Use them for MSW mocks.
+- `content.md` and `_shared/data.json` in that folder hold the sample content. `data.json` is close to the DTO shapes (`packages/shared/src/dto.ts`): before using it in MSW mocks, map `tags` slugs to `TagDTO` objects, `image` to `{url, publicId}` (alt and credit are design-only), and dates to ISO timestamps (R37).
 
 **Phase 3 (web foundation) is merged into `modernize` (PR #5, 2026-11-25).** The notes below are kept for Phase 5.
 - Built: Tailwind v4 theme, UI kit, typed API client, auth hooks, router, layout, header with account menu, and the log in and sign up pages. Setup is in `README.md`.

@@ -2,7 +2,7 @@
   "locale": "en-US",
   "currency": "USD",
   "today": "2026-11-25",
-  "note": "Shared sample data for every screen in It's a Date screens. Mirrors content.md; shapes follow IdeaDTO, TagDTO and UserDTO in packages/shared/src/dto.ts. Maya Chen is the logged-in user (saved and myRating are hers).",
+  "note": "Shared sample data for every screen in It's a Date screens. Mirrors content.md; close to the DTO shapes (packages/shared/src/dto.ts): before using it in MSW mocks, map tags slugs to TagDTO objects, image to {url, publicId} (alt and credit are design-only), and dates to ISO timestamps. Maya Chen is the logged-in user (saved and myRating are hers).",
   "labels": {
     "budget": {
       "1": "$",

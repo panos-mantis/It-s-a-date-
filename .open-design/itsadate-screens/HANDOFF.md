@@ -5,7 +5,7 @@ For the Phase 5 web engineers. Port one screen at a time with `port_open_design_
 **Read first**
 
 - Spec §8.4, §8.6 and §8.7, and `DESIGN.md` (Coral Friendly). The designs follow both.
-- `content.md` is the content sheet: every idea, user, label and photo the screens use. `_shared/data.json` holds the same data in `IdeaDTO` / `TagDTO` / `UserDTO` shapes, plus a `places` list. Use it for MSW mocks.
+- `content.md` is the content sheet: every idea, user, label and photo the screens use. `_shared/data.json` holds the same data, plus a `places` list. It is close to the DTO shapes (`packages/shared/src/dto.ts`): before using it in MSW mocks, map `tags` slugs to `TagDTO` objects, `image` to `{url, publicId}` (alt and credit are design-only), and dates to ISO timestamps.
 - `_shared/nav.html` is the shared header for a logged-in user (Maya). Auth has its own logged-out header (R3) and Admin has its own admin header (R30).
 - `flow.html` is the flow map that the collection check writes. It shows every screen and the links between them.
 - Each screen has a **"Show design states"** toggle at the bottom. It opens the States board: one frame per state the page needs. **The toggle is design-only. Port the frames, not the toggle.**
@@ -44,7 +44,7 @@ For the Phase 5 web engineers. Port one screen at a time with `port_open_design_
 
 ### Log in and sign up (`auth.html`)
 
-- **Default:** the logged-out header. Two cards: "Welcome *back*" (Log in) and "Create your *account*" (Sign up). They sit side by side on desktop and stack on phones. Both submit buttons are coral (two fills, the limit).
+- **Default:** the logged-out header. Two cards: "Welcome *back*" (Log in) and "Create your *account*" (Sign up). They sit side by side on desktop and stack on phones. Both submit buttons are coral (two fills, the limit). **The two-card layout exists only in the mock.** The real app renders one card per route: Log in at `/login`, Sign up at `/signup`.
 - **Board frames:** 1 Wrong email or password · 2 Email already has an account ("Log in instead") · 3 Field checks · 4 Busy · 5 Can't reach the server (`NETWORK_MESSAGE` verbatim) · 6 Sent here from Share an idea ("Log in to share your idea") · 7 Done: the toast after logging in or signing up.
 - **Components:** Button, Input, Toast.
 
@@ -58,9 +58,9 @@ For the Phase 5 web engineers. Port one screen at a time with `port_open_design_
 
 - **Default:** Panos (admin). The site header with the menu Your ideas, Saved ideas, Admin (current), Log out. "Admin" heading. Tabs: Pending 3 / All ideas / Tags / Users, with hash sync.
   - **Pending:** oldest first. Each row has a thumb, title (opens Edit), place type and meta, an excerpt, creator, tags, submitted time, and Approve / Edit / Reject.
-  - **Edit idea:** a 560px side panel, a full-screen sheet on phones. It has every Share field plus Status, "Not set" for migrated ideas, and a danger zone with "Delete idea".
+  - **Edit idea:** a 560px side panel, a full-screen sheet on phones. It has every Share field plus Status, "Not set" on Budget and Duration for migrated ideas, and a danger zone with "Delete idea". Place type has no "Not set": `placeType` is never null.
   - **All ideas:** "Search titles" and a status filter (Approved / Pending review / Not approved).
-  - **Tags:** add (with a live slug and icon preview), rename in place, delete.
+  - **Tags:** add (with a live slug preview, and an icon picker over the curated set with a preview), rename in place (name and icon picker), delete.
   - **Users:** search, role chip, Make admin / Remove admin.
   - **At 360px** every table becomes stacked cards, with no sideways scroll.
 - **Board frames:** 1 Nothing to review · 2 Reject, asked first · 3 Delete a tag, asked first · 4 Removing the last admin ("You can't remove the last admin. …") · 5 A tag name that's taken · 6 Approved, with Undo · 7 Loading · 8 Phone: rows become cards · 9 Signed in, but not an admin. Plus a note frame on the All ideas search API gap.
@@ -89,7 +89,8 @@ None of these exist in `apps/web/src/components/ui/` yet.
 | Side panel / sheet | Admin Edit | `role=dialog`, `aria-modal`, labelled by its heading. Focus starts on the heading, Tab cycles inside, Escape closes, focus returns to the opener, and the header and `<main>` are inert. 560px on desktop, full screen on phones. |
 | Confirm dialog | Admin reject, delete tag, demote | `role=alertdialog`. Focus starts on Cancel. The confirm button is a danger fill with cream text (`--on-danger`). Demoting yourself asks "Remove your own admin access?". |
 | Places panel and map | Idea detail | The compact card, then waiting / found / denied / none / error. The numbered list and map markers are linked by hover and focus. The radius toggle is 3 / 5 / 10 km. "Show all 7" on phones. The map is a static drawing now; Phase 6b swaps in react-leaflet at the same size, with the same numbered markers and the "© OpenStreetMap contributors" attribution. |
-| Toast with action | Profile, Admin | An "Undo" button. Undo toasts last 8 s, others 4 s. Pause on hover or focus, then resume with the toast's own remaining time. Escape closes it. Use **one** live region (`role=status`), rendered from page load and never `display:none`. |
+| Toast with action | Profile, Admin | An "Undo" button. Pause on hover or focus, then resume with the toast's own remaining time. Escape closes it. **Keep the kit's `Toast.tsx` regions:** its `role=status` region for info and success, plus its always-rendered `role=alert` region for errors. Both are rendered from page load and never `display:none`. **Timing is a restyle of the kit's 5000 ms (`DISMISS_MS`):** 4 s for plain toasts, 8 s for toasts with Undo. |
+| Icon picker | Admin Tags (add and rename) | A radio group of 44px round icon buttons over the curated set (section 3, "Tag icons"). Each radio's accessible name is the icon name. Picked: coral-soft fill, coral-ink 2px edge. Keep the preview of the picked icon and its name. Add starts on `sparkles`; rename starts on the tag's current icon. |
 | Password show toggle | Auth | A "Show" / "Hide" button inside the password field. |
 | Heart with count | Idea detail | One overlay pill, "♥ 276", `aria-pressed`. Cards keep the round 44px heart. |
 | Rating panel | Idea detail | See StarRatingInput in section 3. |
@@ -109,15 +110,26 @@ None of these exist in `apps/web/src/components/ui/` yet.
 
 ### Kit components
 
-- **Focus ring:** a 2px coral-ink outline. The kit's 3px coral ring at 30% opacity is too faint on cream.
+- **Bold text:** set `strong, b { font-weight: 600 }` in the base layer. The variable DM Sans would render the browser's `bolder` at 700, and DESIGN.md never goes above 600. The mocks set this per element (`.form-error strong` on Admin, `.state-note strong` on Share).
+- **Focus ring:** buttons, links and other controls get a 2px coral-ink outline. The kit's 3px coral ring at 30% opacity is too faint on cream for them. Text inputs, textareas and selects keep DESIGN.md's Input focus: the coral-ink border plus the 3px ring at 30%.
 - **Card:** an optional `href` (pending and not-approved cards don't link), an optional status line ("Waiting for review", "Not approved this time", "Live · 342 saves"), and a status badge overlay with a tone. Leave the rating slot out when `ratingCount` is 0 (R7). Clamp titles to two lines with `line-clamp` (R5). The no-photo placeholder uses `image-off` on cards and the main tag's icon on the detail page: pick one rule.
+  - **Tag chips:** browse cards (Home, Saved) show the first tag only. Your own ideas (Profile "Your ideas") show all tags.
+  - **"New" badge:** show it when the idea was created within the last 2 days. On Home, idea 1 (created Nov 24, 1 day old) has it, and idea 2 (Nov 22, 3 days old) doesn't.
 - **StarRating summary:** on the detail page it reads "★ 4.7 · 89 ratings", and with no ratings "No ratings yet. Be the first." Cards keep "4.7 (89)". The kit's coral "New" for 0 ratings goes.
 - **StarRatingInput:** 44×44 hit areas around 24px stars. The legend is "Rate this idea" until rated, then "Your rating". A status line ("You gave it 4 out of 5. Pick a star to change it."), and a "Remove rating" ghost button shown only while a rating exists. Empty stars use `--muted`, not `--border` (1.3:1 fails WCAG 1.4.11).
 - **SearchBar:** the segments are What / Vibe / Budget, plus the Filters pill for Duration. On phones it collapses to the pill and sheet (section 2), instead of stacking its segments.
 - **Chip:** add the selectable variant, the status variants and the role variants (section 2).
 - **Button:** a busy state with a spinner and `aria-disabled` (not `disabled`), with the label unchanged. Text-button tones success and danger (Admin Approve and Reject; they underline on hover for contrast). A danger fill with cream text, for confirm dialogs only.
-- **Toast:** an action button, pause on hover or focus, and an always-rendered live region (section 2).
-- **New tokens** used in `admin.html`: `--on-danger: #FFFDF9`, `--scrim: rgba(42, 26, 20, 0.36)`, `--focus-ring: rgba(240, 106, 76, 0.3)`. Add them to `tokens.css` and the Tailwind theme, keeping `theme.test.ts` 1:1.
+- **Toast:** an action button, pause on hover or focus, and the 4 s / 8 s timing. Keep the kit's status and alert regions (section 2).
+- **New tokens** used in `admin.html`: `--on-danger: #FFFDF9`, `--scrim: rgba(42, 26, 20, 0.36)`, `--focus-ring: rgba(240, 106, 76, 0.3)`. Add them to `tokens.css` (`.open-design/design-systems/style-tiles-for-it-s-a-date-a-web-app-where-peop/tokens.css`) and to the Tailwind theme in `apps/web/src/styles/index.css`. `apps/web/tests/theme.test.ts` keeps the theme 1:1 with `tokens.css`, so add both sides together.
+
+### Tag icons (R38)
+
+- Admin picks a tag's icon from a curated set, not from free text. These 16 Lucide names are the **single list Phase 5's name-to-component icon map must cover**:
+  - The 8 tag icons: `utensils`, `mountain`, `house`, `heart`, `dice-5`, `music`, `flower-2`, `book-open`.
+  - 8 more: `coffee`, `film`, `palette`, `tent`, `bike`, `wine`, `camera`, `sparkles`.
+- An icon name outside the set (old data, or a tag made through the API) renders a fallback icon. The mock uses `circle-help`. It never breaks the chip or the row.
+- The picker's helper reads "Pick the icon people will see on the chip."
 
 ### Copy
 
@@ -125,10 +137,37 @@ None of these exist in `apps/web/src/components/ui/` yet.
 - **404 (R33):** "This page wandered off." / "The link may be old, or the idea was removed." / the primary "Back to all ideas". This replaces `NotFoundPage.tsx`'s "We couldn't find that page." / "Back to home" (secondary).
 - **Non-admin on `/admin` (R33):** "This page is for admins." / "You're logged in as Maya Chen. If you need to review ideas, ask an admin to give you access." / the primary "Back to all ideas". This replaces `RequireRole`'s secondary "Go home".
 - **Status labels:** "Pending review", "Approved" and "Not approved", the same on every screen (R26, R29).
-- **`?next` hints:** "Log in to share your idea" from `/share` (R18), and "Log in to see your ideas and saved ideas" from `/profile`.
+- **Login hints:**
+  - "Log in to share your idea" from `/share` (R18), and "Log in to see your ideas and saved ideas" from `/profile`. The login page picks these by `?next`.
+  - "Log in to save ideas you like." from a heart, and "Log in to rate this idea." from the rating on `/ideas/:id`. A heart and the rating can share a `next` (both can come from `/ideas/:id`), so the login page picks these two by a `reason` param, `&reason=save` or `&reason=rate`, not by `next` alone.
+- **Share upload errors (R23):** a rejected file reads "That photo didn't upload. Try a JPEG, PNG or WebP under 5 MB." (verbatim). A dropped connection reads "<file name> didn't finish uploading.", for example "pastry-walk.jpg didn't finish uploading."
+- **Admin "Submitted" date:** "today" on the same day, "N days ago" up to 6 days ("3 days ago"), then an absolute date ("Mar 9, 2024"). Admin's pending rows follow this. The All ideas "Created" column always shows the absolute date.
 - **API strings shown verbatim:** "Email or password is wrong", "An account with this email already exists", `NETWORK_MESSAGE`, "You can't remove the last admin", "A tag with this name already exists", "Use at least one letter or number". Map the real `authErrorMap` and API messages, not the design copy.
 
 ## 4. API gaps (Phase 5 or 6)
+
+### What exists today
+
+Today `apps/api/src/app.ts` mounts only `/auth`, `/tags`, `/ideas`, `/me` and `/admin` under `/api/v1`. Phase dates are from `docs/superpowers/plans/2026-11-20-00-roadmap.md`.
+
+| Screen part | Endpoint | Today | How Phase 5 handles it |
+|---|---|---|---|
+| Log in, sign up, log out, header user | `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | Exists | Real API |
+| Home grid, search and filters | `GET /ideas` | Exists | Real API |
+| Idea detail | `GET /ideas/:id` | Exists | Real API |
+| Category row, Share tags | `GET /tags` | Exists | Real API |
+| Share an idea: send for review | `POST /ideas` | Exists, but it accepts only our own Cloudinary images (`ideas.service.ts:50`, `lib/images.ts`) | Build the form against MSW. Gate real submits that carry a photo on the upload endpoint. |
+| Share and Admin Edit: photo upload | `POST /uploads/image` | Missing: no upload route. Phase 7 (Cloudinary) | MSW only until Phase 7 |
+| Profile "Your ideas" | `GET /me/ideas` | Exists | Real API |
+| Admin queue, All ideas, Edit, delete | `GET /admin/ideas`, `PATCH /admin/ideas/:id`, `DELETE /admin/ideas/:id` | Exists (no `q` yet, see R31 below) | Real API |
+| Admin Tags | `POST /admin/tags`, `PATCH /admin/tags/:id`, `DELETE /admin/tags/:id` | Exists. `tagCreateSchema` takes any icon string of 1–40 characters, so the curated set (section 3) is a UI rule | Real API |
+| Admin Users | `GET /admin/users`, `POST /admin/users/:id/role` | Exists | Real API |
+| Hearts (save, unsave) | `PUT` / `DELETE /ideas/:id/save` | Missing: Phase 6a. The repositories exist (`features/saves`), with no routes | UI only until 6a |
+| Rating input | `PUT` / `DELETE /ideas/:id/rating` | Missing: Phase 6a (`features/ratings` has a repository only) | UI only until 6a |
+| Profile "Saved" tab | `GET /me/saved` | Missing: Phase 6a (`/me` has only `/ideas`) | UI only until 6a |
+| Places panel and map | `GET /places` | Missing: Phase 6b | UI only until 6b |
+
+### Gaps the designs found
 
 - **Admin ideas search (R31):** `adminIdeaQuerySchema` (`packages/shared/src/schemas/admin.ts`) has only `status`. The All ideas tab has a "Search titles" box. Add `q` to the admin ideas query, using the same regex search as the public ideas list.
 - **No "All" status filter (R32):** the API needs one status per request, so the filter is Approved / Pending review / Not approved. The tab is still called "All ideas".
@@ -144,6 +183,7 @@ These are what the real components must do. The prototype doesn't always do them
 
 - The account menu closes on an outside click, as well as on Escape and on picking an item (H4).
 - Give anchor targets and state sections a `scroll-margin-top` below the sticky header (F2).
+- The heart says "Save <title>" with `aria-pressed`, not "Saved: …" as well as `aria-pressed`, which states its state twice (G4). This applies to the hearts on Home, Idea detail and Profile.
 
 **Home**
 
@@ -174,7 +214,6 @@ These are what the real components must do. The prototype doesn't always do them
 
 **Profile**
 
-- The heart says "Save <title>" with `aria-pressed`, not "Saved: …" as well as `aria-pressed` (G4).
 - Generate per-card ids (no fixed `id="rejected-title"`), and drop the `.status-action` z-index and negative margins (G3).
 - Focus the tab from the URL hash without the blur-on-load hack (G5). Don't wrap the tablist in an extra region landmark (G6).
 - Escape on the toast returns focus to where the user was, not always to the first heart (G7).
@@ -193,10 +232,11 @@ These are what the real components must do. The prototype doesn't always do them
 
 - **"Find places near me"** jumps to the board's "Places found" frame in the preview (R15). The real button runs the search in place.
 - **"Send for review"** shows the busy button briefly, then jumps to the board's "Sent" frame. The real form replaces itself with the success view after the 201.
-- **The static board toasts and messages** carry no live roles, or a static `role="status"` on the older screens (D8). Real toasts go through the one live region.
+- **The static board toasts and messages** carry no live roles, or a static `role="status"` on the older screens (D8). Real toasts go through the kit's toast regions (section 2).
+- **Home has no live toast region** in the mock: saving and unsaving from a card show no toast there, and the save / unsave / failure toasts exist only as board frame 8. The real Home uses the kit toast for save and unsave.
 - **`URL.createObjectURL`** is never revoked in Share's preview (F8). Revoke it on Replace, Remove and unmount.
 - **The excerpt word cut** (admin pending rows, 60 characters plus "…", R34) and the card title clamp (R5) are there only because the check counts a CSS clamp as overflow. Use `line-clamp` on the real text.
-- **The phone "Share" label** is CSS `content` (`.nav-share-short::before`), so the collection check reads the link as "Share an idea". In React, use a normal `<span>`. The link's `aria-label` stays "Share an idea".
+- **The phone "Share" label** is CSS `content` (`.nav-share-short::before`), so the collection check reads the link as "Share an idea". The CSS `content` trick is prototype-only. In React, use a normal `aria-hidden` `<span>` that stays visible on phones. The link's `aria-label` stays "Share an idea" (R36).
 - **Dead code:** `.site-header.is-static` on Share (F5) and the copied `.design-states` CSS on each page (E4).
 - **Admin rows** come from `_shared/data.json` through a scratchpad generator script. The committed HTML is the source of truth.
 
@@ -218,10 +258,10 @@ All runs use desktop 1440×900 and phone 360×800 with `states: true`. Each scre
 |---|---|---|---|---|
 | Home | `2026-11-25T12-23-24` (after the menu rename) | 1 error, 2 warnings: all the accepted R5 clamp | `2026-11-25T18-08-07`: same | polish, applied |
 | Idea detail | `2026-11-25T12-27-32` | 0 / 0 | `2026-11-25T18-08-11`: 0 / 0 | polish, applied twice (Task 2 and owner round 1) |
-| Share an idea | `2026-11-25T12-27-34` | 0 / 0 | `2026-11-25T18-08-14`: 0 / 0 | polish, applied |
-| Log in and sign up | `2026-11-25T12-01-32` | 0 errors, 1 accepted warning (R21) | `2026-11-25T18-08-19`: same | polish, applied |
+| Share an idea | `2026-11-25T18-39-07` (Task 8 fixes; board open `18-39-00`) | 0 / 0 | `2026-11-25T18-08-14`: 0 / 0 | polish, applied |
+| Log in and sign up | `2026-11-25T18-39-26` (Task 8 fixes) | 0 errors, 1 accepted warning (R21) | `2026-11-25T18-08-19`: same | polish, applied |
 | Profile | `2026-11-25T12-27-37` | 0 / 0 | `2026-11-25T18-08-23`: 0 / 0 | polish, applied |
-| Admin | `2026-11-25T18-02-05` | 0 errors, 16 data-thin and stress warnings | `2026-11-25T18-08-31`: same | polish, applied |
+| Admin | `2026-11-25T18-38-35` (Task 8 icon picker; board open `18-38-09`: 0 errors, 18 warnings of the same two kinds) | 0 errors, 16 data-thin and stress warnings | `2026-11-25T18-08-31`: same | polish, applied |
 | Page not found | `2026-11-25T17-41-18` | 0 / 0 | `2026-11-25T18-08-34`: 0 / 0 | ship |
 
 - **R5:** the overflow on the 80-character card title is the two-line clamp the Review Focus asks for.
@@ -236,7 +276,7 @@ All runs use desktop 1440×900 and phone 360×800 with `states: true`. Each scre
   - The flow plan's nav label "Profile" became "Your ideas", the header's real label (R8/R24, R35). All 7 screens were re-registered with the same updated plan.
   - The phone "Share" text moved into CSS content, so the link text reads exactly "Share an idea".
   - Commit `295e247`.
-- **Round 2** (`18-08-*`): one `flow-nav-drift` left, on auth. It is accepted: the logged-out header has Log in / Sign up and no avatar menu (R3). The flow map has 23 links, none missing, and all 3 tasks take 1 step.
+- **Round 2** (`18-08-*`): one `flow-nav-drift` left, on auth. It is accepted: the logged-out header has Log in / Sign up and no avatar menu (R3). The flow map has 20 links, plus the 3 task paths. None is missing, and all 3 tasks take 1 step.
 
 ## 8. Photos (R6)
 

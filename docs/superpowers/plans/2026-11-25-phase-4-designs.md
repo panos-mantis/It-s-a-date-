@@ -40,10 +40,10 @@ All runs used desktop 1440×900 and phone 360×800 with `states: true`.
 |---|---|---|---|---|
 | Home | `2026-11-25T12-23-24` | 1 error, 2 warnings, all the R5 clamp | `18-08-07`, same | polish, applied |
 | Idea detail | `2026-11-25T12-27-32` | 0 / 0 | `18-08-11`, 0 / 0 | polish, applied twice |
-| Share an idea | `2026-11-25T12-27-34` | 0 / 0 | `18-08-14`, 0 / 0 | polish, applied |
-| Log in and sign up | `2026-11-25T12-01-32` | 0 errors, 1 warning (R21) | `18-08-19`, same | polish, applied |
+| Share an idea | `2026-11-25T18-39-07` (Task 8 fixes; board open `18-39-00`) | 0 / 0 | `18-08-14`, 0 / 0 | polish, applied |
+| Log in and sign up | `2026-11-25T18-39-26` (Task 8 fixes) | 0 errors, 1 warning (R21) | `18-08-19`, same | polish, applied |
 | Profile | `2026-11-25T12-27-37` | 0 / 0 | `18-08-23`, 0 / 0 | polish, applied |
-| Admin | `2026-11-25T18-02-05` | 0 errors, 16 data-thin and stress warnings | `18-08-31`, same | polish, applied |
+| Admin | `2026-11-25T18-38-35` (Task 8 icon picker; board open `18-38-09`, 18 warnings of the same kinds) | 0 errors, 16 data-thin and stress warnings | `18-08-31`, same | polish, applied |
 | Page not found | `2026-11-25T17-41-18` | 0 / 0 | `18-08-34`, 0 / 0 | ship |
 
 - **Sign-off (Task 3):** on 2026-11-25 the owner said "i let you decide im fine with everything", after agreeing round 1 (R12). Final runs at sign-off: home `11-37-36`, idea-detail `11-36-46`.
@@ -97,6 +97,9 @@ All runs used desktop 1440×900 and phone 360×800 with `states: true`.
 - R33: The 404 and non-admin copy follow the Task 6 brief ("Phase 5 restyles").
 - R34: Pending rows show a word-cut excerpt. Phase 5 uses `line-clamp`.
 - R35: In the collection check, nav drift from the deliberate header variants is accepted, and the flow plan's nav label may change to "Your ideas".
+- R36: The phone "Share" label: in React it is a normal `aria-hidden` `<span>` that stays visible on phones, and the link keeps `aria-label="Share an idea"`. The CSS `content` trick (`.nav-share-short::before`) is prototype-only.
+- R37: `_shared/data.json` is not converted to DTO shapes. It is close to them (`packages/shared/src/dto.ts`): before using it in MSW mocks, map `tags` slugs to `TagDTO` objects, `image` to `{url, publicId}` (alt and credit are design-only), and dates to ISO timestamps.
+- R38: Admin's tag icon field is an icon picker (a radio group) over a curated set: the 8 tag icons plus coffee, film, palette, tent, bike, wine, camera and sparkles. It is the single list Phase 5's icon map must cover. Unknown names from old data render a fallback icon.
 
 ## Scope
 
