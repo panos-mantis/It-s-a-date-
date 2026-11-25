@@ -1,13 +1,13 @@
 # START HERE — resuming the It's a Date modernization
 
-Last updated: 2026-11-25 (Phase 2 built, PR pending). Read this first in a new session, then the files it points to.
+Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in a new session, then the files it points to.
 
 ## How to resume
 
 1. Open the folder `C:\Users\manti\Desktop\its-a-date` in VS Code and start a **new** Claude Code conversation.
-2. Phase 2 is built (PR pending). Next up are Phases 3 and 4. They can run in parallel, one Claude Code conversation each. Their plans aren't written yet. Each conversation writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below. Then it executes the plan.
+2. Phases 2 and 3 are built (PRs pending). Phase 4 is next, and Phase 5 starts after Phases 2, 3 and 4 have merged. Their plans aren't written yet. Each conversation writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below. Then it executes the plan.
    - **Phase 2 (API) is built** on branch `phase-2-api`; merge its PR into `modernize` first.
-   - **Phase 3 (web foundation)** can optionally run in parallel. Use the same prompt with "Phase 3", and add "Work in a git worktree, not the main folder."
+   - **Phase 3 (web foundation)** is built and reviewed on `phase-3-web`. Its PR is open: https://github.com/panos-mantis/It-s-a-date-/pull/5 (CI green). The owner merges it after the click-test in the PR body.
    - **Phase 4 (designs)** can optionally run in parallel. It needs the owner present to sign off the Home and Idea detail screens. Use the same prompt with "Phase 4", plus the worktree line.
 3. Each phase ends with its own PR into `modernize`. Phase 5 starts after 2, 3 and 4 have merged.
 
@@ -27,6 +27,28 @@ Last updated: 2026-11-25 (Phase 2 built, PR pending). Read this first in a new s
 5. For history only: the Phase 0 plan and its ledger, `.superpowers/sdd/2026-11-20-phase-0-security/progress.md`
 
 ## Where things stand
+
+**Phase 3 (web foundation) is built on branch `phase-3-web`. PR #5 into `modernize` is open (https://github.com/panos-mantis/It-s-a-date-/pull/5), CI green, waiting on the owner's click-test and merge.**
+- Built: Tailwind v4 theme, UI kit, typed API client, auth hooks, router, layout, header with account menu, and the log in and sign up pages. Setup is in `README.md`.
+- Checked against the real API through the Vite proxy (register, me, logout, login, wrong password): all as expected.
+- The throwaway dev user from that check is `phase3-check-1795565405@itsadate-dev.test` (in the dev database, `itsadate_dev`; it was created through the local API, which reads `apps/api/.env`).
+- Headless Chromium screenshots at 1280px and 360px match DESIGN.md, and the header fits on one line at 360px. The owner click-test (focus rings, account menu, `/share` → log in → back) is still to do, and it's listed in the PR body.
+
+**Hand-off notes (Phase 5, web)**
+- The kit's components and props live in `apps/web/src/components/ui/index.ts`. `Card` handles `image: null`.
+- Still to build: the phone search sheet and the real Home page.
+- Tag icons are Lucide names. Use a curated name to component map. Don't import the whole `icons` object.
+- `renderApp` (`src/test/render.tsx`) and `authStore` exist for page tests.
+- `react-router` is pinned to 7.x (8.x exists; the spec names 7).
+- `msw` is 3.x. Its option is `onUnhandledFrame` (not `onUnhandledRequest`).
+- `tsconfig` is split into app, test and node configs.
+- The theme lives in `apps/web/src/styles/index.css`. `apps/web/tests/theme.test.ts` keeps it 1:1 with `tokens.css`.
+- The 409 copy is the API's "An account with this email already exists".
+- `RedirectIfAuthed` honours `?next` through `safeNext`.
+- `ErrorPage` tells a 404 apart from other errors.
+- On npm arborist errors, run `npm i --package-lock-only`, then `npm i`.
+- Query keys starting with `'auth'` are exempt from the 401 handling and survive logout. `useLogout` callers must navigate away (the guard sends a successful logout to home). Login and register clear all non-auth queries.
+- `vite preview` now proxies `/api` too (port 4173).
 
 **Phase 2 is built on branch `phase-2-api`; the PR into `modernize` is pending review.**
 - The API is rebuilt (`/api/v1`, cookie auth, roles, tags, ideas, admin) with `migrate`, `create-admin` and `seed` scripts. The legacy API (`apps/api/legacy/`) is deleted from git, so `reset-admins` and `copy-to-dev` are gone. Setup and script commands are in `README.md`.
