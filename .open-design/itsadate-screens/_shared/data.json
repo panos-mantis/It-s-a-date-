@@ -61,6 +61,7 @@
     {
       "id": "u-maria",
       "name": "Maria Fernanda Castellanos-Villalobos y de la Cruz",
+      "email": "mariafernanda.castellanos@example.com",
       "role": "user"
     }
   ],
@@ -436,6 +437,61 @@
       },
       "createdAt": "2024-02-17",
       "status": "approved",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "sunday-pastry-walk",
+      "title": "Sunday pastry walk",
+      "description": "Pick three bakeries within walking distance and buy one pastry at each. Share everything, score them out of ten on a napkin, and finish with a coffee at the winner.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop",
+        "alt": "Croissants on a bakery counter",
+        "credit": "Unsplash photo-1555507036-ab1f4038808a, Unsplash Licence"
+      },
+      "tags": [
+        "food",
+        "adventure"
+      ],
+      "placeType": "cafe",
+      "budget": 1,
+      "duration": "short",
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 0,
+      "creator": {
+        "id": "u-maya",
+        "name": "Maya Chen"
+      },
+      "createdAt": "2026-11-25",
+      "status": "pending",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "sushi-boat-contest",
+      "title": "Sushi boat eating contest",
+      "description": "Order the biggest sushi boat on the menu and race to see who taps out first. The loser pays and the winner picks dessert.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop",
+        "alt": "A wooden sushi boat loaded with maki and nigiri",
+        "credit": "Unsplash photo-1553621042-f6e147245754, Unsplash Licence"
+      },
+      "tags": [
+        "food"
+      ],
+      "placeType": "sushi",
+      "budget": 3,
+      "duration": "short",
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 0,
+      "creator": {
+        "id": "u-maya",
+        "name": "Maya Chen"
+      },
+      "createdAt": "2026-11-21",
+      "status": "rejected",
       "myRating": null,
       "saved": false
     }

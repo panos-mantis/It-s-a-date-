@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>It's a Date · Profile</title>
+<meta name="description" content="Profile: your ideas with their review status, and your saved ideas. Screen 5 of 7 in It's a Date screens.">
+<!--
+  It's a Date · Profile (screen 5 of 7, collection itsadate-screens)
+  Route: /profile (protected: a logged-out visitor is sent to /login?next=%2Fprofile).
+  Main view: Maya Chen, logged in, on "Your ideas". profile.html#ideas and #saved open that tab.
+  Data:
+    header   GET /auth/me                 name, email (avatar = first letter of the name)
+    ideas    GET /me/ideas  (auth)        every status: pending, approved, rejected; newest first
+    saved    GET /me/saved  (auth)        approved ideas Maya saved
+    un-save  DELETE /ideas/:id/save        the card leaves the Saved grid, with an "Undo" toast
+    undo     PUT /ideas/:id/save           puts it back where it was
+  Status chips: Pending = warn, Approved = success, Rejected = danger (tokens only, text on the
+  94% cream overlay, 4.6:1 or better). Only approved cards link to Idea detail; pending and
+  rejected ideas are not public, so they have no page, no heart and no rating.
+  Ideas 13 (pending, the one sent in on Share) and 14 (rejected) are in content.md and data.json.
+  The States board sits in a closed <details> ("Show design states") under the page. It is design-only
+  and not part of the real page: Phase 5 ports the frames, not the toggle.
+  Kit components carry data-component so the Phase 5 port maps them onto apps/web/src/components/ui/.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..600,0..100,0..1;1,9..144,400..600,0..100,0..1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FBF6F0;
+  --surface: #FFFDF9;
+  --surface-sunk: #F4EBE0;
+  --fg: #2A1A14;
+  --muted: #6E5D52;
+  --border: #E6D9CB;
+  --accent: #F06A4C;
+  --accent-hover: #F4826A;
+  --accent-ink: #B23E23;
+  --accent-soft: #FDE7DE;
+  --success: #2E7D4F;
+  --warn: #9A6400;
+  --danger: #B42C2C;
+  --overlay: rgba(255, 253, 249, 0.94);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --soft: "SOFT" 100, "WONK" 0;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --elev-raised: 0 1px 2px rgba(42, 26, 20, 0.06), 0 8px 24px rgba(42, 26, 20, 0.08);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --gutter: 16px;
+  --header-h: 64px;
+}
+@media (min-width: 640px) { :root { --gutter: 28px; } }
+@media (min-width: 1024px) { :root { --gutter: 40px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 500; }
+p, ol, ul, figure { margin: 0; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+.icon-muted { color: var(--muted); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 50;
+  background: var(--accent); color: var(--fg); font-weight: 600;
+  padding: 8px 16px; border-radius: var(--radius-md); text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+.container { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter); }
+
+/* Buttons (data-component="Button") */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap; border: 1.5px solid transparent; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-weight: 600; letter-spacing: 0.02em;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.btn .icon { width: 18px; height: 18px; }
+.btn-md { padding: 12px 24px; font-size: 16px; min-height: 48px; }
+.btn-sm { padding: 8px 16px; font-size: 14px; min-height: 44px; }
+.btn-primary { background: var(--accent); color: var(--fg); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--fg); }
+.btn-secondary:hover { background: var(--surface-sunk); }
+.btn-ghost { background: transparent; color: var(--accent-ink); }
+.btn-ghost:hover { text-decoration: underline; }
+
+/* Header (matches apps/web Header.tsx + AccountMenu.tsx; same as home.html and share.html) */
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms var(--ease);
+}
+.site-header.is-scrolled { border-bottom-color: var(--border); }
+.site-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  height: var(--header-h); width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter);
+}
+.wordmark {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-family: var(--font-display); font-variation-settings: var(--soft);
+  font-style: italic; font-weight: 500; font-size: 20px; text-decoration: none;
+  border-radius: var(--radius-sm); min-height: 44px;
+}
+.wordmark-heart { width: 16px; height: 16px; fill: var(--accent); stroke: var(--accent); stroke-width: 1.75; stroke-linejoin: round; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-share-icon { display: none; }
+.account { position: relative; }
+.account-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: 4px 12px 4px 4px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+  background: var(--surface); font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.account-btn:hover { background: var(--surface-sunk); }
+.avatar {
+  width: 32px; height: 32px; border-radius: var(--radius-pill); flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 14px; font-weight: 600;
+}
+.account-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 192px;
+  display: flex; flex-direction: column; gap: 4px; padding: 8px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  box-shadow: var(--elev-raised);
+}
+.account-menu[hidden] { display: none; }
+.menu-item {
+  display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: var(--radius-sm);
+  background: none; text-align: left; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.menu-item:hover { background: var(--surface-sunk); }
+.nav-share-short { display: none; }
+/* On this page "Your ideas" is the current place: the same 2px underline Share uses for "Share an idea" */
+.site-nav .nav-ideas[aria-current="page"] { color: var(--fg); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.site-nav .menu-item[aria-current="page"] { font-weight: 600; }
+@media (max-width: 639px) {
+  .nav-actions { gap: 4px; }
+  .btn-sm { padding: 0 10px; }
+  .wordmark { font-size: 18px; }
+  .site-nav .nav-share-label, .site-nav .account-name, .site-nav .nav-ideas { display: none; }
+  .site-nav .nav-share-icon, .site-nav .nav-share-short { display: block; }
+  .site-nav .nav-share-icon { width: 16px; height: 16px; }
+  .site-nav .nav-share { gap: 2px; padding: 0 10px 0 8px; border-color: var(--border); border-width: 1px; border-radius: var(--radius-pill); }
+  .site-nav .account-btn { padding-right: 8px; }
+}
+@media (max-width: 359px) {
+  .site-nav { height: auto; min-height: var(--header-h); flex-wrap: wrap; padding-block: 8px; }
+}
+
+/* Profile header: avatar, name, email */
+.profile-head { display: flex; align-items: center; gap: 24px; padding-top: 48px; padding-bottom: 32px; }
+.avatar-lg {
+  width: 88px; height: 88px; font-family: var(--font-display); font-variation-settings: var(--soft);
+  font-size: 38px; font-weight: 500; line-height: 1;
+}
+.profile-id { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.profile-id h1, .profile-id .long-name { font-size: 38px; line-height: 1.08; letter-spacing: -0.025em; overflow-wrap: anywhere; text-wrap: balance; }
+.profile-email { color: var(--muted); overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+  .profile-head { gap: 16px; padding-top: 24px; padding-bottom: 24px; align-items: flex-start; }
+  .avatar-lg { width: 56px; height: 56px; font-size: 26px; }
+  .profile-id h1, .profile-id .long-name { font-size: 30px; }
+  .profile-email { font-size: 14px; }
+}
+
+/* Tabs: a real tablist (role=tab, aria-selected, aria-controls, arrow keys) */
+.tabs { display: flex; gap: 32px; border-bottom: 1px solid var(--border); }
+.tab {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 2px;
+  margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; background: none;
+  color: var(--muted); font-size: 16px; font-weight: 500; white-space: nowrap; cursor: pointer;
+  transition: color 200ms var(--ease), border-color 200ms var(--ease);
+}
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"], .tab.is-current { color: var(--fg); font-weight: 600; border-bottom-color: var(--fg); }
+.tab:focus-visible { outline-offset: -2px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.tab-count {
+  min-width: 24px; height: 22px; padding: 0 7px; border-radius: var(--radius-pill);
+  display: inline-grid; place-items: center; background: var(--surface-sunk); color: var(--fg);
+  font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+@media (max-width: 639px) { .tabs { gap: 24px; } }
+
+.panel { padding: 24px 0 64px; scroll-margin-top: calc(var(--header-h) + 16px); }
+.panel:focus-visible { outline-offset: 8px; border-radius: var(--radius-sm); }
+.panel-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; margin-bottom: 24px; }
+.panel-summary { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.panel-summary strong { font-size: 16px; font-weight: 600; }
+.panel-summary span { font-size: 14px; color: var(--muted); }
+
+/* Idea grid + card (data-component="Card"), as on Home */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 24px; row-gap: 40px; }
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.card { position: relative; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card-media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-sunk); }
+.card-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 150ms var(--ease); }
+.card.is-link:hover .card-media img { transform: scale(1.03); }
+.badge {
+  position: absolute; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: var(--radius-pill);
+  background: var(--overlay); box-shadow: var(--elev-raised); font-size: 12px; font-weight: 600;
+}
+.badge .icon { width: 14px; height: 14px; }
+/* Status chips: colour from the status tokens, always with an icon and a word */
+.status.is-pending { color: var(--warn); }
+.status.is-approved { color: var(--success); }
+.status.is-rejected { color: var(--danger); }
+.heart {
+  position: absolute; right: 6px; top: 6px; z-index: 2;
+  width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--fg);
+  display: grid; place-items: center; cursor: pointer; border-radius: var(--radius-pill);
+}
+.heart-dot {
+  width: 36px; height: 36px; border-radius: var(--radius-pill);
+  display: grid; place-items: center; background: var(--overlay); box-shadow: var(--elev-raised);
+  transition: background-color 150ms var(--ease);
+}
+.heart:hover .heart-dot { background: var(--surface); }
+.heart .icon { width: 18px; height: 18px; }
+.heart[aria-pressed="true"] .icon { fill: var(--accent-ink); stroke: var(--accent-ink); }
+.card-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.card-title {
+  min-width: 0; font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere;
+}
+.card-title a { text-decoration: none; }
+.card-title a::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: var(--radius-lg); }
+.card-title a:focus-visible { outline: none; }
+.card-title a:focus-visible::after { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
+.rating { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; padding-top: 3px; font-size: 14px; white-space: nowrap; }
+.rating .icon { width: 13px; height: 13px; fill: var(--fg); stroke: var(--fg); }
+.rating-value { font-weight: 600; }
+.rating-count { color: var(--muted); }
+.card-meta { font-size: 14px; color: var(--muted); }
+.status-line { font-size: 14px; color: var(--muted); }
+.status-line strong { font-weight: 600; color: var(--fg); }
+.card-foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+
+/* Chip (data-component="Chip") */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: var(--radius-pill);
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.chip .icon { width: 14px; height: 14px; }
+
+/* Empty state (data-component="EmptyState") */
+.empty {
+  max-width: 448px; margin-inline: auto; padding: 64px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+}
+.empty > .icon { width: 40px; height: 40px; color: var(--muted); }
+.empty h3 { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
+.empty p { color: var(--muted); }
+.empty .btn { margin-top: 8px; }
+
+/* Skeleton (data-component="Skeleton") */
+.skel { border-radius: var(--radius-md); background: var(--surface-sunk); animation: pulse 1.6s var(--ease) infinite; }
+.skel-photo { aspect-ratio: 4 / 3; border-radius: var(--radius-lg); }
+.skel-line { height: 20px; width: 75%; }
+.skel-line.short { height: 16px; width: 50%; }
+.skel-card { display: flex; flex-direction: column; gap: 12px; }
+@keyframes pulse { 50% { opacity: 0.55; } }
+
+/* Toast (data-component="Toast"): one live region, bottom centre */
+.toast {
+  display: inline-flex; align-items: center; gap: 12px; max-width: 100%;
+  padding: 6px 6px 6px 16px; min-height: 56px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--elev-raised); font-size: 14px; font-weight: 500;
+}
+.toast .icon { width: 18px; height: 18px; }
+.toast.is-success > .icon { color: var(--success); }
+.toast-text { min-width: 0; }
+.toast .btn-sm { padding: 0 12px; }
+.toast-region { position: fixed; left: 50%; bottom: 24px; z-index: 70; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); }
+.toast-region:empty { display: none; }
+
+/* Design states toggle: design-only, closed by default, not part of the real page */
+.design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }
+.design-states-summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  width: 100%; max-width: 1200px; margin-inline: auto; padding: 12px var(--gutter);
+  list-style: none; cursor: pointer;
+}
+.design-states-summary::-webkit-details-marker { display: none; }
+.design-states-label {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 600;
+}
+.design-states-label .icon { width: 18px; height: 18px; transition: transform 150ms var(--ease); }
+.design-states[open] .design-states-label .icon { transform: rotate(180deg); }
+.design-states-note { font-size: 14px; color: var(--muted); }
+.design-states .when-open, .design-states[open] .when-closed { display: none; }
+.design-states[open] .when-open { display: inline; }
+/* Closed: no box at all (Chromium otherwise keeps the hidden board laid out at zero size) */
+.design-states:not([open]) > .board { display: none; }
+
+/* States board */
+.board { background: var(--surface-sunk); padding: 24px 0 96px; }
+.board-head { max-width: 65ch; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.board-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; margin-top: 8px; }
+.board-head h2 em { font-style: italic; font-weight: 400; }
+.board-head p { margin-top: 12px; color: var(--muted); }
+.board code {
+  font-family: ui-monospace, Consolas, monospace; font-size: 14px; color: var(--fg);
+  background: var(--bg); padding: 1px 6px; border-radius: 6px; word-break: break-all;
+}
+.state { margin-top: 48px; scroll-margin-top: calc(var(--header-h) + 16px); }
+.state > .eyebrow { margin-bottom: 12px; }
+.state-note { margin-top: 12px; max-width: 65ch; font-size: 14px; color: var(--muted); }
+.frame { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); min-width: 0; }
+.frame-pad { padding: 32px; }
+.frame .profile-head { padding: 0 0 24px; }
+.frame .panel { padding-bottom: 0; }
+.frame-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
+.frame-stack { display: flex; flex-direction: column; gap: 32px; }
+.phone-frame { width: 360px; max-width: 100%; padding: 24px 16px; }
+.phone-frame .profile-head { gap: 16px; align-items: flex-start; }
+.phone-frame .avatar-lg { width: 56px; height: 56px; font-size: 26px; }
+.phone-frame .profile-id .long-name { font-size: 30px; }
+.phone-frame .profile-email { font-size: 14px; }
+.toast-demo { display: flex; justify-content: center; margin-top: 32px; }
+.redirect { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; }
+.redirect .icon { width: 18px; height: 18px; color: var(--muted); }
+.note-panel {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 12px; max-width: 640px;
+  padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+.note-panel h3 { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
+.note-panel p { color: var(--muted); }
+.loading-note { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+@media (max-width: 767px) {
+  .board { padding: 16px 0 64px; }
+  .frame-pad { padding: 16px; }
+  .phone-frame { padding: 16px; }
+  .hide-sm { display: none; }
+}
+@media (max-width: 1279px) { .hide-md { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+  .card.is-link:hover .card-media img { transform: none; }
+}
+</style>
+</head>
+<body data-od-current="profile">
+
+<svg width="0" height="0" class="sr-only" aria-hidden="true" focusable="false">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+  <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></symbol>
+  <symbol id="i-flower" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1"/><circle cx="12" cy="8" r="2"/><path d="M12 10v12"/><path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z"/><path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-circle-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-lightbulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+</svg>
+
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header class="site-header" id="site-header" data-od-id="header">
+  <template data-od-include="_shared/nav.html"></template>
+</header>
+
+<main id="content" tabindex="-1">
+  <!-- ===================== Profile header ===================== -->
+  <section class="container profile-head" data-od-id="profile-head" aria-labelledby="profile-name">
+    <span class="avatar avatar-lg" aria-hidden="true">M</span>
+    <div class="profile-id">
+      <h1 id="profile-name" data-od-bind="users[0].name">Maya Chen</h1>
+      <p class="profile-email" data-od-bind="users[0].email">maya.chen@example.com</p>
+    </div>
+  </section>
+
+  <!-- ===================== Tabs: Your ideas / Saved ===================== -->
+  <section class="container" data-od-id="tabs" aria-label="Your ideas and saved ideas">
+    <div class="tabs" role="tablist" aria-label="Profile">
+      <button type="button" class="tab" role="tab" id="tab-ideas" aria-controls="ideas" aria-selected="true" tabindex="0">Your ideas <span class="tab-count">5</span></button>
+      <button type="button" class="tab" role="tab" id="tab-saved" aria-controls="saved" aria-selected="false" tabindex="-1">Saved <span class="tab-count" data-saved-count>3</span></button>
+    </div>
+
+    <!-- Your ideas: GET /me/ideas, every status, newest first -->
+    <div class="panel" role="tabpanel" id="ideas" aria-labelledby="tab-ideas" tabindex="0" data-od-id="your-ideas">
+      <div class="panel-bar">
+        <p class="panel-summary"><strong>5 ideas, 1 waiting for review</strong><span>Pending and rejected ideas are only visible to you.</span></p>
+        <a class="btn btn-secondary btn-sm" href="share.html" data-od-goto="share" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Share an idea</a>
+      </div>
+
+      <div class="grid">
+        <!-- 13 · pending: the idea Maya just sent in on Share. Not public: no link, no heart, no rating. -->
+        <article class="card" data-component="Card" data-status="pending">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="Croissants on a bakery counter" width="800" height="600">
+            <span class="badge status is-pending" data-component="Chip" data-variant="pending"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Pending</span>
+          </div>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title" data-od-bind="ideas[12].title">Sunday pastry walk</h3>
+            </div>
+            <p class="card-meta">$ · 1–2 hours</p>
+            <p class="status-line">Waiting for review</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></div>
+          </div>
+        </article>
+
+        <!-- 14 · rejected. Not public: no link, no heart, no rating. -->
+        <article class="card" data-component="Card" data-status="rejected">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop" alt="A wooden sushi boat loaded with maki and nigiri" width="800" height="600">
+            <span class="badge status is-rejected" data-component="Chip" data-variant="rejected"><svg class="icon" aria-hidden="true"><use href="#i-circle-x"/></svg>Rejected</span>
+          </div>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title" data-od-bind="ideas[13].title">Sushi boat eating contest</h3>
+            </div>
+            <p class="card-meta">$$$ · 1–2 hours</p>
+            <p class="status-line">Not approved this time</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+          </div>
+        </article>
+
+        <!-- 3 · approved: links to Idea detail -->
+        <article class="card is-link" data-component="Card" data-status="approved">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&q=80&auto=format&fit=crop" alt="Dumplings on a wooden plate with chopsticks" width="800" height="600">
+            <span class="badge status is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span>
+          </div>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[2].title">Dumpling crawl</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 128 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(128)</span></span>
+            </div>
+            <p class="card-meta">$$ · 1–2 hours</p>
+            <p class="status-line">Live · 342 saves</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+          </div>
+        </article>
+
+        <!-- 4 · approved, three tags -->
+        <article class="card is-link" data-component="Card" data-status="approved">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop" alt="Long bookshelves under warm hanging bulbs" width="800" height="600">
+            <span class="badge status is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span>
+          </div>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[3].title">Bookshop and coffee afternoon</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.9 out of 5 from 57 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.9</span><span class="rating-count">(57)</span></span>
+            </div>
+            <p class="card-meta">$ · Half day</p>
+            <p class="status-line">Live · 203 saves</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+          </div>
+        </article>
+
+        <!-- 9 · approved -->
+        <article class="card is-link" data-component="Card" data-status="approved">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop" alt="A relaxing massage at a spa" width="800" height="600" loading="lazy">
+            <span class="badge status is-approved" data-component="Chip" data-variant="approved"><svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>Approved</span>
+          </div>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[8].title">Couples massage</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 36 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(36)</span></span>
+            </div>
+            <p class="card-meta">$$$ · Half day</p>
+            <p class="status-line">Live · 154 saves</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <!-- Saved: GET /me/saved. Tapping a filled heart un-saves and removes the card, with Undo. -->
+    <div class="panel" role="tabpanel" id="saved" aria-labelledby="tab-saved" tabindex="0" data-od-id="saved" hidden>
+      <div class="panel-bar">
+        <p class="panel-summary"><strong data-saved-summary>3 saved ideas</strong><span>Tap a heart to take an idea off this list.</span></p>
+      </div>
+
+      <div class="grid" id="saved-grid">
+        <article class="card is-link" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop" alt="Market stalls piled high with fruit and vegetables" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="true" aria-label="Saved: A slow Saturday at the farmers market, then a picnic lunch by the river for two!"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[1].title">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span>
+            </div>
+            <p class="card-meta">$ · Full day</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+          </div>
+        </article>
+
+        <article class="card is-link" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="Mountain valley lookout with pines" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="true" aria-label="Saved: Golden-hour viewpoint drive"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[4].title">Golden-hour viewpoint drive</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.7 out of 5 from 89 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.7</span><span class="rating-count">(89)</span></span>
+            </div>
+            <p class="card-meta">$ · Half day</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></div>
+          </div>
+        </article>
+
+        <article class="card is-link" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop" alt="A relaxing massage at a spa" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="true" aria-label="Saved: Couples massage"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[8].title">Couples massage</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 36 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(36)</span></span>
+            </div>
+            <p class="card-meta">$$$ · Half day</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</span></div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Shown when the last saved idea is un-saved (and on a first visit with nothing saved) -->
+      <div class="empty" data-component="EmptyState" id="saved-empty" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>
+        <h3>Nothing saved yet.</h3>
+        <p>Tap the heart on any idea to save it for later.</p>
+        <a class="btn btn-primary btn-md" href="home.html" data-od-goto="home" data-component="Button">Browse ideas</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- The one toast live region. In the DOM before anything is announced; after the tab panels so
+       Undo is the next stop after the cards. -->
+  <div class="toast-region" id="toasts" role="status" aria-live="polite"></div>
+
+  <!-- ===================== States board (design-only, behind a closed toggle) ===================== -->
+  <details class="design-states" data-od-id="design-states">
+    <summary class="design-states-summary">
+      <span class="design-states-label"><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg><span class="when-closed">Show design states</span><span class="when-open">Hide design states</span></span>
+      <span class="design-states-note">Design only, not part of the real page.</span>
+    </summary>
+  <section class="board" data-od-id="states-board" aria-labelledby="board-title">
+    <div class="container">
+      <div class="board-head">
+        <p class="eyebrow">States board</p>
+        <h2 id="board-title">Profile, in <em>every</em> state</h2>
+        <p>Each frame is one state of this page, for the Phase 5 port. The page above is Maya Chen, logged in, on Your ideas; the Saved tab works in the preview (un-save a card to see the Undo toast). Frames show the part that changes; the site header stays as it is. Tabs in the frames are pictures of the tabs, not working copies.</p>
+      </div>
+
+      <!-- 1. No ideas yet -->
+      <div class="state" id="state-no-ideas" data-od-id="state-no-ideas">
+        <p class="eyebrow">1 · No ideas yet</p>
+        <div class="frame frame-pad">
+          <div class="tabs" aria-hidden="true"><span class="tab is-current">Your ideas <span class="tab-count">0</span></span><span class="tab">Saved <span class="tab-count">3</span></span></div>
+          <div class="empty" data-component="EmptyState">
+            <svg class="icon" aria-hidden="true"><use href="#i-lightbulb"/></svg>
+            <h3>You haven't shared an idea yet.</h3>
+            <p>Got a date you'd happily go on again? Share it, and once an admin approves it, everyone can find it on Home.</p>
+            <a class="btn btn-primary btn-md" href="share.html" data-od-goto="share" data-component="Button">Share an idea</a>
+          </div>
+        </div>
+        <p class="state-note">A new account, or one whose ideas were all removed. "Share an idea" is the only coral fill here. The panel bar (count and the secondary "Share an idea") is hidden, so there is one way forward, not two.</p>
+      </div>
+
+      <!-- 2. Nothing saved -->
+      <div class="state" id="state-no-saved" data-od-id="state-no-saved">
+        <p class="eyebrow">2 · Nothing saved</p>
+        <div class="frame frame-pad">
+          <div class="tabs" aria-hidden="true"><span class="tab">Your ideas <span class="tab-count">5</span></span><span class="tab is-current">Saved <span class="tab-count">0</span></span></div>
+          <div class="empty" data-component="EmptyState">
+            <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>
+            <h3>Nothing saved yet.</h3>
+            <p>Tap the heart on any idea to save it for later.</p>
+            <a class="btn btn-primary btn-md" href="home.html" data-od-goto="home" data-component="Button">Browse ideas</a>
+          </div>
+        </div>
+        <p class="state-note">The same panel shows when Maya un-saves her last saved idea; focus then moves to the Saved panel, and the Undo toast still works. "Browse ideas" goes to Home with no filters.</p>
+      </div>
+
+      <!-- 3. Loading -->
+      <div class="state" id="state-loading" data-od-id="state-loading">
+        <p class="eyebrow">3 · Loading</p>
+        <div class="frame frame-pad" aria-busy="true">
+          <div class="tabs" aria-hidden="true"><span class="tab is-current">Your ideas</span><span class="tab">Saved</span></div>
+          <div class="panel">
+            <p class="loading-note">Loading your ideas…</p>
+            <div class="grid">
+              <div class="skel-card" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+              <div class="skel-card" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+              <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+              <div class="skel-card hide-sm hide-md" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">The name, email and tab labels come from the session (<code>GET /auth/me</code>), so they show at once; only the counts and the grid wait. 4 card skeletons in the grid's shape (2 on phones), and in the app "Loading your ideas…" is a <code>role="status"</code> line (here it is a plain copy). Saved loads the same way with "Loading your saved ideas…". After 15 seconds the line adds "Still loading. Hang on, or try again." with a Try again button. The shimmer stops under reduced motion.</p>
+      </div>
+
+      <!-- 4. Error -->
+      <div class="state" id="state-error" data-od-id="state-error">
+        <p class="eyebrow">4 · Couldn't load</p>
+        <div class="frame frame-pad">
+          <div class="tabs" aria-hidden="true"><span class="tab is-current">Your ideas</span><span class="tab">Saved</span></div>
+          <div class="empty" data-component="EmptyState">
+            <svg class="icon" aria-hidden="true"><use href="#i-wifi-off"/></svg>
+            <h3>We couldn't load your ideas.</h3>
+            <p>Check your connection and try again. Nothing you shared is lost.</p>
+            <button type="button" class="btn btn-primary btn-md" data-component="Button">Try again</button>
+          </div>
+        </div>
+        <p class="state-note">Only the panel shows the error; the header and the tabs keep working, so Saved can still load. In the app the panel is <code>role="alert"</code> (not here, so the closed board stays quiet). "Try again" repeats <code>GET /me/ideas</code>; while it runs it reads "Trying again…" with <code>aria-disabled</code>. Saved says "We couldn't load your saved ideas." with the same button.</p>
+      </div>
+
+      <!-- 5. The 50-character name -->
+      <div class="state" id="state-long-name" data-od-id="state-long-name">
+        <p class="eyebrow">5 · A 50-character name</p>
+        <div class="frame-stack">
+          <div class="frame frame-pad">
+            <p class="frame-label">Full width</p>
+            <div class="profile-head">
+              <span class="avatar avatar-lg" aria-hidden="true">M</span>
+              <div class="profile-id">
+                <h3 class="long-name" data-od-bind="users[7].name">Maria Fernanda Castellanos-Villalobos y de la Cruz</h3>
+                <p class="profile-email" data-od-bind="users[7].email">mariafernanda.castellanos@example.com</p>
+              </div>
+            </div>
+          </div>
+          <div class="frame phone-frame">
+            <p class="frame-label">Phone, 360 px</p>
+            <div class="profile-head">
+              <span class="avatar avatar-lg" aria-hidden="true">M</span>
+              <div class="profile-id">
+                <h3 class="long-name">Maria Fernanda Castellanos-Villalobos y de la Cruz</h3>
+                <p class="profile-email">mariafernanda.castellanos@example.com</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">The name is never cut: it wraps in full (balanced lines on desktop, four lines at 360 px) and the avatar stays top-aligned beside it. A long email breaks anywhere rather than pushing the page sideways. The avatar shows the first letter of the name. The account button in the header shows the first name only ("Maria").</p>
+      </div>
+
+      <!-- 6. Un-saving a card -->
+      <div class="state" id="state-unsave" data-od-id="state-unsave">
+        <p class="eyebrow">6 · Un-saving a card, with Undo</p>
+        <div class="frame frame-pad">
+          <div class="tabs" aria-hidden="true"><span class="tab">Your ideas <span class="tab-count">5</span></span><span class="tab is-current">Saved <span class="tab-count">2</span></span></div>
+          <div class="panel">
+            <div class="grid">
+              <article class="card is-link" data-component="Card">
+                <div class="card-media">
+                  <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop" alt="Market stalls piled high with fruit and vegetables" width="800" height="600" loading="lazy">
+                </div>
+                <button type="button" class="heart" aria-pressed="true" aria-label="Saved: A slow Saturday at the farmers market, then a picnic lunch by the river for two! (example)" tabindex="-1"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                <div class="card-body">
+                  <div class="card-head">
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
+                    <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span>
+                  </div>
+                  <p class="card-meta">$ · Full day</p>
+                  <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+                </div>
+              </article>
+              <article class="card is-link hide-sm" data-component="Card">
+                <div class="card-media">
+                  <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop" alt="A relaxing massage at a spa" width="800" height="600" loading="lazy">
+                </div>
+                <button type="button" class="heart" aria-pressed="true" aria-label="Saved: Couples massage (example)" tabindex="-1"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                <div class="card-body">
+                  <div class="card-head">
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail">Couples massage</a></h3>
+                    <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 36 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(36)</span></span>
+                  </div>
+                  <p class="card-meta">$$$ · Half day</p>
+                  <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</span></div>
+                </div>
+              </article>
+            </div>
+            <div class="toast-demo">
+              <div class="toast is-success" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span class="toast-text">Removed from your saved ideas.</span><button type="button" class="btn btn-ghost btn-sm" data-component="Button" tabindex="-1">Undo</button></div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Maya tapped the heart on "Golden-hour viewpoint drive": the card leaves at once (<code>DELETE /ideas/:id/save</code>), the Saved count drops to 2, and focus moves to the heart of the card that took its place (the one before it if it was last, the Saved panel if none are left). The toast sits at the bottom centre in the page's one live region, which comes straight after the tab panels, so Undo is the next Tab stop after the cards. It stays 8 seconds, longer while hovered or focused, and Escape closes it. Undo (<code>PUT /ideas/:id/save</code>) puts the card back in the same place, focuses its heart and says "Back in your saved ideas." If the request fails, the card comes back and the toast says "We couldn't remove that. Try again." The app's Toast has no action yet: Phase 5 adds one.</p>
+      </div>
+
+      <!-- 7. Logged out -->
+      <div class="state" id="state-logged-out" data-od-id="state-logged-out">
+        <p class="eyebrow">7 · Logged out (a note: this page never shows)</p>
+        <div class="frame frame-pad">
+          <div class="note-panel">
+            <svg class="icon icon-muted" aria-hidden="true"><use href="#i-lock"/></svg>
+            <h3>You never see this page logged out</h3>
+            <p>The route guard sends a logged-out visitor from <code>/profile</code> to <code>/login?next=%2Fprofile</code> before anything here renders. Log in opens with the hint "Log in to see your ideas and saved ideas", and afterwards they come straight back here.</p>
+            <p class="redirect"><code>/profile</code><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg><code>/login?next=%2Fprofile</code><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg><code>/profile</code></p>
+            <a class="btn btn-secondary btn-sm" href="auth.html#state-next" data-od-goto="auth" data-component="Button">See the hint on Log in</a>
+          </div>
+        </div>
+        <p class="state-note">The logged-out header has no "Your ideas" link and no avatar menu, so the only ways here are a typed URL or an old bookmark. The guard keeps the path and query but not the <code>#saved</code> part; Phase 5 can pass it through <code>next</code> if that matters.</p>
+      </div>
+    </div>
+  </section>
+  </details>
+</main>
+
+<script>
+(function () {
+  var header = document.getElementById('site-header');
+  function onScroll() { if (header) header.classList.toggle('is-scrolled', window.scrollY > 0); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ---- Tabs: automatic activation, roving tabindex, arrow keys, Home and End. #ideas / #saved pick one.
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tablist"] [role="tab"]'));
+  function select(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if (focus) tab.focus();
+    var id = tab.getAttribute('aria-controls');
+    if (location.hash !== '#' + id && history.replaceState) history.replaceState(null, '', '#' + id);
+  }
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { select(tab, false); });
+    tab.addEventListener('keydown', function (e) {
+      var next = null;
+      if (e.key === 'ArrowRight') next = tabs[(i + 1) % tabs.length];
+      else if (e.key === 'ArrowLeft') next = tabs[(i - 1 + tabs.length) % tabs.length];
+      else if (e.key === 'Home') next = tabs[0];
+      else if (e.key === 'End') next = tabs[tabs.length - 1];
+      if (next) { e.preventDefault(); select(next, true); }
+    });
+  });
+  function fromHash() {
+    var id = location.hash.replace('#', '');
+    var tab = tabs.filter(function (t) { return t.getAttribute('aria-controls') === id; })[0];
+    if (tab) { select(tab, false); window.scrollTo(0, 0); }
+  }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+  // Opening profile.html#saved focuses the panel (it is the URL's target); keep the place, drop the ring.
+  window.addEventListener('load', function () {
+    var a = document.activeElement;
+    if (a && a.getAttribute('role') === 'tabpanel') a.blur();
+  });
+
+  // ---- Saved: un-save removes the card, with an Undo toast in the one live region.
+  var grid = document.getElementById('saved-grid');
+  var panel = document.getElementById('saved');
+  var empty = document.getElementById('saved-empty');
+  var region = document.getElementById('toasts');
+  var counts = document.querySelectorAll('[data-saved-count]');
+  var summary = document.querySelector('[data-saved-summary]');
+  var removed = null, timer = null, paused = false, left = 0;
+
+  function paint() {
+    var n = grid.querySelectorAll('.card').length;
+    counts.forEach(function (c) { c.textContent = n; });
+    summary.textContent = n === 1 ? '1 saved idea' : n + ' saved ideas';
+    grid.hidden = n === 0;
+    summary.closest('.panel-bar').hidden = n === 0;
+    empty.hidden = n !== 0;
+  }
+  function clearToast() { clearTimeout(timer); region.innerHTML = ''; }
+  function arm(ms) { left = ms; clearTimeout(timer); if (!paused) timer = setTimeout(clearToast, ms); }
+  function toast(text, undo) {
+    clearToast();
+    var el = document.createElement('div');
+    el.className = 'toast is-success';
+    el.setAttribute('data-component', 'Toast');
+    el.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span class="toast-text"></span>';
+    el.querySelector('.toast-text').textContent = text;
+    if (undo) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn btn-ghost btn-sm'; b.textContent = 'Undo';
+      b.setAttribute('data-component', 'Button');
+      b.addEventListener('click', doUndo);
+      el.appendChild(b);
+    }
+    region.appendChild(el);
+    arm(undo ? 8000 : 4000);
+  }
+  region.addEventListener('mouseenter', function () { paused = true; clearTimeout(timer); });
+  region.addEventListener('mouseleave', function () { paused = false; arm(4000); });
+  region.addEventListener('focusin', function () { paused = true; clearTimeout(timer); });
+  region.addEventListener('focusout', function () { paused = false; arm(4000); });
+  region.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { clearToast(); paused = false; var h = grid.querySelector('.heart'); (h || panel).focus(); }
+  });
+
+  grid.addEventListener('click', function (e) {
+    var heart = e.target.closest('button.heart');
+    if (!heart) return;
+    var card = heart.closest('.card');
+    var all = Array.prototype.slice.call(grid.children);
+    var i = all.indexOf(card);
+    removed = { card: card, index: i };
+    card.remove();
+    paint();
+    var rest = grid.querySelectorAll('.card');
+    var next = rest[i] || rest[i - 1];
+    if (next) next.querySelector('.heart').focus(); else panel.focus();
+    toast('Removed from your saved ideas.', true);
+  });
+
+  function doUndo() {
+    if (!removed) return;
+    var before = grid.children[removed.index] || null;
+    grid.insertBefore(removed.card, before);
+    paint();
+    removed.card.querySelector('.heart').focus();
+    removed = null;
+    toast('Back in your saved ideas.', false);
+  }
+
+  // ---- Account menu (shared header)
+  document.addEventListener('click', function (e) {
+    var acct = e.target.closest('.account-btn[aria-controls]');
+    if (acct) {
+      var menu = document.getElementById(acct.getAttribute('aria-controls'));
+      var open = acct.getAttribute('aria-expanded') !== 'true';
+      acct.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (menu) menu.hidden = !open;
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.account-btn[aria-expanded="true"]').forEach(function (b) {
+      b.setAttribute('aria-expanded', 'false');
+      var p = document.getElementById(b.getAttribute('aria-controls'));
+      if (p) p.hidden = true;
+    });
+  });
+})();
+</script>
+</body>
+</html>

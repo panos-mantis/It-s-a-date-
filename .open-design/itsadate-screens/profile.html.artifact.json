@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Profile",
+  "entry": ".open-design/itsadate-screens/profile.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "standalone",
+    "site",
+    "png",
+    "jpeg",
+    "pdf"
+  ],
+  "supportingFiles": [
+    "_shared/nav.html",
+    "_shared/data.json",
+    "content.md"
+  ],
+  "createdAt": "2026-11-25T12:16:42.402Z",
+  "updatedAt": "2026-11-25T12:16:42.402Z",
+  "sourceSkillId": "od:prototype:web-prototype",
+  "collectionId": "itsadate-screens",
+  "collectionName": "It's a Date screens",
+  "screenRole": "profile",
+  "screenIndex": 4,
+  "sources": [
+    {
+      "path": ".open-design/itsadate-screens/content.md",
+      "sha256": "e8138c950fda22937ea9f552c0051e619adf405db920d93c4005d0e74b3356ea"
+    },
+    {
+      "path": "DESIGN.md",
+      "sha256": "d32b2f61e802aff2b3c058678f971eb878af45c2c804a063ca00950ad4e82574"
+    }
+  ],
+  "metadata": {
+    "brief": {
+      "text": "The Profile page of It's a Date (/profile, logged in as Maya Chen): avatar, name and email; tabs Your ideas (status chips Pending, Approved, Rejected) and Saved (un-save with an Undo toast); States board behind a 'Show design states' toggle with no ideas, nothing saved, loading, error, the 50-character name, un-saving and logged out.",
+      "answers": {
+        "purpose": "Explaining a product or service",
+        "theme": "Light",
+        "density": "A multi-section site page"
+      },
+      "assumptions": [
+        "Light theme only (spec section 4)",
+        "Logged in as Maya Chen; header from _shared/nav.html with Your ideas marked as the current page",
+        "Your ideas holds the Sunday pastry walk from Share's success frame as the Pending card",
+        "States board is design-only, in a closed details toggle under the page",
+        "Tags, budget and duration labels from packages/shared constants",
+        "Photos reuse verified photos from content.md, or the no-photo placeholder"
+      ]
+    },
+    "flow": {
+      "plan": {
+        "screens": [
+          {
+            "id": "home",
+            "title": "Home",
+            "role": "Browse and filter approved date ideas"
+          },
+          {
+            "id": "idea-detail",
+            "title": "Idea detail",
+            "role": "Read one idea, rate it, save it, find places near me"
+          },
+          {
+            "id": "share",
+            "title": "Share an idea",
+            "role": "Submit a new idea for review",
+            "end": true
+          },
+          {
+            "id": "auth",
+            "title": "Log in and sign up",
+            "role": "Get an account or log back in"
+          },
+          {
+            "id": "profile",
+            "title": "Profile",
+            "role": "My ideas with their status, and my saved ideas"
+          },
+          {
+            "id": "admin",
+            "title": "Admin",
+            "role": "Review pending ideas, edit ideas, manage tags and users"
+          },
+          {
+            "id": "not-found",
+            "title": "Page not found",
+            "role": "A friendly 404 with a way home"
+          }
+        ],
+        "links": [
+          {
+            "from": "home",
+            "trigger": "an idea card",
+            "to": "idea-detail"
+          },
+          {
+            "from": "home",
+            "trigger": "Share an idea",
+            "to": "share"
+          },
+          {
+            "from": "home",
+            "trigger": "Log in",
+            "to": "auth"
+          },
+          {
+            "from": "home",
+            "trigger": "Profile",
+            "to": "profile"
+          },
+          {
+            "from": "home",
+            "trigger": "Admin",
+            "to": "admin"
+          },
+          {
+            "from": "idea-detail",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "idea-detail",
+            "trigger": "Log in to rate",
+            "to": "auth"
+          },
+          {
+            "from": "share",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "auth",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "profile",
+            "trigger": "an idea card",
+            "to": "idea-detail"
+          },
+          {
+            "from": "profile",
+            "trigger": "Share an idea",
+            "to": "share"
+          },
+          {
+            "from": "admin",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "not-found",
+            "trigger": "Back to all ideas",
+            "to": "home"
+          }
+        ],
+        "nav": [
+          {
+            "label": "It's a Date",
+            "to": "home"
+          },
+          {
+            "label": "Share an idea",
+            "to": "share"
+          },
+          {
+            "label": "Profile",
+            "to": "profile"
+          }
+        ],
+        "tasks": [
+          {
+            "name": "Find an idea and the places near me",
+            "start": "home",
+            "end": "idea-detail",
+            "maxSteps": 1
+          },
+          {
+            "name": "Share an idea",
+            "start": "home",
+            "end": "share",
+            "maxSteps": 1
+          },
+          {
+            "name": "Check on an idea I shared",
+            "start": "home",
+            "end": "profile",
+            "maxSteps": 1
+          }
+        ]
+      },
+      "screenId": "profile"
+    }
+  }
+}

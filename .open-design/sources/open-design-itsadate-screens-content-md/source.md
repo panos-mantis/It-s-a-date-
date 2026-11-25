@@ -32,6 +32,7 @@ Every screen in this collection uses the data below, so the same idea shows the 
 |---|---|---|---|---|
 | Maya Chen | user | maya.chen@example.com | M | The logged-in user on Home, Idea detail, Share and Profile |
 | Panos | admin | (owner's account) | P | Only on the Admin screen |
+| Maria Fernanda Castellanos-Villalobos y de la Cruz | user | mariafernanda.castellanos@example.com | M | A creator name; also the long-name frame on Profile |
 
 Other creators (sample users who shared ideas; they only appear as a creator name): Jonah Reyes, Priya Natarajan, Sam Okafor, Lena Brooks, Daniel Okoye, and **Maria Fernanda Castellanos-Villalobos y de la Cruz** (50 characters, the long-name test).
 
@@ -71,6 +72,20 @@ Maya's state (logged in): she has **saved** ideas 2, 5 and 9 (filled heart) and 
 | 2000-character description (for Idea detail, Task 2) | #2 |
 
 New ideas require a photo, budget and duration (`ideaCreateSchema`), so the null cases are migrated ideas (older `createdAt`, older accounts).
+
+### Maya's ideas that aren't public (Profile)
+
+Only Maya sees these, on Profile > Your ideas. They never show on Home and have no Idea detail page, so they have no ratings or saves.
+
+| # | Title | Tags | Budget | Duration | Meta line | placeType | Status | createdAt | Photo |
+|---|---|---|---|---|---|---|---|---|---|
+| 13 | Sunday pastry walk | food, adventure | 1 | short | $ · 1–2 hours | cafe | **pending** | 2026-11-25 | P13 |
+| 14 | Sushi boat eating contest | food | 3 | short | $$$ · 1–2 hours | sushi | **rejected** | 2026-11-21 | P14 |
+
+13 is the idea Maya sends in on Share (its success frame), so "See it on your profile" lands on it. 14 is there so Profile shows all three statuses. Maya's ideas, newest first: 13 (pending), 14 (rejected), 3, 4 and 9 (approved).
+
+13. **Sunday pastry walk.** Pick three bakeries within walking distance and buy one pastry at each. Share everything, score them out of ten on a napkin, and finish with a coffee at the winner.
+14. **Sushi boat eating contest.** Order the biggest sushi boat on the menu and race to see who taps out first. The loser pays and the winner picks dessert.
 
 ### Descriptions
 
@@ -121,6 +136,10 @@ Licence: [Unsplash Licence](https://unsplash.com/license) (free to use, no permi
 | P9 | Couples massage | `https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop` | A massage at a spa, oil being poured | Unsplash photo-1544161515-4ab6ce6db874, Unsplash Licence |
 | P10 | Sushi counter night | `https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80&auto=format&fit=crop` | Salmon sushi rolls at a counter, low light | Unsplash photo-1579871494447-9811cf80d66c, Unsplash Licence |
 | P12 | Planetarium show | `https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80&auto=format&fit=crop` | A starry night sky with a shooting star | Unsplash photo-1419242902214-272b3f66ee7a, Unsplash Licence |
+| P13 | Sunday pastry walk (spare "croissants", used on Share) | `https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop` | Croissants on a bakery counter | Unsplash photo-1555507036-ab1f4038808a, Unsplash Licence |
+| P14 | Sushi boat eating contest (spare "sushi") | `https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop` | A wooden sushi boat loaded with maki and nigiri | Unsplash photo-1553621042-f6e147245754, Unsplash Licence |
+
+P13 and P14 were checked again on 2026-11-25 for Profile (HTTP 200, viewed).
 
 Spare checked photos (200, viewed), for later screens that need one more: croissants `photo-1555507036-ab1f4038808a` (pastry walk), books on a shelf `photo-1495446815901-a7297e633e8d`, sushi `photo-1553621042-f6e147245754`.
 
