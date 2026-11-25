@@ -12,49 +12,91 @@
 
 ## Status (2026-11-25) — read this first if you're picking the phase up
 
-**Tasks 1 and 2 are built, critiqued and reviewed (both approved). Task 3 (owner sign-off) is in progress: the owner gave feedback, and the agreed changes below aren't made yet.** Don't re-run Tasks 1 or 2.
+**Tasks 1–7 are done: all 7 screens are built, checked, critiqued and reviewed, the owner signed off Home and Idea detail, and the hand-off sheet is written. Next is Task 8: the whole-branch review, then push and open the PR.** Don't re-run Tasks 1–7.
 
-- **Branch:** `phase-4-designs`, from `modernize` at `dc15757`. Commits: `6357dd8` and `fbb71ed` (this plan), `987314f` and `04ad2cb` (Task 1: content sheet and Home, plus the critic polish), `ea8fd51` and `663fdd3` (Task 2: Idea detail, plus the critic polish), then the commit that added this section. Nothing is pushed.
-- **Screens:** `.open-design/itsadate-screens/home.html` and `idea-detail.html`, with the shared `content.md`, `_shared/data.json` and `_shared/nav.html`.
-- **Last checks:**
-  - Home: run `2026-11-25T03-36-46`. One error and two warnings, all from the deliberate two-line clamp on the 80-character title (R5).
-  - Idea detail: run `2026-11-25T03-53-51`. 0 errors, 0 warnings.
-  - Critic verdict: polish on both, applied once each.
-- **Ledger** (git-ignored, on the original machine only): `.superpowers/sdd/2026-11-25-phase-4-designs/progress.md`. It has the full rulings, the reviewers' minor findings, and the brief, report and critique files for each task.
+- **Branch:** `phase-4-designs`, from `modernize` at `dc15757`. Nothing is pushed.
+- **Screens:** `.open-design/itsadate-screens/` has `home.html`, `idea-detail.html`, `share.html`, `auth.html`, `profile.html`, `admin.html` and `not-found.html`. It also has the shared `content.md`, `_shared/data.json` and `_shared/nav.html`, the flow map `flow.html`, and **`HANDOFF.md`, which Phase 5 ports from**.
+- **Ledger** (git-ignored, on the original machine only): `.superpowers/sdd/2026-11-25-phase-4-designs/progress.md`. It has the task briefs, reports, critiques and frame renders.
+
+### Commits
+
+| Task | Commits |
+|---|---|
+| Plan | `6357dd8`, `fbb71ed` |
+| 1 Content sheet and Home | `987314f`, `04ad2cb` (critic polish) |
+| 2 Idea detail | `ea8fd51`, `663fdd3` (critic polish) |
+| Status before the owner round | `d990df7` |
+| 3 Owner round 1 and sign-off | `3b37350`, `4af6e2f` (critic polish), `be67405` (sign-off record) |
+| 4 Share an idea, and auth | `461a271`, `ddbcaf0` (critic polish) |
+| 5 Profile | `7ab3d69`, `45b0d22` (critic polish), `2dcabcf` (review fix) |
+| 6 Admin and 404 | `e1b98b0`, `942ed5d` (critic polish), `51a90d7` (review fix) |
+| 7 Collection check and hand-off | `295e247` (link fixes), then the commit that wrote this section |
+
+### Checks and critic
+
+All runs used desktop 1440×900 and phone 360×800 with `states: true`.
+
+| Screen | Last task check | Result | Collection check | Critic |
+|---|---|---|---|---|
+| Home | `2026-11-25T12-23-24` | 1 error, 2 warnings, all the R5 clamp | `18-08-07`, same | polish, applied |
+| Idea detail | `2026-11-25T12-27-32` | 0 / 0 | `18-08-11`, 0 / 0 | polish, applied twice |
+| Share an idea | `2026-11-25T12-27-34` | 0 / 0 | `18-08-14`, 0 / 0 | polish, applied |
+| Log in and sign up | `2026-11-25T12-01-32` | 0 errors, 1 warning (R21) | `18-08-19`, same | polish, applied |
+| Profile | `2026-11-25T12-27-37` | 0 / 0 | `18-08-23`, 0 / 0 | polish, applied |
+| Admin | `2026-11-25T18-02-05` | 0 errors, 16 data-thin and stress warnings | `18-08-31`, same | polish, applied |
+| Page not found | `2026-11-25T17-41-18` | 0 / 0 | `18-08-34`, 0 / 0 | ship |
+
+- **Sign-off (Task 3):** on 2026-11-25 the owner said "i let you decide im fine with everything", after agreeing round 1 (R12). Final runs at sign-off: home `11-37-36`, idea-detail `11-36-46`.
+- **Collection check (Task 7):**
+  - No broken links, dead ends, unlinked screens or unreachable tasks.
+  - The flow plan's nav label "Profile" became "Your ideas", on all 7 screens (R35).
+  - The one `flow-nav-drift` left is auth's logged-out header (R3), and it is accepted.
 
 ### What the next agent does
 
-1. Check that `git status` is clean, the branch is `phase-4-designs`, and `git log --oneline -1` is this section's commit or later. Never check out pre-Phase-0 commits, and never touch `apps/api/.env`.
-2. Do the **Task 3 Step 2 owner round**. The exact list is in Task 3, under "Owner round 1 (agreed 2026-11-25)". Dispatch one fresh `itsadate-designer` agent for it, then a critic, then an `itsadate-reviewer`, exactly as for Tasks 1–2 (see the rulings below).
-3. Show the owner the result:
-   - Run `open_open_design_preview` with `entryPath: ".open-design/itsadate-screens/home.html"` and `open: false`, then open the URL it returns with `start "" "<url>"`. The tool can't open a window on this PC by itself.
-   - The URL changes every session; give the owner the new one.
-   - Don't use a Claude artifact link: its viewer blocks the Unsplash photos (R11).
-4. When the owner approves Home and Idea detail in so many words, record it in the ledger and in Task 3 Step 3. Then go on to Tasks 4–8.
+1. Check that `git status` is clean and the branch is `phase-4-designs`. Never check out pre-Phase-0 commits, and never touch `apps/api/.env`.
+2. Do **Task 8**:
+   - Run the whole-branch review with `itsadate-reviewer` on the most capable model.
+   - Fix its findings in a fresh `itsadate-designer` agent, re-check and commit.
+   - Then push and open the PR into `modernize`. The owner merges.
 
 ### Rulings made during execution (binding unless the owner overturns them)
 
 - R1: The controller owns the ledger. Implementers write a report file instead.
-- R2: The controller runs the critic. The implementer stops after the check and writes `get_open_design_artifact(critique: true)`'s `critiqueInput` to `<ledger dir>/task-N-critique-input.json`. The controller dispatches `open-design:design-critic`, then resumes the implementer for one polish round (register with `critique`, then re-check). The task reviewer runs after that.
-- R3: Auth is one file, `auth.html` (Log in and Sign up together).
+- R2: The controller runs the critic. The implementer stops after the check and writes the critique input. Then one polish round (register with `critique`, then re-check), then the task review.
+- R3: Auth is one file, `auth.html` (Log in and Sign up together), with its own logged-out header.
 - R4: Commit the kit's own state, `.open-design/history.json` and `.open-design/sources/`, with each task.
-- R5: The remaining `overflow` error on the two-line clamp of the 80-character card title is accepted. Phase 5 uses `line-clamp`.
-- R6: Photo credits give the Unsplash id and the licence, without the photographer's name (the lookup was blocked). Complete them before Phase 7.
+- R5: The `overflow` error on the two-line clamp of the 80-character card title is accepted. Phase 5 uses `line-clamp`.
+- R6: Photo credits give the Unsplash id and the licence, without the photographer's name. Complete them before any photo reaches the real app.
 - R7: Cards leave the rating out when `ratingCount` is 0. The detail page says "No ratings yet. Be the first."
-- R8: The header gets "Your ideas" (a desktop link, and the first item in the account menu, to `profile.html#ideas`) and a "+ Share" pill on phones. Phase 5 restyles the Phase 3 header to match.
-- R9: Idea 5's numbers follow `content.md` ("$", Sam Okafor, 4.7 · 89), not Task 2's example values.
-- R10: `data.json` now has Maya's `myRating: 4` on idea 5 and a 7-item `places` list.
-- R11: Owner previews use the local Open Design preview, not a Claude artifact.
-- Admin (Task 6) needs its own header variant, because `_shared/nav.html` has Maya's avatar menu.
-
-### Reviewer minors parked for Task 7's `HANDOFF.md` (not for the owner round)
-
-- Long title links carry a `title=` attribute that repeats the visible text.
-- The phone search sheet preview has no focus trap and doesn't return focus. The real sheet needs both, and must make the page behind it inert.
-- Photographer credits are missing (R6).
-- Arrow keys on the rating radios would save on every step. Phase 6a should commit on Enter, Space or blur, or debounce.
-- The 5 km and 10 km place counts (14 and 20) are illustrative only.
-- The board's static toasts carry `role="status"`. Don't copy them as they are.
+- R8: The header gets "Your ideas" (a desktop link and a menu item) and a "+ Share" pill on phones. Phase 5 restyles the Phase 3 header.
+- R9: Idea 5's numbers follow `content.md`.
+- R10: `data.json` has Maya's `myRating: 4` on idea 5 and a `places` list.
+- R11: Owner previews use the local Open Design preview, not a Claude artifact (its viewer blocks the Unsplash photos).
+- R12: The owner's "i let you decide im fine with everything" is the sign-off on Home and Idea detail.
+- R13: Idea detail's phone photo is 3:2.
+- R14: Idea 5's alt text follows `content.md` everywhere.
+- R15: In the preview, "Find places near me" jumps to the board's "Places found". The real button runs the search in place.
+- R16: Every later screen puts its States board behind the same closed "Show design states" toggle, and is checked with it open and closed.
+- R17: The check keeps 3 screenshots per viewport, so implementers render the other board frames themselves for the critic.
+- R18: The `?next` hint is "Log in to share your idea".
+- R19: Auth keeps the plan's link texts, plus Show password, "Log in instead" and `aria-disabled` busy buttons ("Phase 5 restyles").
+- R20: Share keeps the croissant photo.
+- R21: Auth's `state-missing` warning is accepted (its states are on the closed board).
+- R22: The "Check on an idea I shared" unreachable-task findings on Share and Auth waited for Profile (Task 5) and the collection check (Task 7). The task now takes 1 step.
+- R23: Share's upload failure is split in two, and the rejected-file copy stays verbatim.
+- R24: Profile's first tab is "Your ideas".
+- R25: "Your ideas" holds the idea from Share's success frame as the pending card.
+- R26: The pending chip reads "Pending review".
+- R27: Undo-toast reach and the `#saved` hash through login go to Phase 5.
+- R28: The menu item "Profile" becomes "Saved ideas" (`profile.html#saved`) on every screen.
+- R29: The API has no review note. The rejected chip reads "Not approved".
+- R30: Admin's header is the site header with Panos's menu, including "Admin".
+- R31: All ideas keeps its search box. Phase 5 adds `q` to the admin ideas query.
+- R32: No "All" status filter, and "Not set" can't be re-picked. Both match the real API.
+- R33: The 404 and non-admin copy follow the Task 6 brief ("Phase 5 restyles").
+- R34: Pending rows show a word-cut excerpt. Phase 5 uses `line-clamp`.
+- R35: In the collection check, nav drift from the deliberate header variants is accepted, and the flow plan's nav label may change to "Your ideas".
 
 ## Scope
 
@@ -88,6 +130,8 @@
 
 ### Flow plan (the same object on every screen)
 
+Task 7 changed the nav label "Profile" to "Your ideas", the header's real label (R35). All 7 screens carry this version.
+
 ```json
 {
   "screens": [
@@ -117,7 +161,7 @@
   "nav": [
     { "label": "It's a Date", "to": "home" },
     { "label": "Share an idea", "to": "share" },
-    { "label": "Profile", "to": "profile" }
+    { "label": "Your ideas", "to": "profile" }
   ],
   "tasks": [
     { "name": "Find an idea and the places near me", "start": "home", "end": "idea-detail", "maxSteps": 1 },
@@ -244,7 +288,7 @@ git commit -m "design: idea detail screen"
 
 Not an agent task. The owner must approve these two before the other screens copy their patterns (spec §8.7, §10.3).
 
-- [ ] **Step 1: Show them**
+- [x] **Step 1: Show them**
 
 `open_open_design_preview` on `home.html` (the preview is a clickable prototype: cards lead to Idea detail). Give the owner the URL. Don't publish a Claude artifact: its viewer blocks the Unsplash photos (R11).
 
@@ -301,7 +345,7 @@ Expected: the owner said, in so many words, that Home and Idea detail are approv
 - Consumes: the signed-off header, inputs and buttons from Tasks 1–3.
 - Binding copy from `apps/web/src/features/auth/`: the titles "Welcome back" and "Create your account". The labels "Name", "Email" and "Password". The hint "At least 8 characters.". The errors "Email or password is wrong" and "An account with this email already exists". The network error "We can't reach the server…" (`NETWORK_MESSAGE` in `apps/web/src/lib/api.ts`; copy it exactly).
 
-- [ ] **Step 1: Share — brief and write** (`screenRole: "share"`, `od:prototype:web-prototype`)
+- [x] **Step 1: Share — brief and write** (`screenRole: "share"`, `od:prototype:web-prototype`)
 
 A single-column form (max 640px):
 - Photo: a drop zone "Add a photo", "JPEG, PNG or WebP, up to 5 MB", then a 4:3 preview with "Replace" and "Remove"
@@ -321,7 +365,7 @@ States board:
 5. success: "Thanks! Your idea is waiting for review." with "See it on your profile" and "Share another"
 6. logged out: you never see this page, because the guard sends you to log in (show it as a note only)
 
-- [ ] **Step 2: Auth — brief and write** (`screenRole: "auth"`, `od:prototype:flow-sign-in`, Log in and Sign up only)
+- [x] **Step 2: Auth — brief and write** (`screenRole: "auth"`, `od:prototype:flow-sign-in`, Log in and Sign up only)
 
 One file: Log in on top, Sign up beside it on desktop (stacked on phone), each a card on cream with a link to the other ("New here? Create an account" / "Already have an account? Log in").
 
@@ -333,11 +377,11 @@ States board:
 5. network error
 6. the `?next` hint, "Log in to share your idea", when sent from `/share`
 
-- [ ] **Step 3: Register and check both** (titles "Share an idea" and "Log in and sign up"). Expected: 0 errors each.
+- [x] **Step 3: Register and check both** (titles "Share an idea" and "Log in and sign up"). Expected: 0 errors each.
 
-- [ ] **Step 4: Critic on both** (as Task 1 Step 6)
+- [x] **Step 4: Critic on both** (as Task 1 Step 6)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add .open-design/itsadate-screens
@@ -354,7 +398,7 @@ git commit -m "design: share an idea and auth screens"
 **Interfaces:**
 - Consumes: the card and chip markup, and `content.md`.
 
-- [ ] **Step 1: Brief and write** (`screenRole: "profile"`, `od:prototype:web-prototype`)
+- [x] **Step 1: Brief and write** (`screenRole: "profile"`, `od:prototype:web-prototype`)
 
 A header with the avatar initial, the name "Maya Chen" and the email. Two tabs: "My ideas" and "Saved".
 - **My ideas:** a grid of Maya's ideas, each card with a status chip: Pending (warn), Approved (success), Rejected (danger, with "Not approved this time" helper text). Approved cards link to the detail page; pending ones are not public yet ("Waiting for review").
@@ -367,9 +411,9 @@ States board:
 4. error with retry
 5. the 50-character name, wrapped in the header
 
-- [ ] **Step 2: Register, check, critic** (as Task 1 Steps 5–6, title "Profile")
+- [x] **Step 2: Register, check, critic** (as Task 1 Steps 5–6, title "Profile")
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add .open-design/itsadate-screens
@@ -387,7 +431,7 @@ git commit -m "design: profile screen"
 - Consumes: the header, Button, Input and Chip. The Admin panel and table rules from DESIGN.md "Admin panels and tables".
 - Real API behaviour to show: the pending queue is **oldest first**. Statuses are pending, approved and rejected. The role change is `POST /admin/users/:id/role`, and demoting the last admin fails with "You can't remove the last admin". The tag name is 2–30 characters, and a duplicate shows "A tag with this name already exists". The icon is a Lucide name. `GET /admin/users` lists users.
 
-- [ ] **Step 1: Admin — brief and write** (`screenRole: "admin"`, `od:prototype:app-table`, the app-screens answers)
+- [x] **Step 1: Admin — brief and write** (`screenRole: "admin"`, `od:prototype:app-table`, the app-screens answers)
 
 The admin uses the same site header, plus a tab row: Pending (with a count), All ideas, Tags, Users.
 - **Pending:** rows with a thumb (or placeholder), title, creator, "Submitted 3 days ago", tags, and the actions Approve (success text button), Edit and Reject (danger text button).
@@ -409,15 +453,15 @@ States board:
 8. the phone stacked rows
 9. a non-admin who opens `/admin`: "This page is for admins." with "Back to all ideas"
 
-- [ ] **Step 2: 404 — brief and write** (`screenRole: "not-found"`, `od:prototype:web-prototype`)
+- [x] **Step 2: 404 — brief and write** (`screenRole: "not-found"`, `od:prototype:web-prototype`)
 
 The site header, then the headline "This page *wandered off*." and the line "The link may be old, or the idea was removed.", then the primary "Back to all ideas". No illustration.
 
-- [ ] **Step 3: Register, check, critic for both** (titles "Admin" and "Page not found")
+- [x] **Step 3: Register, check, critic for both** (titles "Admin" and "Page not found")
 
 Expected: 0 errors. `tap-target` passes at 360 on the admin row actions.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add .open-design/itsadate-screens
@@ -435,19 +479,19 @@ git commit -m "design: admin and 404 screens"
 **Interfaces:**
 - Produces, for Phase 5: per screen, its path, the states it shows, the kit components it uses (`data-component`), the **new components** Phase 5 must add (the phone search sheet, tabs, the segmented control, the photo drop zone, the status chip variants, the side panel or sheet, the confirm dialog, the places panel and map), and every "Phase 5 restyles" change to the Phase 3 kit or header.
 
-- [ ] **Step 1: Collection check**
+- [x] **Step 1: Collection check**
 
 `check_open_design_artifact` with `collectionId: "itsadate-screens"`. Expected: no `flow-broken-link`, `flow-dead-end`, `flow-unlinked`, `flow-nav-drift` or `task-unreachable`. `flow.html` is written. Fix the links (two rounds max).
 
-- [ ] **Step 2: Write `HANDOFF.md`**
+- [x] **Step 2: Write `HANDOFF.md`**
 
 Include the owner's sign-off record from Task 3, and the critic verdict and last check run for each screen.
 
-- [ ] **Step 3: Docs**
+- [x] **Step 3: Docs**
 
 Mark Phase 4 built in the roadmap and START-HERE (branch, PR pending), and add Phase 5 hand-off notes pointing to `HANDOFF.md`. Add a Status section to the top of this plan.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add .open-design/itsadate-screens docs/superpowers

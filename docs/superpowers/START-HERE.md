@@ -1,13 +1,14 @@
 # START HERE — resuming the It's a Date modernization
 
-Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 in progress, waiting on the owner's sign-off round). Read this first in a new session, then the files it points to.
+Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 built, PR pending). Read this first in a new session, then the files it points to.
 
 ## How to resume
 
 1. Open the folder `C:\Users\manti\Desktop\its-a-date` in VS Code and start a **new** Claude Code conversation.
-2. Phases 2 and 3 are merged into `modernize` (PR #4 and PR #5). **Phase 4 (designs) is in progress** on branch `phase-4-designs`, which isn't pushed yet. Phase 5 starts after Phase 4 merges. Each later phase writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below, then executes it.
-   - **To continue Phase 4,** follow the **Status** section at the top of `docs/superpowers/plans/2026-11-25-phase-4-designs.md`. Next is the owner round in Task 3 (the agreed changes to Home and Idea detail), then the owner's sign-off, then Tasks 4–8. The owner must be present for the sign-off.
-   - Prompt for a new session: "Read docs/superpowers/START-HERE.md and continue Phase 4 from the plan's Status section."
+2. Phases 2 and 3 are merged into `modernize` (PR #4 and PR #5). **Phase 4 (designs) is built** on branch `phase-4-designs`. It isn't pushed yet, and its PR is pending. Phase 5 starts after Phase 4 merges. Each later phase writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below, then executes it.
+   - **To finish Phase 4,** follow the **Status** section at the top of `docs/superpowers/plans/2026-11-25-phase-4-designs.md`. Only Task 8 is left: the whole-branch review, then push and open the PR into `modernize`.
+   - Prompt for a new session: "Read docs/superpowers/START-HERE.md and do Phase 4 Task 8 from the plan's Status section."
+   - **Phase 5 ports from** `.open-design/itsadate-screens/HANDOFF.md` (see the hand-off notes below).
 3. Each phase ends with its own PR into `modernize`. Phase 5 starts after 2, 3 and 4 have merged.
 
 **Execution method (owner's choice): agent per task.** Use superpowers:subagent-driven-development.
@@ -27,10 +28,17 @@ Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 in progress, waiting on
 
 ## Where things stand
 
-**Phase 4 (designs) is in progress on `phase-4-designs`.**
-- Home and Idea detail are designed, critiqued and reviewed, in `.open-design/itsadate-screens/`.
-- The owner asked for less scrolling on Idea detail: places collapsed by default, and the States board hidden behind a toggle. That round isn't made yet.
-- Details, rulings and next steps are in the plan's Status section.
+**Phase 4 (designs) is built on `phase-4-designs`. The PR is pending (Task 8).**
+- All 7 screens are designed, checked, critiqued and reviewed, in `.open-design/itsadate-screens/`: Home, Idea detail, Share an idea, Log in and sign up, Profile, Admin and Page not found. Each works at desktop and phone width.
+- The owner signed off Home and Idea detail on 2026-11-25 ("i let you decide im fine with everything", after round 1).
+- The collection check passes: no broken links, dead ends, unlinked screens or unreachable tasks. The one nav drift left, on auth's logged-out header, is accepted.
+- Details, rulings and the commit list are in the plan's Status section.
+
+**Hand-off notes (Phase 5, from Phase 4)**
+- Read `.open-design/itsadate-screens/HANDOFF.md` first. Per screen, it gives the path, the states and the kit components used. It also lists the new components to build, every change to the Phase 3 kit and header ("Phase 5 restyles"), the API gaps, the parked reviewer notes and the prototype-only behaviour not to copy.
+- Port one screen at a time with `port_open_design_artifact_to_app`. The "Show design states" toggle on each screen is design-only: port the frames inside it, not the toggle.
+- API gaps to close in Phase 5: add `q` to the admin ideas query (R31). Decide whether budget and duration can be cleared to null (R32).
+- `content.md` and `_shared/data.json` in that folder hold the sample content, in the DTO shapes. Use them for MSW mocks.
 
 **Phase 3 (web foundation) is merged into `modernize` (PR #5, 2026-11-25).** The notes below are kept for Phase 5.
 - Built: Tailwind v4 theme, UI kit, typed API client, auth hooks, router, layout, header with account menu, and the log in and sign up pages. Setup is in `README.md`.
@@ -40,7 +48,7 @@ Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 in progress, waiting on
 
 **Hand-off notes (Phase 5, web)**
 - The kit's components and props live in `apps/web/src/components/ui/index.ts`. `Card` handles `image: null`.
-- Still to build: the phone search sheet and the real Home page.
+- Still to build: the phone search sheet and the real Home page. Both are designed now (Phase 4, `HANDOFF.md`).
 - Tag icons are Lucide names. Use a curated name to component map. Don't import the whole `icons` object.
 - `renderApp` (`src/test/render.tsx`) and `authStore` exist for page tests.
 - `react-router` is pinned to 7.x (8.x exists; the spec names 7).
