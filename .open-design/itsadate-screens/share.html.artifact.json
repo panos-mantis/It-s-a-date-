@@ -18,8 +18,8 @@
     "_shared/data.json",
     "content.md"
   ],
-  "createdAt": "2026-11-25T11:54:12.205Z",
-  "updatedAt": "2026-11-25T11:54:12.205Z",
+  "createdAt": "2026-11-25T12:01:16.310Z",
+  "updatedAt": "2026-11-25T12:01:16.310Z",
   "sourceSkillId": "od:prototype:web-prototype",
   "collectionId": "itsadate-screens",
   "collectionName": "It's a Date screens",
@@ -195,6 +195,43 @@
         ]
       },
       "screenId": "share"
+    },
+    "critique": {
+      "verdict": "polish",
+      "findings": [
+        {
+          "area": "purpose-hierarchy",
+          "fix": "Keep \"Your ideas\" as it is on home, and mark [aria-current=\"page\"] on \"Share an idea\" with a 2px --fg underline 6px below the text, the same as the active item in the category row.",
+          "where": "desktop header, all check screenshots",
+          "problem": "\"Your ideas\" is coral and the current link \"Share an idea\" is plain dark text, so the link that looks active is the one for the other page."
+        },
+        {
+          "area": "fit",
+          "fix": "Style .seg input:checked + span like a picked tag: --accent-soft fill, --accent-ink text at 600, a 1px --accent-ink border and a 14px check icon before the label. Keep the outer track as it is.",
+          "where": "Budget and Duration controls",
+          "problem": "A picked tag is a coral-soft pill with a check, but a picked budget or duration is a solid espresso pill: two ways of saying selected, and the dark pill is heavier than Send for review."
+        },
+        {
+          "area": "states",
+          "fix": "Split it in two. Rejected file: empty drop zone with a message. Network failure: keep the faded preview and file name, add \"pastry-walk.jpg didn't finish uploading.\" with a secondary \"Try again\" next to Remove.",
+          "where": "board frame 3, upload failed",
+          "problem": "One message covers both a rejected file and a dropped connection; it throws away the chosen photo and gives the wrong next step for a network failure."
+        },
+        {
+          "area": "states",
+          "fix": "While a field is invalid, put the error message in place of the helper text, on the same row with the counter on the right, and drop the extra muted line.",
+          "where": "board frame 1, field errors: Title and Description",
+          "problem": "Each invalid field shows the error line and then the normal hint and counter row as well, two lines saying nearly the same thing."
+        },
+        {
+          "area": "task",
+          "fix": "Design the Profile screen with the \"Your ideas\" tab showing this pending card, then re-run the task walk.",
+          "where": "task \"Check on an idea I shared\", frame 5",
+          "problem": "The task is unreachable; \"See it on your profile\" leads to a Profile screen that isn't designed yet."
+        }
+      ],
+      "at": "2026-11-25T12:01:16.302Z",
+      "checkRunId": "2026-11-25T11-54-43"
     }
   }
 }

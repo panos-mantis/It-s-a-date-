@@ -175,7 +175,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .menu-item:hover { background: var(--surface-sunk); }
 .nav-share-short { display: none; }
 /* On this page "Share an idea" is the current place: no underline, just the current-page mark */
-.site-nav [aria-current="page"] { color: var(--fg); }
+.site-nav [aria-current="page"] { color: var(--fg); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+@media (max-width: 639px) { .site-nav .nav-share[aria-current="page"] { text-decoration: none; border-color: var(--fg); } }
 @media (max-width: 639px) {
   .nav-actions { gap: 4px; }
   .btn-sm { padding: 0 10px; }
@@ -220,6 +221,7 @@ textarea.input.is-title { min-height: 0; resize: none; }
 .input:focus-visible, .select:focus-visible { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px rgba(240, 106, 76, 0.3); }
 .input[aria-invalid="true"], .select[aria-invalid="true"] { border-color: var(--danger); }
 .helper-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.helper-row .error { min-width: 0; }
 .helper { font-size: 12px; color: var(--muted); }
 .count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; flex-shrink: 0; margin-left: auto; }
 .count.is-full { color: var(--fg); font-weight: 600; }
@@ -288,12 +290,15 @@ textarea.input.is-title { min-height: 0; resize: none; }
 .seg.is-invalid { border-color: var(--danger); }
 .seg label { position: relative; flex: 1 1 0; min-width: 0; }
 .seg span {
-  display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 10px;
+  display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 8px;
   border-radius: var(--radius-pill); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
   transition: background-color 150ms var(--ease), color 150ms var(--ease);
 }
 .seg span:hover { background: var(--surface-sunk); }
-.seg input:checked + span { background: var(--fg); color: var(--surface); font-weight: 600; }
+.seg span { gap: 4px; border: 1px solid transparent; }
+.seg-check { display: none; width: 14px; height: 14px; }
+.seg input:checked + span { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; border-color: var(--accent-ink); }
+.seg input:checked + span .seg-check { display: block; }
 .seg input:focus-visible + span { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 .seg input:disabled + span { cursor: default; }
 .seg-hint { display: flex; justify-content: space-between; max-width: 420px; font-size: 12px; color: var(--muted); padding-inline: 16px; }
@@ -323,6 +328,7 @@ textarea.input.is-title { min-height: 0; resize: none; }
   background: var(--accent-soft); color: var(--accent-ink); font-size: 12px; font-weight: 600; white-space: nowrap;
 }
 .chip .icon { width: 14px; height: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* Success (replaces the form) */
 .done { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
@@ -544,9 +550,9 @@ textarea.input.is-title { min-height: 0; resize: none; }
         <fieldset class="field">
           <legend class="field-label">Budget</legend>
           <div class="seg">
-            <label><input class="sr-only" type="radio" name="budget" value="1" aria-label="$, low budget" checked><span aria-hidden="true">$</span></label>
-            <label><input class="sr-only" type="radio" name="budget" value="2" aria-label="$$, medium budget"><span aria-hidden="true">$$</span></label>
-            <label><input class="sr-only" type="radio" name="budget" value="3" aria-label="$$$, high budget"><span aria-hidden="true">$$$</span></label>
+            <label><input class="sr-only" type="radio" name="budget" value="1" aria-label="$, low budget" checked><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$</span></label>
+            <label><input class="sr-only" type="radio" name="budget" value="2" aria-label="$$, medium budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$</span></label>
+            <label><input class="sr-only" type="radio" name="budget" value="3" aria-label="$$$, high budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$$</span></label>
           </div>
           <p class="seg-hint" aria-hidden="true"><span>Low</span><span>High</span></p>
         </fieldset>
@@ -555,9 +561,9 @@ textarea.input.is-title { min-height: 0; resize: none; }
         <fieldset class="field">
           <legend class="field-label">Duration</legend>
           <div class="seg">
-            <label><input class="sr-only" type="radio" name="duration" value="short"><span>1–2 hours</span></label>
-            <label><input class="sr-only" type="radio" name="duration" value="half-day"><span>Half day</span></label>
-            <label><input class="sr-only" type="radio" name="duration" value="full-day"><span>Full day</span></label>
+            <label><input class="sr-only" type="radio" name="duration" value="short"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>1–2 hours</span></label>
+            <label><input class="sr-only" type="radio" name="duration" value="half-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Half day</span></label>
+            <label><input class="sr-only" type="radio" name="duration" value="full-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Full day</span></label>
           </div>
         </fieldset>
 
@@ -602,14 +608,12 @@ textarea.input.is-title { min-height: 0; resize: none; }
               <div class="field" data-component="Input">
                 <label class="field-label" for="e-title">Title</label>
                 <input class="input" id="e-title" type="text" maxlength="80" value="Go" aria-invalid="true" aria-describedby="e-title-err e-title-count">
-                <p class="error" id="e-title-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Use at least 3 characters.</p>
-                <div class="helper-row"><span class="helper">Short and concrete works best.</span><span class="count" id="e-title-count">2/80</span></div>
+                <div class="helper-row"><p class="error" id="e-title-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Use at least 3 characters.</p><span class="count" id="e-title-count">2/80</span></div>
               </div>
               <div class="field" data-component="Input">
                 <label class="field-label" for="e-desc">Description</label>
                 <textarea class="input" id="e-desc" maxlength="2000" rows="3" aria-invalid="true" aria-describedby="e-desc-err e-desc-count">Pastries :)</textarea>
-                <p class="error" id="e-desc-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Write at least 20 characters. You have 11 so far.</p>
-                <div class="helper-row"><span class="helper">At least 20 characters</span><span class="count" id="e-desc-count">11/2000</span></div>
+                <div class="helper-row"><p class="error" id="e-desc-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Write at least 20 characters. You have 11 so far.</p><span class="count" id="e-desc-count">11/2000</span></div>
               </div>
               <fieldset class="field">
                 <legend class="field-label" id="e-tags">Tags</legend>
@@ -635,17 +639,17 @@ textarea.input.is-title { min-height: 0; resize: none; }
               <fieldset class="field">
                 <legend class="field-label">Budget</legend>
                 <div class="seg">
-                  <label><input class="sr-only" type="radio" name="e-budget" value="1" aria-label="$, low budget" checked><span aria-hidden="true">$</span></label>
-                  <label><input class="sr-only" type="radio" name="e-budget" value="2" aria-label="$$, medium budget"><span aria-hidden="true">$$</span></label>
-                  <label><input class="sr-only" type="radio" name="e-budget" value="3" aria-label="$$$, high budget"><span aria-hidden="true">$$$</span></label>
+                  <label><input class="sr-only" type="radio" name="e-budget" value="1" aria-label="$, low budget" checked><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$</span></label>
+                  <label><input class="sr-only" type="radio" name="e-budget" value="2" aria-label="$$, medium budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$</span></label>
+                  <label><input class="sr-only" type="radio" name="e-budget" value="3" aria-label="$$$, high budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$$</span></label>
                 </div>
               </fieldset>
               <fieldset class="field" aria-describedby="e-duration-err">
                 <legend class="field-label" id="e-duration">Duration</legend>
                 <div class="seg is-invalid">
-                  <label><input class="sr-only" type="radio" name="e-duration" value="short"><span>1–2 hours</span></label>
-                  <label><input class="sr-only" type="radio" name="e-duration" value="half-day"><span>Half day</span></label>
-                  <label><input class="sr-only" type="radio" name="e-duration" value="full-day"><span>Full day</span></label>
+                  <label><input class="sr-only" type="radio" name="e-duration" value="short"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>1–2 hours</span></label>
+                  <label><input class="sr-only" type="radio" name="e-duration" value="half-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Half day</span></label>
+                  <label><input class="sr-only" type="radio" name="e-duration" value="full-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Full day</span></label>
                 </div>
                 <p class="error" id="e-duration-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Pick how long it takes.</p>
               </fieldset>
@@ -658,7 +662,7 @@ textarea.input.is-title { min-height: 0; resize: none; }
             </form>
           </div>
         </div>
-        <p class="state-note">The same messages show on blur (client check with <code>ideaCreateSchema</code>) and when the API answers 422: each issue whose path matches a field lands on that field (as <code>applyServerErrors</code> does for Log in), and focus moves to the first one. The summary links jump to each field. Everything Maya typed stays. A 422 issue that matches no field, or any other error, shows only in the summary box.</p>
+        <p class="state-note">The same messages show on blur (client check with <code>ideaCreateSchema</code>) and when the API answers 422: each issue whose path matches a field lands on that field (as <code>applyServerErrors</code> does for Log in), and focus moves to the first one. The summary links jump to each field. While a field is invalid, its error takes the place of the helper text, on the same row as the counter; the helper comes back once the value is fine. Everything Maya typed stays. A 422 issue that matches no field, or any other error, shows only in the summary box.</p>
       </div>
 
       <!-- 2. Uploading -->
@@ -688,12 +692,13 @@ textarea.input.is-title { min-height: 0; resize: none; }
         <p class="state-note">Picking a file starts <code>POST /uploads/image</code> at once, so the photo is ready by the time the rest is filled in. The preview shows straight away from the local file, faded until the upload finishes. "Send for review" stays disabled only while the upload runs (nothing of its own is in flight), and the line beside it says why. The other fields stay editable. Progress over 10 seconds adds "Still uploading. Keep waiting or cancel."</p>
       </div>
 
-      <!-- 3. Upload failed -->
+      <!-- 3. Upload failed: a rejected file, and a dropped connection -->
       <div class="state" id="state-upload-failed" data-od-id="state-upload-failed">
         <p class="eyebrow">3 · Upload failed</p>
         <div class="frame frame-pad">
-          <div class="share">
-            <div class="form">
+          <div class="frame-split">
+            <div>
+              <p class="frame-label">The file was rejected (type, size, not an image)</p>
               <div class="field">
                 <span class="field-label" id="f-photo-label">Photo</span>
                 <label class="dropzone is-error">
@@ -706,9 +711,18 @@ textarea.input.is-title { min-height: 0; resize: none; }
                 <p class="error" id="f-photo-err" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>That photo didn't upload. Try a JPEG, PNG or WebP under 5 MB.</p>
               </div>
             </div>
+            <div>
+              <p class="frame-label">The connection dropped during the upload</p>
+              <div class="field">
+                <span class="field-label">Photo</span>
+                <div class="media is-uploading"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="Your photo, not uploaded yet: croissants on a bakery counter" width="800" height="600" loading="lazy"></div>
+                <p class="error" id="f-net-err" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>pastry-walk.jpg didn't finish uploading.</p>
+                <div class="photo-bar"><p class="photo-file"><strong>pastry-walk.jpg</strong> · 2.4 MB</p><div class="photo-actions"><button type="button" class="btn btn-secondary btn-sm" aria-describedby="f-net-err" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Try again</button><button type="button" class="btn btn-ghost btn-sm" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Remove</button></div></div>
+              </div>
+            </div>
           </div>
         </div>
-        <p class="state-note">Shown when the upload is rejected (wrong type, over 5 MB, a file that isn't really an image) or fails on the way. The drop zone comes back with a red edge and the message under it; the rest of the form keeps what was typed. The browser checks type and size before uploading, so most bad files never leave the device. Over 5 MB, the API's 413 gets the same message.</p>
+        <p class="state-note">Two failures, two next steps. <strong>Rejected:</strong> the browser's own check or the API refuses the file (wrong type, over 5 MB with the API's 413, or not really an image). The photo is dropped, the drop zone comes back with a red edge, and the message says what to pick instead. <strong>Dropped connection:</strong> the file was fine but the upload didn't finish. The faded preview and file name stay, "Try again" re-sends the same file, and Remove clears it. In both cases the rest of the form keeps what was typed, and "Send for review" stays disabled until a photo has uploaded.</p>
       </div>
 
       <!-- 4. Submitting -->
@@ -725,9 +739,9 @@ textarea.input.is-title { min-height: 0; resize: none; }
               <fieldset class="field">
                 <legend class="field-label">Duration</legend>
                 <div class="seg">
-                  <label><input class="sr-only" type="radio" name="s-duration" value="short" checked disabled><span>1–2 hours</span></label>
-                  <label><input class="sr-only" type="radio" name="s-duration" value="half-day" disabled><span>Half day</span></label>
-                  <label><input class="sr-only" type="radio" name="s-duration" value="full-day" disabled><span>Full day</span></label>
+                  <label><input class="sr-only" type="radio" name="s-duration" value="short" checked disabled><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>1–2 hours</span></label>
+                  <label><input class="sr-only" type="radio" name="s-duration" value="half-day" disabled><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Half day</span></label>
+                  <label><input class="sr-only" type="radio" name="s-duration" value="full-day" disabled><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Full day</span></label>
                 </div>
               </fieldset>
               <div class="submit">
@@ -758,7 +772,7 @@ textarea.input.is-title { min-height: 0; resize: none; }
                 </div>
                 <p class="card-title">Sunday pastry walk</p>
                 <p class="meta">$ · 1–2 hours</p>
-                <div><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+                <div class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></div>
               </div>
               <div class="done-actions">
                 <a class="btn btn-primary btn-md" href="profile.html#ideas" data-od-goto="profile" data-component="Button">See it on your profile<svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
@@ -767,7 +781,7 @@ textarea.input.is-title { min-height: 0; resize: none; }
             </div>
           </div>
         </div>
-        <p class="state-note">Replaces the form after <code>201</code>, and focus moves to the heading. The card is the new idea as it will look on Profile, with the "Pending review" badge in warn colour. "See it on your profile" opens Profile on Your ideas; "Share another" gives a fresh, empty form (frame 7). A toast is not used here because the page itself changes.</p>
+        <p class="state-note">Replaces the form after <code>201</code>, and focus moves to the heading. The card is the new idea as it will look on Profile, with both its tags, with the "Pending review" badge in warn colour. "See it on your profile" opens Profile on Your ideas; "Share another" gives a fresh, empty form (frame 7). A toast is not used here because the page itself changes.</p>
       </div>
 
       <!-- 6. Logged out -->

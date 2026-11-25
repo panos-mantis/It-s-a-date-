@@ -86,6 +86,7 @@ button, input { font: inherit; color: inherit; }
   fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
 }
 .icon-muted { color: var(--muted); }
+[hidden] { display: none !important; }
 :focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 
 .skip-link {
@@ -141,15 +142,17 @@ button, input { font: inherit; color: inherit; }
 .nav-actions { display: flex; align-items: center; gap: 8px; }
 .nav-share-icon, .nav-share-short { display: none; }
 @media (max-width: 639px) {
-  .nav-actions { gap: 4px; flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
+  .nav-actions { gap: 2px; flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
   .btn-sm { padding: 0 10px; }
   .wordmark { font-size: 18px; }
-  .site-nav { flex-wrap: wrap; height: auto; min-height: var(--header-h); padding-block: 8px; padding-inline: 8px; }
+  .site-nav { flex-wrap: wrap; height: auto; min-height: var(--header-h); padding-block: 8px; }
   .site-nav .nav-share-label { display: none; }
   .site-nav .nav-share-icon, .site-nav .nav-share-short { display: block; }
   .site-nav .nav-share-icon { width: 16px; height: 16px; }
   .site-nav .nav-share { gap: 2px; padding: 0 10px 0 8px; border-color: var(--border); border-width: 1px; border-radius: var(--radius-pill); }
 }
+
+@media (max-width: 399px) { .site-nav .nav-login { padding: 0 6px; } }
 
 /* The two cards: side by side on desktop, Log in then Sign up on phones */
 .auth { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; justify-items: center; padding-block: 64px 80px; }
@@ -192,7 +195,11 @@ button, input { font: inherit; color: inherit; }
 .helper { font-size: 12px; color: var(--muted); }
 .error { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 2px 6px; font-size: 12px; color: var(--danger); }
 .error .icon { width: 14px; height: 14px; margin-top: 2px; }
-.error .text-link { min-height: 0; font-size: 12px; }
+.field-action {
+  align-self: flex-start; display: inline-flex; align-items: center; padding: 4px 0;
+  font-size: 14px; font-weight: 600; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; border-radius: 6px;
+}
+.field-action:hover { text-decoration-thickness: 2px; }
 .error-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; }
 .pw { position: relative; }
 .pw .input { padding-right: 76px; }
@@ -300,7 +307,7 @@ button, input { font: inherit; color: inherit; }
     <a class="wordmark" href="home.html" data-od-goto="home"><svg class="wordmark-heart" aria-hidden="true"><use href="#i-heart"/></svg>It's a Date</a>
     <div class="nav-actions">
       <a class="btn btn-ghost btn-sm nav-share" href="auth.html#state-next" data-od-goto="share" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-label" aria-hidden="true">Share an idea</span><span class="nav-share-short" aria-hidden="true">Share</span></a>
-      <a class="btn btn-ghost btn-sm" href="#log-in" data-component="Button">Log in</a>
+      <a class="btn btn-ghost btn-sm nav-login" href="#log-in" data-component="Button">Log in</a>
       <a class="btn btn-secondary btn-sm" href="#sign-up" data-component="Button">Sign up</a>
     </div>
   </nav>
@@ -352,6 +359,7 @@ button, input { font: inherit; color: inherit; }
             <input class="input" id="signup-password" name="password" type="password" autocomplete="new-password" aria-describedby="signup-password-hint">
             <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="signup-password" data-pw-toggle>Show</button>
           </div>
+          <p class="error" id="signup-password-err" hidden><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Use at least 8 characters.</p>
           <p class="helper" id="signup-password-hint">At least 8 characters.</p>
         </div>
         <button type="submit" class="btn btn-primary btn-md btn-block" data-component="Button">Sign up</button>
@@ -418,7 +426,8 @@ button, input { font: inherit; color: inherit; }
                 <div class="field" data-component="Input">
                   <label class="field-label" for="f2-email">Email</label>
                   <input class="input is-focus" id="f2-email" type="email" value="maya.chen@example.com" aria-invalid="true" aria-describedby="f2-email-err" autocomplete="off">
-                  <p class="error" id="f2-email-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><span>An account with this email already exists</span><a class="text-link" href="#log-in">Log in instead</a></p>
+                  <p class="error" id="f2-email-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>An account with this email already exists</p>
+                  <a class="field-action" href="#log-in">Log in instead</a>
                 </div>
                 <div class="field" data-component="Input">
                   <label class="field-label" for="f2-password">Password</label>
@@ -460,11 +469,10 @@ button, input { font: inherit; color: inherit; }
                   <div class="field" data-component="Input">
                     <label class="field-label" for="f3-password">Password</label>
                     <div class="pw">
-                      <input class="input" id="f3-password" type="password" value="salsa" aria-invalid="true" aria-describedby="f3-password-err f3-password-hint" autocomplete="off">
+                      <input class="input" id="f3-password" type="password" value="salsa" aria-invalid="true" aria-describedby="f3-password-err" autocomplete="off">
                       <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="f3-password" data-pw-toggle>Show</button>
                     </div>
                     <p class="error" id="f3-password-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Use at least 8 characters.</p>
-                    <p class="helper" id="f3-password-hint">At least 8 characters.</p>
                   </div>
                   <button type="button" class="btn btn-primary btn-md btn-block" data-component="Button">Sign up</button>
                 </form>
@@ -494,7 +502,7 @@ button, input { font: inherit; color: inherit; }
             </div>
           </div>
         </div>
-        <p class="state-note">Messages are the current ones from <code>authErrorMap</code> (<code>apps/web/src/lib/form-errors.ts</code>). The error sits under the field and above its hint, so "At least 8 characters." stays visible. Checked on submit, then again as each field changes; the message goes as soon as the value is fine. A 422 from the API lands on the same fields. Other limits: name up to 50 characters ("Use 50 characters or fewer."), password up to 72 ("Use 72 characters or fewer.").</p>
+        <p class="state-note">Messages are the current ones from <code>authErrorMap</code> (<code>apps/web/src/lib/form-errors.ts</code>). While the password error shows, it takes the place of the hint "At least 8 characters." (and <code>aria-describedby</code> points at the error only); the hint comes back once the password has 8 or more characters. Checked on submit, then again as each field changes; the message goes as soon as the value is fine. A 422 from the API lands on the same fields. Other limits: name up to 50 characters ("Use 50 characters or fewer."), password up to 72 ("Use 72 characters or fewer.").</p>
       </div>
 
       <!-- 4. Busy -->
@@ -633,6 +641,21 @@ button, input { font: inherit; color: inherit; }
       if (input) input.type = show ? 'text' : 'password';
     });
   });
+
+  // Sign up password: after the first blur, an error under 8 characters takes the hint's place.
+  var pw = document.getElementById('signup-password');
+  var pwErr = document.getElementById('signup-password-err');
+  var pwHint = document.getElementById('signup-password-hint');
+  var touched = false;
+  function checkPw() {
+    if (!touched) return;
+    var bad = pw.value.length > 0 && pw.value.length < 8;
+    pwErr.hidden = !bad; pwHint.hidden = bad;
+    pw.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    pw.setAttribute('aria-describedby', bad ? 'signup-password-err' : 'signup-password-hint');
+  }
+  pw.addEventListener('blur', function () { touched = true; checkPw(); });
+  pw.addEventListener('input', checkPw);
 
   // Prototype only: the forms don't send anything.
   document.querySelectorAll('[data-auth-form]').forEach(function (f) {
