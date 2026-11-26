@@ -12,6 +12,13 @@ expect.extend(matchers);
 // jsdom does not implement scrollTo (ScrollRestoration calls it).
 if (typeof window !== 'undefined') window.scrollTo = () => undefined;
 
+// jsdom has no canvas; axe's colour-contrast check probes it for image backgrounds and jsdom logs
+// "not implemented" noise. Returning null is what jsdom does anyway, minus the log.
+if (typeof HTMLCanvasElement !== 'undefined') {
+  HTMLCanvasElement.prototype.getContext = (() =>
+    null) as typeof HTMLCanvasElement.prototype.getContext;
+}
+
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 
 // Vitest `globals` is off, so Testing Library's automatic cleanup is never registered.

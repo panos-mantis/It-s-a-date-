@@ -134,6 +134,31 @@ describe('Toast', () => {
     expect(screen.queryByText('older')).not.toBeInTheDocument();
   });
 
+  it('Escape already handled elsewhere leaves the toast open', async () => {
+    const { user } = setup(['Saved.']);
+    await user.click(screen.getByRole('button', { name: 'Fire' }));
+    const stop = (e: KeyboardEvent) => e.preventDefault();
+    document.addEventListener('keydown', stop, true);
+    await user.keyboard('{Escape}');
+    document.removeEventListener('keydown', stop, true);
+    expect(screen.getByText('Saved.')).toBeInTheDocument();
+  });
+
+  it('a throwing onAction still closes the toast', async () => {
+    const onAction = vi.fn(() => {
+      throw new Error('boom');
+    });
+    const { user } = setup(['Removed.'], undefined, { label: 'Undo', onAction });
+    await user.click(screen.getByRole('button', { name: 'Fire' }));
+    // React reports the handler error to window; keep it out of the output.
+    const swallow = (e: ErrorEvent) => e.preventDefault();
+    window.addEventListener('error', swallow);
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    window.removeEventListener('error', swallow);
+    expect(onAction).toHaveBeenCalledOnce();
+    expect(screen.queryByText('Removed.')).not.toBeInTheDocument();
+  });
+
   it('dismisses on click', async () => {
     const { user } = setup(['Saved.']);
     await user.click(screen.getByRole('button', { name: 'Fire' }));
