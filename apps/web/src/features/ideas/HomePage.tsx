@@ -82,8 +82,11 @@ export function HomePage() {
   );
 
   // Filters keep the scroll position; each change is a new history entry, so Back undoes it.
+  // Re-applying the same search adds no entry, so Back never seems to do nothing.
   function apply(next: IdeaSearch) {
-    setParams(toSearchParams(next), { preventScrollReset: true });
+    const nextParams = toSearchParams(next);
+    if (nextParams.toString() === toSearchParams(search).toString()) return;
+    setParams(nextParams, { preventScrollReset: true });
   }
   const applyValues = (next: SearchValues) => apply({ ...next, sort });
 

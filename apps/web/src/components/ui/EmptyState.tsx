@@ -33,14 +33,19 @@ export function EmptyState({
       )}
       <Heading
         className={cn(
-          'font-medium text-fg [&_em]:font-normal [&_em]:italic',
+          'font-medium text-fg [overflow-wrap:anywhere] [&_em]:font-normal [&_em]:italic',
           page ? 'text-balance text-[38px] leading-tight tracking-display sm:text-4xl' : 'text-xl',
         )}
       >
         {title}
       </Heading>
       {body && (
-        <p className={cn('text-muted', page ? 'max-w-[40ch] text-base sm:text-lg' : 'text-base')}>
+        <p
+          className={cn(
+            'text-muted [overflow-wrap:anywhere]',
+            page ? 'max-w-[40ch] text-base sm:text-lg' : 'text-base',
+          )}
+        >
           {body}
         </p>
       )}

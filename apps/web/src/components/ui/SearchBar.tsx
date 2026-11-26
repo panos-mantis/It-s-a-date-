@@ -82,6 +82,7 @@ export function SearchBar({
               value={values.q}
               placeholder="Search date ideas"
               autoComplete="off"
+              maxLength={100}
               onChange={(e) => setValues({ ...values, q: e.target.value })}
               className={cn(fieldClass, 'text-fg')}
             />

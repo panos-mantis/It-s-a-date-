@@ -15,6 +15,8 @@ describe('SearchBar', () => {
     render(<SearchBar initial={empty} vibes={vibes} onSubmit={() => {}} />);
     expect(screen.getByRole('search')).toBeInTheDocument();
     expect(screen.getByLabelText('What')).toBeInTheDocument();
+    // Matches ideaQuerySchema.q.
+    expect(screen.getByLabelText('What')).toHaveAttribute('maxlength', '100');
     expect(screen.getByLabelText('Vibe')).toBeInTheDocument();
     expect(screen.getByLabelText('Budget')).toBeInTheDocument();
   });

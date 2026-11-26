@@ -213,6 +213,33 @@ describe('Home', () => {
     expect(screen.getByRole('button', { name: 'Filters, 1 filter on' })).toHaveFocus();
   });
 
+  it('re-applying the same filters adds no history entry', async () => {
+    const { router, user } = renderApp('/?tag=food&budget=2');
+    expect(await screen.findByRole('link', { name: 'Dumpling crawl' })).toBeInTheDocument();
+    const before = router.state.location.key;
+
+    await user.click(within(screen.getByRole('search')).getByRole('button', { name: 'Search' }));
+    const vibes = screen.getByRole('navigation', { name: 'Vibes' });
+    await user.click(await within(vibes).findByRole('button', { name: 'Food' }));
+    await user.click(screen.getByRole('button', { name: 'New' }));
+
+    expect(router.state.location.key).toBe(before);
+    expect(router.state.historyAction).toBe('POP');
+    expect(router.state.location.search).toBe('?tag=food&budget=2');
+  });
+
+  it('caps What at 100 characters, like the API', async () => {
+    const { user } = renderApp('/');
+    await findGrid();
+    expect(within(screen.getByRole('search')).getByLabelText('What')).toHaveAttribute(
+      'maxlength',
+      '100',
+    );
+    await user.click(screen.getByRole('button', { name: /Find a date idea/ }));
+    const sheet = screen.getByRole('dialog', { name: 'Find a date idea' });
+    expect(within(sheet).getByLabelText('What')).toHaveAttribute('maxlength', '100');
+  });
+
   it('Show more loads page 2', async () => {
     ideaStore.set(manyIdeas(30));
     const seen = spyOnIdeas();

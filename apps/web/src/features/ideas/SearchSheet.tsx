@@ -113,6 +113,7 @@ export function SearchSheet({
                 type="text"
                 placeholder="Search date ideas"
                 autoComplete="off"
+                maxLength={100}
                 value={draft.q}
                 onChange={(e) => setDraft({ ...draft, q: e.target.value })}
               />
