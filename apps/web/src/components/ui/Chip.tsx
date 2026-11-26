@@ -6,9 +6,9 @@ type Status = 'pending' | 'approved' | 'rejected';
 type Role = 'admin' | 'user';
 
 const STATUS: Record<Status, { label: string; icon: LucideIcon; tone: string }> = {
-  pending: { label: 'Pending review', icon: Clock, tone: 'bg-warn/10 text-warn' },
-  approved: { label: 'Approved', icon: CircleCheck, tone: 'bg-success/10 text-success' },
-  rejected: { label: 'Not approved', icon: CircleX, tone: 'bg-danger/10 text-danger' },
+  pending: { label: 'Pending review', icon: Clock, tone: 'bg-overlay shadow-raised text-warn' },
+  approved: { label: 'Approved', icon: CircleCheck, tone: 'bg-overlay shadow-raised text-success' },
+  rejected: { label: 'Not approved', icon: CircleX, tone: 'bg-overlay shadow-raised text-danger' },
 };
 
 const ROLE: Record<Role, { label: string; icon: LucideIcon; tone: string }> = {

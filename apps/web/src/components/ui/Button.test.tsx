@@ -53,7 +53,9 @@ describe('Button', () => {
     );
     const cls = screen.getByRole('button').className;
     expect(cls).toContain('text-success');
+    expect(cls).not.toContain('text-accent-ink');
     expect(cls).toContain('hover:underline');
+    expect(cls).not.toContain('text-accent-ink');
   });
 
   it('has no axe violations', async () => {

@@ -9,14 +9,14 @@ type Tone = 'default' | 'success' | 'danger';
 const variants: Record<Variant, string> = {
   primary: 'bg-accent text-accent-on border-transparent hover:bg-accent-hover',
   secondary: 'bg-surface text-fg border-fg hover:bg-surface-sunk',
-  ghost: 'bg-transparent text-accent-ink border-transparent hover:underline',
+  ghost: 'bg-transparent border-transparent hover:underline',
   // Confirm dialogs only.
   danger: 'bg-danger text-on-danger border-transparent hover:opacity-90',
 };
 
 // Text-button tones for ghost buttons (Admin approve / reject); they underline on hover.
 const tones: Record<Tone, string> = {
-  default: '',
+  default: 'text-accent-ink',
   success: 'text-success',
   danger: 'text-danger',
 };

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { Heart } from 'lucide-react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { expectNoAxeViolations } from '../../test/axe';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
@@ -82,5 +82,18 @@ describe('SelectableChip', () => {
   it('has no axe violations', async () => {
     const { container } = render(<Harness />);
     await expectNoAxeViolations(container);
+  });
+});
+
+describe('SelectableChip disabled', () => {
+  it('does not call onToggle', async () => {
+    const onToggle = vi.fn();
+    render(
+      <SelectableChip selected={false} disabled onToggle={onToggle}>
+        Cosy
+      </SelectableChip>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Cosy' }));
+    expect(onToggle).not.toHaveBeenCalled();
   });
 });
