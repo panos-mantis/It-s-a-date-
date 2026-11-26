@@ -1,38 +1,8 @@
-import type { Role, UserDTO } from '@itsadate/shared';
 import { http, HttpResponse, type RequestHandler } from 'msw';
+import { authStore, toDTO } from './auth-store';
+import { ideasHandlers } from './ideas-handlers';
 
-interface FakeUser extends UserDTO {
-  password: string;
-}
-
-let users: FakeUser[] = [];
-let sessionEmail: string | null = null;
-let nextId = 1;
-
-const toDTO = ({ id, name, email, role }: FakeUser): UserDTO => ({ id, name, email, role });
-
-// Fake auth backend for tests; mirrors the real API's messages.
-export const authStore = {
-  reset(): void {
-    users = [];
-    sessionEmail = null;
-    nextId = 1;
-  },
-  addUser(input: { name: string; email: string; password: string; role?: Role }): UserDTO {
-    const user: FakeUser = {
-      id: `u${nextId++}`,
-      name: input.name,
-      email: input.email.toLowerCase(),
-      password: input.password,
-      role: input.role ?? 'user',
-    };
-    users.push(user);
-    return toDTO(user);
-  },
-  loginAs(email: string): void {
-    sessionEmail = email.toLowerCase();
-  },
-};
+export { authStore };
 
 function errorResponse(status: number, code: string, message: string, details?: unknown) {
   return HttpResponse.json({ error: { code, message, details } }, { status });
@@ -47,7 +17,7 @@ export const handlers: RequestHandler[] = [
         issues: [{ location: 'body', path: 'email', message: 'Use a real email address' }],
       });
     }
-    if (users.some((u) => u.email === body.email.toLowerCase())) {
+    if (authStore.emailTaken(body.email)) {
       return errorResponse(409, 'CONFLICT', 'An account with this email already exists');
     }
     const user = authStore.addUser(body);
@@ -56,20 +26,19 @@ export const handlers: RequestHandler[] = [
   }),
   http.post('*/api/v1/auth/login', async ({ request }) => {
     const body = (await request.json()) as { email: string; password: string };
-    const user = users.find(
-      (u) => u.email === body.email.toLowerCase() && u.password === body.password,
-    );
+    const user = authStore.findByCredentials(body.email, body.password);
     if (!user) return errorResponse(401, 'UNAUTHORIZED', 'Email or password is wrong');
     authStore.loginAs(user.email);
     return HttpResponse.json(toDTO(user));
   }),
   http.post('*/api/v1/auth/logout', () => {
-    sessionEmail = null;
+    authStore.logout();
     return new HttpResponse(null, { status: 204 });
   }),
   http.get('*/api/v1/auth/me', () => {
-    const user = users.find((u) => u.email === sessionEmail);
+    const user = authStore.sessionUser();
     if (!user) return errorResponse(401, 'UNAUTHORIZED', 'Please log in');
-    return HttpResponse.json(toDTO(user));
+    return HttpResponse.json(user);
   }),
+  ...ideasHandlers,
 ];

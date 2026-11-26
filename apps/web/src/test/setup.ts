@@ -3,6 +3,7 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, expect } from 'vitest';
 import { authStore } from './msw/handlers';
+import { resetIdeasStores } from './msw/ideas-handlers';
 import { server } from './msw/server';
 
 // Explicit extend (instead of '@testing-library/jest-dom/vitest') so the matchers attach to the
@@ -26,6 +27,7 @@ afterEach(() => {
   cleanup();
   server.resetHandlers();
   authStore.reset();
+  resetIdeasStores();
 });
 
 afterAll(() => server.close());

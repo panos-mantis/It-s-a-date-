@@ -40,6 +40,7 @@ interface RequestOptions {
   method: string;
   query?: Record<string, QueryValue>;
   body?: unknown;
+  form?: FormData;
   signal?: AbortSignal;
 }
 
@@ -54,6 +55,16 @@ function isErrorBody(value: unknown): value is ApiErrorBody {
   );
 }
 
+/** Turns a failed response (status plus parsed JSON, if any) into an ApiError. */
+export function toApiError(status: number, json: unknown): ApiError {
+  if (isErrorBody(json)) {
+    const { code, message, details } = json.error;
+    return new ApiError(status, code, message, details);
+  }
+  // A non-JSON error body is almost always the proxy failing to reach the API.
+  return new ApiError(status, 'INTERNAL', NETWORK_MESSAGE);
+}
+
 async function request<T>(path: string, opts: RequestOptions): Promise<T> {
   const url = new URL(API_BASE + path, window.location.origin);
   for (const [key, value] of Object.entries(opts.query ?? {})) {
@@ -63,6 +74,7 @@ async function request<T>(path: string, opts: RequestOptions): Promise<T> {
 
   const hasBody = opts.body !== undefined;
   const headers: Record<string, string> = { Accept: 'application/json' };
+  // A FormData body gets no Content-Type: the browser adds multipart with its boundary.
   if (hasBody) headers['Content-Type'] = 'application/json';
 
   let res: Response;
@@ -71,7 +83,7 @@ async function request<T>(path: string, opts: RequestOptions): Promise<T> {
       method: opts.method,
       credentials: 'include',
       headers,
-      body: hasBody ? JSON.stringify(opts.body) : undefined,
+      body: opts.form ?? (hasBody ? JSON.stringify(opts.body) : undefined),
       signal: opts.signal,
     });
   } catch (err) {
@@ -88,14 +100,7 @@ async function request<T>(path: string, opts: RequestOptions): Promise<T> {
     json = undefined;
   }
 
-  if (!res.ok) {
-    if (isErrorBody(json)) {
-      const { code, message, details } = json.error;
-      throw new ApiError(res.status, code, message, details);
-    }
-    // A non-JSON error body is almost always the proxy failing to reach the API.
-    throw new ApiError(res.status, 'INTERNAL', NETWORK_MESSAGE);
-  }
+  if (!res.ok) throw toApiError(res.status, json);
   return json as T;
 }
 
@@ -111,6 +116,10 @@ export const api = {
   },
   put<T>(path: string, body?: unknown): Promise<T> {
     return request<T>(path, { method: 'PUT', body });
+  },
+  /** POSTs multipart form data; sends no Content-Type so the browser sets the boundary. */
+  upload<T>(path: string, form: FormData): Promise<T> {
+    return request<T>(path, { method: 'POST', form });
   },
   patch<T>(path: string, body?: unknown): Promise<T> {
     return request<T>(path, { method: 'PATCH', body });
