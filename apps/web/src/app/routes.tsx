@@ -2,6 +2,7 @@ import type { RouteObject } from 'react-router';
 import { HomePage } from '../features/ideas/HomePage';
 import { IdeaDetailPage } from '../features/ideas/IdeaDetailPage';
 import { SharePage } from '../features/ideas/SharePage';
+import { ProfilePage } from '../features/profile/ProfilePage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { SignupPage } from '../features/auth/SignupPage';
 import { RedirectIfAuthed, RequireAuth, RequireRole } from './guards';
@@ -50,7 +51,7 @@ export const routes: RouteObject[] = [
         path: 'profile',
         element: (
           <RequireAuth>
-            <ComingSoonPage title="Profile" />
+            <ProfilePage />
           </RequireAuth>
         ),
       },

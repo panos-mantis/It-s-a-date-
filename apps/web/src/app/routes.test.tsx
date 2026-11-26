@@ -71,7 +71,7 @@ describe('routes', () => {
     await user.type(screen.getByLabelText('Email'), 'ana@x.com');
     await user.type(screen.getByLabelText('Password'), 'password1');
     await user.click(screen.getByRole('button', { name: 'Log in' }));
-    expect(await screen.findByRole('heading', { name: 'Profile' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Ana' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/profile');
     expect(router.state.location.hash).toBe('#ideas');
   });

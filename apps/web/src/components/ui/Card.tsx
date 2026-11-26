@@ -14,6 +14,8 @@ export function Card({
   badge,
   status,
   action,
+  titleId,
+  statusAction,
 }: {
   href?: string;
   title: string;
@@ -24,6 +26,10 @@ export function Card({
   badge?: string;
   status?: { tone: 'pending' | 'approved' | 'rejected'; line: string };
   action?: ReactNode;
+  /** Id for the title, so a link in the card can describe itself by it. */
+  titleId?: string;
+  /** A link under the status line, above the card's own link layer. */
+  statusAction?: ReactNode;
 }) {
   return (
     <article className="group relative isolate flex flex-col gap-3">
@@ -54,7 +60,10 @@ export function Card({
       {action && <div className="absolute right-3 top-3 z-10">{action}</div>}
       <div className="flex flex-col gap-1">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="line-clamp-2 font-display text-xl font-semibold leading-[1.2] tracking-[-0.01em] text-fg">
+          <h3
+            id={titleId}
+            className="line-clamp-2 font-display text-xl font-semibold leading-[1.2] tracking-[-0.01em] text-fg"
+          >
             {href ? (
               <Link to={href} className="rounded-sm after:absolute after:inset-0">
                 {title}
@@ -86,7 +95,8 @@ export function Card({
             {status.line}
           </p>
         )}
-        {chip && <div className="mt-1 flex">{chip}</div>}
+        {statusAction && <div className="relative z-10 flex">{statusAction}</div>}
+        {chip && <div className="mt-1 flex flex-wrap gap-2">{chip}</div>}
       </div>
     </article>
   );
