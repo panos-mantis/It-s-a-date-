@@ -3,7 +3,15 @@ import { Lightbulb, Plus, WifiOff } from 'lucide-react';
 import { Fragment, useId } from 'react';
 import { Link } from 'react-router';
 import { paths } from '../../app/paths';
-import { Button, buttonClasses, Card, CardSkeleton, Chip, EmptyState } from '../../components/ui';
+import {
+  Button,
+  buttonClasses,
+  Card,
+  CardSkeleton,
+  Chip,
+  EmptyState,
+  useToast,
+} from '../../components/ui';
 import { ideaMeta } from '../../lib/labels';
 import { tagIcon } from '../../lib/tag-icons';
 import { useMe } from '../auth/api';
@@ -81,6 +89,16 @@ function MyIdeaCard({ idea }: { idea: IdeaDTO }) {
 export function ProfilePage() {
   const me = useMe();
   const ideas = useMyIdeas();
+  const toast = useToast();
+
+  async function showMore() {
+    const result = await ideas.fetchNextPage();
+    if (result.isFetchNextPageError) {
+      toast.show("We couldn't load more ideas. Check your connection and try again.", {
+        tone: 'error',
+      });
+    }
+  }
   const user = me.data;
   const items = ideas.data?.pages.flatMap((p) => p.items) ?? [];
   const total = ideas.data?.pages[0]?.total ?? 0;
@@ -121,7 +139,7 @@ export function ProfilePage() {
       <EmptyState
         icon={Lightbulb}
         title="You haven't shared an idea yet."
-        body="Share a date idea and it will show up here while it waits for review."
+        body="Got a date you'd happily go on again? Share it, and once an admin approves it, everyone can find it on Home."
         action={
           <Link to={paths.share} className={buttonClasses()}>
             Share an idea
@@ -142,7 +160,7 @@ export function ProfilePage() {
             <Button
               variant="secondary"
               busy={ideas.isFetchingNextPage}
-              onClick={() => void ideas.fetchNextPage()}
+              onClick={() => void showMore()}
             >
               Show more
             </Button>

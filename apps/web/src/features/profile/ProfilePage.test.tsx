@@ -84,6 +84,11 @@ describe('Profile', () => {
     ideaStore.set([]);
     const { user, router } = renderApp('/profile');
     expect(await screen.findByText("You haven't shared an idea yet.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Got a date you'd happily go on again? Share it, and once an admin approves it, everyone can find it on Home.",
+      ),
+    ).toBeInTheDocument();
     await user.click(within(screen.getByRole('main')).getByRole('link', { name: 'Share an idea' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/share'));
   });
@@ -158,5 +163,30 @@ describe('Profile with a 50-character name', () => {
     expect(container.querySelectorAll('wbr').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('@example.com')).toHaveClass('whitespace-nowrap');
     await screen.findByRole('heading', { level: 2, name: /Your ideas/ });
+  });
+});
+
+describe('Profile show more failure', () => {
+  it('keeps the grid and shows an error toast', async () => {
+    login();
+    const base = ideaFixtures.find((i) => i.status === 'pending')!;
+    server.use(
+      http.get('*/api/v1/me/ideas', ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page') ?? 1);
+        if (page > 1)
+          return HttpResponse.json({ error: { code: 'X', message: 'no' } }, { status: 500 });
+        return HttpResponse.json({
+          items: [{ ...base, title: 'Page 1 idea' }],
+          page,
+          pageSize: 1,
+          total: 2,
+        });
+      }),
+    );
+    const { user } = renderApp('/profile');
+    await screen.findByRole('heading', { level: 3, name: 'Page 1 idea' });
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(await screen.findByText(/We couldn't load more ideas/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Page 1 idea' })).toBeInTheDocument();
   });
 });
