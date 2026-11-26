@@ -34,7 +34,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(0);
   const clocks = useRef(new Map<number, Clock>());
-  const latestId = useRef<number | null>(null);
 
   const forget = useCallback((id: number) => {
     const clock = clocks.current.get(id);
@@ -79,7 +78,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const show = useCallback(
     (message: string, opts?: { tone?: Tone; action?: ToastAction }) => {
       const id = nextId.current++;
-      latestId.current = id;
       const active = document.activeElement;
       clocks.current.set(id, {
         timer: null,
@@ -104,8 +102,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hasToasts) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape' || latestId.current === null) return;
-      const id = latestId.current;
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      const id = [...clocks.current.keys()].pop();
+      if (id === undefined) return;
       const opener = clocks.current.get(id)?.opener;
       dismiss(id);
       if (opener?.isConnected) opener.focus();
@@ -193,8 +192,8 @@ function ToastCard({
         <button
           type="button"
           onClick={() => {
-            toast.action?.onAction();
             onDismiss(toast.id);
+            toast.action?.onAction();
           }}
           className="min-h-11 rounded-sm px-2 font-semibold text-accent-ink underline underline-offset-2"
         >

@@ -120,6 +120,20 @@ describe('Toast', () => {
     expect(fire).toHaveFocus();
   });
 
+  it('Escape still closes an older toast after the newest is gone', async () => {
+    const { user } = setup(['older']);
+    await user.click(screen.getByRole('button', { name: 'Fire' }));
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    await user.click(screen.getByRole('button', { name: 'Fire' }));
+    expect(screen.getAllByText('older')).toHaveLength(2);
+    await user.click(screen.getAllByRole('button', { name: 'Dismiss' })[1]!);
+    expect(screen.getAllByText('older')).toHaveLength(1);
+    await user.keyboard('{Escape}');
+    expect(screen.queryByText('older')).not.toBeInTheDocument();
+  });
+
   it('dismisses on click', async () => {
     const { user } = setup(['Saved.']);
     await user.click(screen.getByRole('button', { name: 'Fire' }));
