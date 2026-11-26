@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Idea detail",
+  "entry": ".open-design/itsadate-screens/idea-detail.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "standalone",
+    "site",
+    "png",
+    "jpeg",
+    "pdf"
+  ],
+  "supportingFiles": [
+    "_shared/nav.html",
+    "_shared/data.json",
+    "content.md"
+  ],
+  "createdAt": "2026-11-25T18:07:57.523Z",
+  "updatedAt": "2026-11-25T18:07:57.523Z",
+  "sourceSkillId": "od:prototype:web-prototype",
+  "collectionId": "itsadate-screens",
+  "collectionName": "It's a Date screens",
+  "screenRole": "idea-detail",
+  "screenIndex": 1,
+  "sources": [
+    {
+      "path": ".open-design/itsadate-screens/content.md",
+      "sha256": "8c0baa0091f0b8f442c91a823a075778254d31ccbf88343f0927e9fa90c820c0"
+    },
+    {
+      "path": "DESIGN.md",
+      "sha256": "d32b2f61e802aff2b3c058678f971eb878af45c2c804a063ca00950ad4e82574"
+    }
+  ],
+  "metadata": {
+    "brief": {
+      "text": "The Idea detail page of It's a Date per spec 8.4 and 8.6 for 'Golden-hour viewpoint drive': photo with save heart and count, title, tags, meta, rating summary, description, 'Your rating' input, and a compact places card ('Find places near me'); results (list, static OSM map, 3/5/10 km) and other states on a States board behind a 'Show design states' toggle.",
+      "answers": {
+        "purpose": "Explaining a product or service",
+        "theme": "Light",
+        "density": "A multi-section site page"
+      },
+      "assumptions": [
+        "Light theme only (spec section 4)",
+        "Logged in as Maya Chen on the main view, who has saved this idea and rated it 4; logged-out variant on the States board",
+        "Places start collapsed (owner round 1): compact card with the one coral fill; 'Places found' is a States board frame",
+        "States board is design-only, in a closed details toggle under the page",
+        "The map is a static drawn panel with OSM attribution, no real tiles (Leaflet comes in Phase 6)",
+        "Idea values follow content.md (idea 5: $ · Half day, 4.7 from 89 ratings, Sam Okafor)"
+      ]
+    },
+    "flow": {
+      "plan": {
+        "screens": [
+          {
+            "id": "home",
+            "title": "Home",
+            "role": "Browse and filter approved date ideas"
+          },
+          {
+            "id": "idea-detail",
+            "title": "Idea detail",
+            "role": "Read one idea, rate it, save it, find places near me"
+          },
+          {
+            "id": "share",
+            "title": "Share an idea",
+            "role": "Submit a new idea for review",
+            "end": true
+          },
+          {
+            "id": "auth",
+            "title": "Log in and sign up",
+            "role": "Get an account or log back in"
+          },
+          {
+            "id": "profile",
+            "title": "Profile",
+            "role": "My ideas with their status, and my saved ideas"
+          },
+          {
+            "id": "admin",
+            "title": "Admin",
+            "role": "Review pending ideas, edit ideas, manage tags and users"
+          },
+          {
+            "id": "not-found",
+            "title": "Page not found",
+            "role": "A friendly 404 with a way home"
+          }
+        ],
+        "links": [
+          {
+            "from": "home",
+            "trigger": "an idea card",
+            "to": "idea-detail"
+          },
+          {
+            "from": "home",
+            "trigger": "Share an idea",
+            "to": "share"
+          },
+          {
+            "from": "home",
+            "trigger": "Log in",
+            "to": "auth"
+          },
+          {
+            "from": "home",
+            "trigger": "Profile",
+            "to": "profile"
+          },
+          {
+            "from": "home",
+            "trigger": "Admin",
+            "to": "admin"
+          },
+          {
+            "from": "idea-detail",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "idea-detail",
+            "trigger": "Log in to rate",
+            "to": "auth"
+          },
+          {
+            "from": "share",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "auth",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "profile",
+            "trigger": "an idea card",
+            "to": "idea-detail"
+          },
+          {
+            "from": "profile",
+            "trigger": "Share an idea",
+            "to": "share"
+          },
+          {
+            "from": "admin",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "not-found",
+            "trigger": "Back to all ideas",
+            "to": "home"
+          }
+        ],
+        "nav": [
+          {
+            "label": "It's a Date",
+            "to": "home"
+          },
+          {
+            "label": "Share an idea",
+            "to": "share"
+          },
+          {
+            "label": "Your ideas",
+            "to": "profile"
+          }
+        ],
+        "tasks": [
+          {
+            "name": "Find an idea and the places near me",
+            "start": "home",
+            "end": "idea-detail",
+            "maxSteps": 1
+          },
+          {
+            "name": "Share an idea",
+            "start": "home",
+            "end": "share",
+            "maxSteps": 1
+          },
+          {
+            "name": "Check on an idea I shared",
+            "start": "home",
+            "end": "profile",
+            "maxSteps": 1
+          }
+        ]
+      },
+      "screenId": "idea-detail"
+    },
+    "critique": {
+      "verdict": "polish",
+      "findings": [
+        {
+          "area": "colour-contrast",
+          "fix": "Make .map-pin.is-active a dark ring (0 0 0 2px var(--surface), 0 0 0 4px var(--fg)) so coral-ink means only \"you\", and remove is-active from row 1 and pin 1 in the static frame so nothing is lit until a tap or focus.",
+          "where": "6 · Places found, map and list (phone and desktop)",
+          "problem": "The selected pin 1 has the same coral-ink ring as the \"You are here\" dot (.map-pin.is-active and .you-dot both use --accent-ink), and on phone the two sit side by side; row 1 is also shown lit by default, which on a phone (no hover) reads as a selection."
+        },
+        {
+          "area": "typography",
+          "fix": "Use the same heading in both: \"Viewpoints <em>near you</em>\" at the same size (xl 24px), so expanding changes only the content below it.",
+          "where": "Compact places card (desktop 1/9, phone 2/9) vs 6 · Places found heading",
+          "problem": "The compact card says \"Viewpoints near you\" in plain type at about 20px, but the results it opens into say \"Viewpoints <em>near you</em>\" at about 30px, so the heading jumps in size and style when the card expands."
+        },
+        {
+          "area": "states",
+          "fix": "On phone, while the list is collapsed, fade pins 6 and 7 to about 40% opacity, and bring them back at full strength when \"Show all 7\" expands the list.",
+          "where": "6 · Places found, phone",
+          "problem": "The map shows all 7 pins while the list shows only the nearest 5, so pins 6 and 7 have no row until \"Show all 7\"."
+        }
+      ],
+      "at": "2026-11-25T11:36:27.490Z",
+      "checkRunId": "2026-11-25T11-31-47"
+    }
+  }
+}

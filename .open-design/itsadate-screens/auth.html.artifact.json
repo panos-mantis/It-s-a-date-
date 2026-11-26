@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Log in and sign up",
+  "entry": ".open-design/itsadate-screens/auth.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "standalone",
+    "site",
+    "png",
+    "jpeg",
+    "pdf"
+  ],
+  "supportingFiles": [
+    "_shared/data.json",
+    "content.md"
+  ],
+  "createdAt": "2026-11-25T18:39:21.736Z",
+  "updatedAt": "2026-11-25T18:39:21.736Z",
+  "sourceSkillId": "od:prototype:flow-sign-in",
+  "collectionId": "itsadate-screens",
+  "collectionName": "It's a Date screens",
+  "screenRole": "auth",
+  "screenIndex": 3,
+  "sources": [
+    {
+      "path": ".open-design/itsadate-screens/content.md",
+      "sha256": "4542c28f1a0f857ae94bb75782c0da357fc7b98ac97f46c4125f62289a215a7e"
+    },
+    {
+      "path": "DESIGN.md",
+      "sha256": "d32b2f61e802aff2b3c058678f971eb878af45c2c804a063ca00950ad4e82574"
+    }
+  ],
+  "metadata": {
+    "brief": {
+      "text": "Log in and Sign up for It's a Date in one file: 'Welcome back' and 'Create your account' cards on cream, side by side on desktop and stacked on phone, each linking to the other, logged-out header; States board behind a 'Show design states' toggle with wrong password, email taken, field validation, busy, network error and the ?next hint 'Log in to share your idea'.",
+      "answers": {
+        "platform": "Web app",
+        "density": "Medium"
+      },
+      "assumptions": [
+        "Light theme only (spec section 4)",
+        "Log in and Sign up only: no forgot password, magic link or code screens (spec section 4)",
+        "Logged-out header: Log in / Sign up instead of the avatar menu",
+        "Copy that exists in apps/web/src/features/auth is binding",
+        "States board is design-only, in a closed details toggle under the page",
+        "Email and password only, no social sign-in (the API has none)"
+      ]
+    },
+    "flow": {
+      "plan": {
+        "screens": [
+          {
+            "id": "home",
+            "title": "Home",
+            "role": "Browse and filter approved date ideas"
+          },
+          {
+            "id": "idea-detail",
+            "title": "Idea detail",
+            "role": "Read one idea, rate it, save it, find places near me"
+          },
+          {
+            "id": "share",
+            "title": "Share an idea",
+            "role": "Submit a new idea for review",
+            "end": true
+          },
+          {
+            "id": "auth",
+            "title": "Log in and sign up",
+            "role": "Get an account or log back in"
+          },
+          {
+            "id": "profile",
+            "title": "Profile",
+            "role": "My ideas with their status, and my saved ideas"
+          },
+          {
+            "id": "admin",
+            "title": "Admin",
+            "role": "Review pending ideas, edit ideas, manage tags and users"
+          },
+          {
+            "id": "not-found",
+            "title": "Page not found",
+            "role": "A friendly 404 with a way home"
+          }
+        ],
+        "links": [
+          {
+            "from": "home",
+            "trigger": "an idea card",
+            "to": "idea-detail"
+          },
+          {
+            "from": "home",
+            "trigger": "Share an idea",
+            "to": "share"
+          },
+          {
+            "from": "home",
+            "trigger": "Log in",
+            "to": "auth"
+          },
+          {
+            "from": "home",
+            "trigger": "Profile",
+            "to": "profile"
+          },
+          {
+            "from": "home",
+            "trigger": "Admin",
+            "to": "admin"
+          },
+          {
+            "from": "idea-detail",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "idea-detail",
+            "trigger": "Log in to rate",
+            "to": "auth"
+          },
+          {
+            "from": "share",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "auth",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "profile",
+            "trigger": "an idea card",
+            "to": "idea-detail"
+          },
+          {
+            "from": "profile",
+            "trigger": "Share an idea",
+            "to": "share"
+          },
+          {
+            "from": "admin",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "not-found",
+            "trigger": "Back to all ideas",
+            "to": "home"
+          }
+        ],
+        "nav": [
+          {
+            "label": "It's a Date",
+            "to": "home"
+          },
+          {
+            "label": "Share an idea",
+            "to": "share"
+          },
+          {
+            "label": "Your ideas",
+            "to": "profile"
+          }
+        ],
+        "tasks": [
+          {
+            "name": "Find an idea and the places near me",
+            "start": "home",
+            "end": "idea-detail",
+            "maxSteps": 1
+          },
+          {
+            "name": "Share an idea",
+            "start": "home",
+            "end": "share",
+            "maxSteps": 1
+          },
+          {
+            "name": "Check on an idea I shared",
+            "start": "home",
+            "end": "profile",
+            "maxSteps": 1
+          }
+        ]
+      },
+      "screenId": "auth"
+    },
+    "critique": {
+      "verdict": "polish",
+      "findings": [
+        {
+          "area": "layout-rhythm",
+          "fix": "Remove padding-inline: 8px from the live .site-nav phone rule so it keeps var(--gutter) of 16px. Change .nav-actions gap from 4px to 2px and give the ghost 'Log in' button padding 0 6px under 400px, keeping each target at least 44px tall.",
+          "where": "site header, phone (360px), live page",
+          "problem": "The phone header uses padding-inline: 8px, so the wordmark sits about 8px from the edge while the cards below start at the 16px gutter."
+        },
+        {
+          "area": "states",
+          "fix": "While the password error shows, hide the helper and point aria-describedby at the error only. Bring the helper back once the value has 8 or more characters.",
+          "where": "states board, frame 3 'Field checks', Sign up password field",
+          "problem": "The error 'Use at least 8 characters.' and the helper 'At least 8 characters.' sit stacked under the same field, saying the same rule twice."
+        },
+        {
+          "area": "states",
+          "fix": "Put 'Log in instead' on its own line under the error message at 14px weight 600 in coral ink, with padding 4px 0 so its tap area is at least 24px tall. Keep the error message at 12px danger.",
+          "where": "states board, frame 2 'Email already has an account', 'Log in instead' link (phone)",
+          "problem": "The main way out of this error is a 12px inline link about 16px tall that wraps onto its own line on a phone."
+        },
+        {
+          "area": "task",
+          "fix": "Resolve it where it belongs: Home's avatar menu 'Your ideas' links to profile once the profile screen is designed.",
+          "where": "critiqueInput.tasks, 'Check on an idea I shared'",
+          "problem": "The task is marked unreachable; a logged-out auth screen can't fix it."
+        }
+      ],
+      "at": "2026-11-25T12:01:16.342Z",
+      "checkRunId": "2026-11-25T11-54-49"
+    }
+  }
+}

@@ -1,14 +1,14 @@
 # START HERE — resuming the It's a Date modernization
 
-Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in a new session, then the files it points to.
+Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 built, PR pending). Read this first in a new session, then the files it points to.
 
 ## How to resume
 
 1. Open the folder `C:\Users\manti\Desktop\its-a-date` in VS Code and start a **new** Claude Code conversation.
-2. Phases 2 and 3 are built (PRs pending). Phase 4 is next, and Phase 5 starts after Phases 2, 3 and 4 have merged. Their plans aren't written yet. Each conversation writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below. Then it executes the plan.
-   - **Phase 2 (API) is built** on branch `phase-2-api`; merge its PR into `modernize` first.
-   - **Phase 3 (web foundation)** is built and reviewed on `phase-3-web`. Its PR is open: https://github.com/panos-mantis/It-s-a-date-/pull/5 (CI green). The owner merges it after the click-test in the PR body.
-   - **Phase 4 (designs)** can optionally run in parallel. It needs the owner present to sign off the Home and Idea detail screens. Use the same prompt with "Phase 4", plus the worktree line.
+2. Phases 2 and 3 are merged into `modernize` (PR #4 and PR #5). **Phase 4 (designs) is built** on branch `phase-4-designs`. It isn't pushed yet, and its PR is pending. Phase 5 starts after Phase 4 merges. Each later phase writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below, then executes it.
+   - **To finish Phase 4,** follow the **Status** section at the top of `docs/superpowers/plans/2026-11-25-phase-4-designs.md`. Only Task 8 is left: the whole-branch review, then push and open the PR into `modernize`.
+   - Prompt for a new session: "Read docs/superpowers/START-HERE.md and do Phase 4 Task 8 from the plan's Status section."
+   - **Phase 5 ports from** `.open-design/itsadate-screens/HANDOFF.md` (see the hand-off notes below).
 3. Each phase ends with its own PR into `modernize`. Phase 5 starts after 2, 3 and 4 have merged.
 
 **Execution method (owner's choice): agent per task.** Use superpowers:subagent-driven-development.
@@ -28,7 +28,19 @@ Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in
 
 ## Where things stand
 
-**Phase 3 (web foundation) is built on branch `phase-3-web`. PR #5 into `modernize` is open (https://github.com/panos-mantis/It-s-a-date-/pull/5), CI green, waiting on the owner's click-test and merge.**
+**Phase 4 (designs) is built on `phase-4-designs`. The PR is pending (Task 8).**
+- All 7 screens are designed, checked, critiqued and reviewed, in `.open-design/itsadate-screens/`: Home, Idea detail, Share an idea, Log in and sign up, Profile, Admin and Page not found. Each works at desktop and phone width.
+- The owner signed off Home and Idea detail on 2026-11-25 ("i let you decide im fine with everything", after round 1).
+- The collection check passes: no broken links, dead ends, unlinked screens or unreachable tasks. The one nav drift left, on auth's logged-out header, is accepted.
+- Details, rulings and the commit list are in the plan's Status section.
+
+**Hand-off notes (Phase 5, from Phase 4)**
+- Read `.open-design/itsadate-screens/HANDOFF.md` first. Per screen, it gives the path, the states and the kit components used. It also lists the new components to build, every change to the Phase 3 kit and header ("Phase 5 restyles"), the API gaps, the parked reviewer notes and the prototype-only behaviour not to copy.
+- Port one screen at a time with `port_open_design_artifact_to_app`. The "Show design states" toggle on each screen is design-only: port the frames inside it, not the toggle.
+- API gaps to close in Phase 5: add `q` to the admin ideas query (R31). Decide whether budget and duration can be cleared to null (R32).
+- `content.md` and `_shared/data.json` in that folder hold the sample content. `data.json` is close to the DTO shapes (`packages/shared/src/dto.ts`): before using it in MSW mocks, map `tags` slugs to `TagDTO` objects, `image` to `{url, publicId}` (alt and credit are design-only), and dates to ISO timestamps (R37).
+
+**Phase 3 (web foundation) is merged into `modernize` (PR #5, 2026-11-25).** The notes below are kept for Phase 5.
 - Built: Tailwind v4 theme, UI kit, typed API client, auth hooks, router, layout, header with account menu, and the log in and sign up pages. Setup is in `README.md`.
 - Checked against the real API through the Vite proxy (register, me, logout, login, wrong password): all as expected.
 - The throwaway dev user from that check is `phase3-check-1795565405@itsadate-dev.test` (in the dev database, `itsadate_dev`; it was created through the local API, which reads `apps/api/.env`).
@@ -36,7 +48,7 @@ Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in
 
 **Hand-off notes (Phase 5, web)**
 - The kit's components and props live in `apps/web/src/components/ui/index.ts`. `Card` handles `image: null`.
-- Still to build: the phone search sheet and the real Home page.
+- Still to build: the phone search sheet and the real Home page. Both are designed now (Phase 4, `HANDOFF.md`).
 - Tag icons are Lucide names. Use a curated name to component map. Don't import the whole `icons` object.
 - `renderApp` (`src/test/render.tsx`) and `authStore` exist for page tests.
 - `react-router` is pinned to 7.x (8.x exists; the spec names 7).
@@ -50,7 +62,7 @@ Last updated: 2026-11-25 (Phases 2 and 3 built, PRs pending). Read this first in
 - Query keys starting with `'auth'` are exempt from the 401 handling and survive logout. `useLogout` callers must navigate away (the guard sends a successful logout to home). Login and register clear all non-auth queries.
 - `vite preview` now proxies `/api` too (port 4173).
 
-**Phase 2 is built on branch `phase-2-api`; the PR into `modernize` is pending review.**
+**Phase 2 (API) is merged into `modernize` (PR #4).**
 - The API is rebuilt (`/api/v1`, cookie auth, roles, tags, ideas, admin) with `migrate`, `create-admin` and `seed` scripts. The legacy API (`apps/api/legacy/`) is deleted from git, so `reset-admins` and `copy-to-dev` are gone. Setup and script commands are in `README.md`.
 - Dev DB `itsadate_dev` is migrated and seeded (53 ideas). The owner's dev admin `png.mantis@gmail.com` exists.
 - The local env now lives at **`apps/api/.env`** (untracked, ignored). `apps/api/legacy/.env` is kept on disk as a backup (untracked); the owner deletes it after Phase 7.

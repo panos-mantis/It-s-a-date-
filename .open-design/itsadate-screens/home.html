@@ -1,0 +1,1285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>It's a Date · Home</title>
+<meta name="description" content="Home: browse and filter approved date ideas. Screen 1 of 7 in It's a Date screens.">
+<!--
+  It's a Date · Home (screen 1 of 7, collection itsadate-screens)
+  Data: _shared/data.json and content.md (same ideas, users and photos on every screen).
+  Filters are URL query state: ?q=&tag=&budget=&duration=&sort=
+    q        What (text search, 1–100 chars)
+    tag      Vibe (tag slug: food, adventure, home, self-date, board-game, dancing, self-care, learning)
+    budget   1 | 2 | 3  ($ / $$ / $$$)
+    duration short | half-day | full-day  (in the Filters pill on desktop, in the sheet on phones)
+    sort     new (default) | top
+  Page size 24 (PAGE_SIZE_DEFAULT). "Show more" loads the next page (&page=2).
+  The main grid shows 12 cards to keep this mockup short.
+  The States board sits in a closed <details> ("Show design states") under the page. It is design-only
+  and not part of the real page: Phase 5 ports the frames, not the toggle.
+  Kit components carry data-component so the Phase 5 port maps them onto apps/web/src/components/ui/.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..600,0..100,0..1;1,9..144,400..600,0..100,0..1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FBF6F0;
+  --surface: #FFFDF9;
+  --surface-sunk: #F4EBE0;
+  --fg: #2A1A14;
+  --muted: #6E5D52;
+  --border: #E6D9CB;
+  --accent: #F06A4C;
+  --accent-hover: #F4826A;
+  --accent-ink: #B23E23;
+  --accent-soft: #FDE7DE;
+  --success: #2E7D4F;
+  --warn: #9A6400;
+  --danger: #B42C2C;
+  --overlay: rgba(255, 253, 249, 0.94);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --soft: "SOFT" 100, "WONK" 0;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --elev-raised: 0 1px 2px rgba(42, 26, 20, 0.06), 0 8px 24px rgba(42, 26, 20, 0.08);
+  --elev-search: 0 1px 2px rgba(42, 26, 20, 0.08), 0 6px 18px rgba(42, 26, 20, 0.07);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --gutter: 16px;
+  --header-h: 64px;
+}
+@media (min-width: 640px) { :root { --gutter: 28px; } }
+@media (min-width: 1024px) { :root { --gutter: 40px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 500; }
+p { margin: 0; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+button, input, select { font: inherit; color: inherit; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+.icon-muted { color: var(--muted); }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 50;
+  background: var(--accent); color: var(--fg); font-weight: 600;
+  padding: 8px 16px; border-radius: var(--radius-md); text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+.container { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter); }
+
+/* Buttons (data-component="Button") */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap; border: 1.5px solid transparent; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-weight: 600; letter-spacing: 0.02em;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.btn-md { padding: 12px 24px; font-size: 16px; min-height: 48px; }
+.btn-sm { padding: 8px 16px; font-size: 14px; min-height: 44px; }
+.btn-primary { background: var(--accent); color: var(--fg); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--fg); }
+.btn-secondary:hover { background: var(--surface-sunk); }
+.btn-ghost { background: transparent; color: var(--accent-ink); }
+.btn-ghost:hover { text-decoration: underline; }
+
+/* Header (matches apps/web Header.tsx + AccountMenu.tsx) */
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms var(--ease);
+}
+.site-header.is-scrolled, .site-header.is-static { border-bottom-color: var(--border); }
+.site-header.is-static { position: relative; z-index: 2; }
+.site-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  height: var(--header-h); width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter);
+}
+.wordmark {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-family: var(--font-display); font-variation-settings: var(--soft);
+  font-style: italic; font-weight: 500; font-size: 20px; text-decoration: none;
+  border-radius: var(--radius-sm); min-height: 44px;
+}
+.wordmark-heart { width: 16px; height: 16px; fill: var(--accent); stroke: var(--accent); stroke-width: 1.75; stroke-linejoin: round; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-share-icon { display: none; }
+.account { position: relative; }
+.account-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: 4px 12px 4px 4px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+  background: var(--surface); font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.account-btn:hover { background: var(--surface-sunk); }
+.avatar {
+  width: 32px; height: 32px; border-radius: var(--radius-pill);
+  display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 14px; font-weight: 600;
+}
+.account-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 192px;
+  display: flex; flex-direction: column; gap: 4px; padding: 8px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  box-shadow: var(--elev-raised);
+}
+.account-menu[hidden] { display: none; }
+.menu-item {
+  display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: var(--radius-sm);
+  background: none; text-align: left; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.menu-item:hover { background: var(--surface-sunk); }
+.nav-share-short { display: none; }
+.nav-share-short::before { content: "Share"; } /* phone label as CSS content, so the link text reads "Share an idea" */
+/* Phone header: "Your ideas" moves into the account menu; Share keeps a short label as a ghost pill. */
+.site-nav.is-compact .nav-share-label, .site-nav.is-compact .account-name, .site-nav.is-compact .nav-ideas { display: none; }
+.site-nav.is-compact .nav-share-icon, .site-nav.is-compact .nav-share-short { display: block; }
+.site-nav.is-compact .nav-share { gap: 2px; padding: 0 10px 0 8px; border-color: var(--border); border-width: 1px; border-radius: var(--radius-pill); }
+.site-nav.is-compact .nav-share-icon { width: 16px; height: 16px; }
+.site-nav.is-compact .wordmark { font-size: 18px; }
+.site-nav.is-compact .nav-actions { gap: 4px; }
+.site-nav.is-compact .account-btn { padding-right: 8px; }
+.site-nav.is-compact { padding-inline: 16px; }
+@media (max-width: 639px) {
+  .nav-actions { gap: 4px; }
+  .btn-sm { padding: 0 10px; }
+  .wordmark { font-size: 18px; }
+  /* Board frames are narrower than a real phone: let their header row wrap instead of spilling out. */
+  .frame .site-nav { padding-inline: 8px; flex-wrap: wrap; height: auto; min-height: var(--header-h); padding-block: 8px; }
+  .site-nav .nav-share-label, .site-nav .account-name, .site-nav .nav-ideas { display: none; }
+  .site-nav .nav-share-icon, .site-nav .nav-share-short { display: block; }
+  .site-nav .nav-share-icon { width: 16px; height: 16px; }
+  .site-nav .nav-share { gap: 2px; padding: 0 10px 0 8px; border-color: var(--border); border-width: 1px; border-radius: var(--radius-pill); }
+  .site-nav .account-btn { padding-right: 8px; }
+}
+@media (max-width: 359px) {
+  /* WCAG reflow at 320px: the actions drop under the wordmark instead of pushing the page sideways. */
+  .site-nav { height: auto; min-height: var(--header-h); flex-wrap: wrap; padding-block: 8px; }
+}
+
+/* Hero */
+.hero { padding-top: 48px; text-align: center; }
+.hero h1, .hero-title { font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 500; font-size: 48px; line-height: 1.08; letter-spacing: -0.025em; text-wrap: balance; }
+.hero h1 em, .hero-title em, .board-head h2 em { font-style: italic; font-weight: 400; }
+
+/* Search (data-component="SearchBar") */
+.search-band {
+  position: sticky; top: var(--header-h); z-index: 20;
+  background: var(--bg); padding: 24px 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms var(--ease);
+}
+/* Once stuck under the header, a hairline shows that the cards slide under it. */
+.search-band.is-stuck { border-bottom-color: var(--border); }
+.search-row { display: flex; justify-content: center; align-items: center; gap: 12px; }
+.searchbar {
+  display: flex; align-items: center; flex: 0 1 720px; min-width: 520px;
+  padding: 8px 8px 8px 0;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill);
+  box-shadow: var(--elev-search);
+}
+.seg {
+  position: relative; flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 2px 20px; border-right: 1px solid var(--border);
+}
+.seg:first-child { flex-grow: 1.5; padding-left: 28px; }
+.seg:nth-child(3) { border-right: 0; }
+.seg-label { font-size: 12px; font-weight: 600; line-height: 1.4; }
+.seg-field {
+  width: 100%; padding: 0; border: 0; background: transparent; border-radius: 6px;
+  font-size: 14px; line-height: 1.5; -webkit-appearance: none; appearance: none; cursor: pointer;
+}
+.seg-field::placeholder { color: var(--muted); opacity: 1; }
+input.seg-field { cursor: text; }
+select.seg-field { padding-right: 20px; }
+select.seg-field.is-empty { color: var(--muted); }
+.seg-chevron { position: absolute; right: 18px; bottom: 6px; width: 16px; height: 16px; color: var(--muted); pointer-events: none; }
+.search-btn {
+  width: 44px; height: 44px; flex-shrink: 0; margin-left: 4px;
+  display: grid; place-items: center; border: 0; border-radius: var(--radius-pill);
+  background: var(--accent); color: var(--fg); cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.search-btn:hover { background: var(--accent-hover); }
+.filters { position: relative; }
+.pill-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill);
+  font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background-color 150ms var(--ease);
+}
+.pill-btn:hover { background: var(--surface-sunk); }
+.pill-count {
+  min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-pill);
+  display: inline-grid; place-items: center; background: var(--fg); color: var(--surface);
+  font-size: 12px; font-weight: 600;
+}
+.popover {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 25; width: 360px; max-width: calc(100vw - 32px);
+  padding: 20px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--elev-raised);
+}
+.popover[hidden] { display: none; }
+.popover-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+
+/* Phone search pill */
+.search-pill {
+  display: none; width: 100%; align-items: center; gap: 14px; min-height: 60px;
+  padding: 8px 20px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-pill); box-shadow: var(--elev-search); text-align: left; cursor: pointer;
+}
+.search-pill-text { display: flex; flex-direction: column; min-width: 0; }
+.search-pill-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.search-pill-sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
+@media (max-width: 767px) {
+  .search-band .searchbar, .search-band .filters { display: none; }
+  .search-band .search-pill { display: flex; }
+  .search-band { padding: 20px 0; }
+}
+
+/* Category row (data-component="CategoryRow") */
+.cat-scroll { overflow-x: auto; scrollbar-width: none; margin-top: 16px; }
+.cat-scroll::-webkit-scrollbar { display: none; }
+.cat-row { display: flex; gap: 48px; width: max-content; margin: 0 auto; padding: 4px; list-style: none; }
+.cat-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 48px;
+  padding: 6px 4px 10px; border: 0; border-bottom: 2px solid transparent; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: none; color: var(--muted); font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer;
+  transition: color 200ms var(--ease), border-color 200ms var(--ease);
+}
+.cat-btn .icon { width: 26px; height: 26px; }
+.cat-btn:hover { color: var(--fg); }
+.cat-btn[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.cat-row.is-compact { gap: 28px; margin: 0; padding-inline: 16px; }
+@media (max-width: 767px) {
+  .cat-scroll { margin-inline: calc(var(--gutter) * -1); }
+  .cat-row { gap: 28px; margin: 0; padding-inline: var(--gutter); }
+}
+
+/* Toolbar + sort */
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 24px;
+}
+.toolbar h2 { font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+.toggle {
+  display: inline-flex; padding: 4px; gap: 2px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill);
+}
+.toggle button {
+  min-height: 40px; padding: 0 16px; border: 0; border-radius: var(--radius-pill);
+  background: none; color: var(--muted); font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease);
+}
+.toggle button:hover { color: var(--fg); }
+.toggle button[aria-pressed="true"] { background: var(--surface-sunk); color: var(--fg); font-weight: 600; }
+.toggle.is-full { display: flex; }
+.toggle.is-full button { flex: 1; }
+@media (max-width: 639px) { .toggle button { min-height: 44px; } }
+
+/* Idea grid + card (data-component="Card") */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 24px; row-gap: 40px; }
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.card { position: relative; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card-media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-sunk); }
+.card-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 150ms var(--ease); }
+.card:hover .card-media img { transform: scale(1.03); }
+.photo-empty { width: 100%; height: 100%; display: grid; place-items: center; color: var(--muted); }
+.photo-empty .icon { width: 32px; height: 32px; }
+.badge {
+  position: absolute; left: 12px; top: 12px;
+  padding: 4px 12px; border-radius: var(--radius-pill);
+  background: var(--overlay); box-shadow: var(--elev-raised); font-size: 12px; font-weight: 600;
+}
+.heart {
+  position: absolute; right: 6px; top: 6px; z-index: 2;
+  width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--fg);
+  display: grid; place-items: center; cursor: pointer; border-radius: var(--radius-pill);
+}
+.heart-dot {
+  width: 36px; height: 36px; border-radius: var(--radius-pill);
+  display: grid; place-items: center; background: var(--overlay); box-shadow: var(--elev-raised);
+  transition: background-color 150ms var(--ease);
+}
+.heart:hover .heart-dot { background: var(--surface); }
+.heart .icon { width: 18px; height: 18px; }
+.heart[aria-pressed="true"] .icon { fill: var(--accent-ink); stroke: var(--accent-ink); }
+.card-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.card-title {
+  min-width: 0; font-size: 20px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere;
+}
+.card-title a { text-decoration: none; }
+.card-title a::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: var(--radius-lg); }
+.card-title a:focus-visible { outline: none; }
+.card-title a:focus-visible::after { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
+.rating { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; padding-top: 3px; font-size: 14px; white-space: nowrap; }
+.rating .icon { width: 13px; height: 13px; fill: var(--fg); stroke: var(--fg); }
+.rating-value { font-weight: 600; }
+.rating-count { color: var(--muted); }
+.card-meta { font-size: 14px; color: var(--muted); }
+.card-foot { display: flex; margin-top: 4px; }
+
+/* Chip (data-component="Chip") */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: var(--radius-pill);
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.chip .icon { width: 14px; height: 14px; }
+
+/* Selectable chips (sheet, filters popover) */
+.choice-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px;
+  border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface);
+  font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.choice .icon { width: 16px; height: 16px; }
+.choice:hover { background: var(--surface-sunk); }
+.choice[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent-ink); color: var(--accent-ink); font-weight: 600; }
+
+.more { display: flex; justify-content: center; margin: 48px 0 64px; }
+
+/* Empty state (data-component="EmptyState") */
+.empty {
+  max-width: 448px; margin-inline: auto; padding: 64px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
+}
+.empty > .icon { width: 40px; height: 40px; color: var(--muted); }
+.empty h3 { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
+.empty p { color: var(--muted); }
+.empty .btn { margin-top: 8px; }
+
+/* Skeleton (data-component="Skeleton") */
+.skel { border-radius: var(--radius-md); background: var(--surface-sunk); animation: pulse 1.6s var(--ease) infinite; }
+.skel-photo { aspect-ratio: 4 / 3; border-radius: var(--radius-lg); }
+.skel-line { height: 20px; width: 75%; }
+.skel-line.short { height: 16px; width: 50%; }
+.skel-card { display: flex; flex-direction: column; gap: 12px; }
+@keyframes pulse { 50% { opacity: 0.55; } }
+
+/* Input (data-component="Input") */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 14px; font-weight: 600; }
+.input {
+  width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--muted); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: 16px;
+}
+.input::placeholder { color: var(--muted); opacity: 1; }
+.input:focus-visible { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px rgba(240, 106, 76, 0.3); }
+.helper { font-size: 12px; color: var(--muted); }
+
+/* Toast (data-component="Toast") */
+.toast {
+  display: inline-flex; align-items: center; gap: 12px; max-width: 100%;
+  padding: 12px 16px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--elev-raised); font-size: 14px; font-weight: 500;
+}
+.toast .icon { width: 18px; height: 18px; }
+.toast.is-success .icon { color: var(--success); }
+.toast.is-error .icon { color: var(--danger); }
+
+/* Search sheet (phone) */
+.sheet { display: flex; flex-direction: column; height: 100%; background: var(--surface); }
+.sheet-head {
+  display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+}
+.sheet-head h3 { font-family: var(--font-body); font-size: 16px; font-weight: 600; text-align: center; }
+.icon-btn {
+  width: 44px; height: 44px; display: grid; place-items: center; padding: 0;
+  border: 0; border-radius: var(--radius-pill); background: none; cursor: pointer;
+}
+.icon-btn:hover { background: var(--surface-sunk); }
+.sheet-body { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 24px; }
+.sheet-section { display: flex; flex-direction: column; gap: 10px; }
+.sheet-section + .sheet-section { padding-top: 24px; border-top: 1px solid var(--border); }
+.sheet-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px; border-top: 1px solid var(--border); background: var(--surface);
+}
+.sheet-overlay { position: fixed; inset: 0; z-index: 60; }
+.sheet-overlay[hidden] { display: none; }
+
+/* Design states toggle: design-only, closed by default, not part of the real page */
+.design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }
+.design-states-summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  width: 100%; max-width: 1200px; margin-inline: auto; padding: 12px var(--gutter);
+  list-style: none; cursor: pointer;
+}
+.design-states-summary::-webkit-details-marker { display: none; }
+.design-states-label {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 600;
+}
+.design-states-label .icon { width: 18px; height: 18px; transition: transform 150ms var(--ease); }
+.design-states[open] .design-states-label .icon { transform: rotate(180deg); }
+.design-states-note { font-size: 14px; color: var(--muted); }
+.design-states .when-open, .design-states[open] .when-closed { display: none; }
+.design-states[open] .when-open { display: inline; }
+/* Closed: no box at all (Chromium otherwise keeps the hidden board laid out at zero size) */
+.design-states:not([open]) > .board { display: none; }
+
+/* States board */
+.board { background: var(--surface-sunk); padding: 24px 0 96px; }
+.board-head { max-width: 65ch; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.board-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; margin-top: 8px; }
+.board-head p { margin-top: 12px; color: var(--muted); }
+.board-head code, .state-note code {
+  font-family: ui-monospace, Consolas, monospace; font-size: 14px; color: var(--fg);
+  background: var(--bg); padding: 1px 6px; border-radius: 6px; word-break: break-all;
+}
+.state { margin-top: 48px; }
+.state > .eyebrow { margin-bottom: 12px; }
+.state-note { margin-top: 12px; max-width: 65ch; font-size: 14px; color: var(--muted); }
+.frame { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.frame > .site-header, .phone .frame .site-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+#sheet-demo .sheet { border-radius: var(--radius-lg); overflow: hidden; }
+.frame-pad { padding: 24px; }
+.frame-row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.frame-row > .state { margin-top: 0; }
+.phone { width: 360px; max-width: 100%; }
+.phone .frame { position: relative; }
+#sheet-demo .sheet { height: auto; }
+#sheet-demo .sheet-body { overflow: visible; }
+.loading-note { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+.phone .frame .site-header { position: relative; }
+.phone-page { padding: 0 16px 24px; }
+.phone-page .hero { padding-top: 24px; }
+.phone-page .hero-title { font-size: 30px; }
+.phone-page .search-pill { display: flex; margin-top: 16px; }
+.phone-page .toolbar { margin-top: 16px; padding-top: 16px; margin-bottom: 16px; }
+.phone-page .cat-scroll { margin: 16px -16px 0; }
+.phone-cats { padding: 16px 0 0; }
+.phone-cats .search-pill { display: flex; margin: 0 16px 0; width: auto; }
+.menu-demo { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.menu-demo .account-menu { position: static; }
+.popover-demo { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; width: 360px; max-width: 100%; }
+.popover-demo .popover { position: static; width: 100%; }
+.demo-label { margin-bottom: 8px; }
+.toast-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+
+@media (max-width: 767px) {
+  .hero { padding-top: 32px; }
+  .hero h1, .hero-title { font-size: 30px; }
+  .board { padding: 16px 0 64px; }
+  .frame-pad { padding: 16px; }
+  .hide-sm { display: none; }
+}
+@media (max-width: 1279px) { .hide-md { display: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+  .card:hover .card-media img { transform: none; }
+}
+</style>
+</head>
+<body data-od-current="home">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+  <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-dice" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M16 8h.01"/><path d="M8 8h.01"/><path d="M8 16h.01"/><path d="M16 16h.01"/><path d="M12 12h.01"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="i-flower" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1"/><circle cx="12" cy="8" r="2"/><path d="M12 10v12"/><path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z"/><path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="i-image-off" viewBox="0 0 24 24"><path d="M2 2l20 20"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><path d="M13.5 13.5 6 21"/><path d="M18 12l3 3"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-search-x" viewBox="0 0 24 24"><path d="m13.5 8.5-5 5"/><path d="m8.5 8.5 5 5"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-lightbulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+</svg>
+
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header class="site-header" id="site-header" data-od-id="header">
+  <template data-od-include="_shared/nav.html"></template>
+</header>
+
+<main id="content" tabindex="-1">
+  <div class="page">
+    <section class="hero container" data-od-id="hero">
+      <h1>Plans worth <em>saying yes</em>&nbsp;to.</h1>
+    </section>
+
+    <section class="search-band" data-od-id="search" aria-label="Search and filters">
+      <div class="container">
+        <div class="search-row">
+          <form class="searchbar" role="search" action="home.html" method="get" data-component="SearchBar">
+            <div class="seg">
+              <label class="seg-label" for="q">What</label>
+              <input class="seg-field" id="q" name="q" type="text" placeholder="Search date ideas" autocomplete="off">
+            </div>
+            <div class="seg">
+              <label class="seg-label" for="tag">Vibe</label>
+              <select class="seg-field is-empty" id="tag" name="tag">
+                <option value="">Any vibe</option>
+                <option value="food">Food</option>
+                <option value="adventure">Adventure</option>
+                <option value="home">Home</option>
+                <option value="self-date">Self-date</option>
+                <option value="board-game">Board games</option>
+                <option value="dancing">Dancing</option>
+                <option value="self-care">Self-care</option>
+                <option value="learning">Learning</option>
+              </select>
+              <svg class="icon seg-chevron" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+            </div>
+            <div class="seg">
+              <label class="seg-label" for="budget">Budget</label>
+              <select class="seg-field is-empty" id="budget" name="budget">
+                <option value="">Any budget</option>
+                <option value="1">$</option>
+                <option value="2">$$</option>
+                <option value="3">$$$</option>
+              </select>
+              <svg class="icon seg-chevron" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+            </div>
+            <button class="search-btn" type="submit" aria-label="Search">
+              <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+            </button>
+          </form>
+          <div class="filters">
+            <button type="button" class="pill-btn" aria-expanded="false" aria-controls="filters-pop" data-pop="filters-pop">
+              <svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg>
+              Filters
+            </button>
+            <div class="popover" id="filters-pop" hidden>
+              <p class="popover-title" id="dur-label">Duration</p>
+              <div class="choice-group" role="group" aria-labelledby="dur-label" data-single>
+                <button type="button" class="choice" aria-pressed="false">1–2 hours</button>
+                <button type="button" class="choice" aria-pressed="false">Half day</button>
+                <button type="button" class="choice" aria-pressed="false">Full day</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="search-pill" aria-haspopup="dialog" aria-controls="search-sheet" data-open-sheet>
+          <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <span class="search-pill-text">
+            <span class="search-pill-title">Find a date idea</span>
+            <span class="search-pill-sub">Any vibe · Any budget · Any length</span>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <section class="container" data-od-id="categories" aria-label="Vibes">
+      <nav class="cat-scroll" aria-label="Vibes" data-component="CategoryRow">
+        <ul class="cat-row" role="list">
+          <li><button type="button" class="cat-btn" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg>All</button></li>
+          <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</button></li>
+          <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</button></li>
+          <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</button></li>
+          <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</button></li>
+          <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg>Board games</button></li>
+          <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</button></li>
+          <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</button></li>
+          <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</button></li>
+        </ul>
+      </nav>
+    </section>
+
+    <section class="container" data-od-id="ideas" aria-labelledby="ideas-title">
+      <div class="toolbar">
+        <h2 id="ideas-title">Date ideas</h2>
+        <div class="toggle" role="group" aria-label="Sort ideas" data-single data-required>
+          <button type="button" aria-pressed="true">New</button>
+          <button type="button" aria-pressed="false">Top rated</button>
+        </div>
+      </div>
+
+      <div class="grid" id="idea-grid">
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80&auto=format&fit=crop" alt="A crowded dance floor seen from above in warm light" width="800" height="600">
+            <span class="badge">New</span>
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Salsa social night"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[0].title">Salsa social night</a></h3>
+              <!-- ratingCount is 0: the rating slot is left out on cards (Idea detail says "No ratings yet") -->
+            </div>
+            <p class="card-meta">$$ · 1–2 hours</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop" alt="Market stalls piled high with fruit and vegetables" width="800" height="600">
+          </div>
+          <button type="button" class="heart" aria-pressed="true" aria-label="Saved: A slow Saturday at the farmers market, then a picnic lunch by the river for two!"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[1].title" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span>
+            </div>
+            <p class="card-meta">$ · Full day</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&q=80&auto=format&fit=crop" alt="Dumplings on a wooden plate with chopsticks" width="800" height="600">
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Dumpling crawl"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[2].title">Dumpling crawl</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 128 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(128)</span></span>
+            </div>
+            <p class="card-meta">$$ · 1–2 hours</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop" alt="Long bookshelves under warm hanging bulbs" width="800" height="600">
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Bookshop and coffee afternoon"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[3].title">Bookshop and coffee afternoon</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.9 out of 5 from 57 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.9</span><span class="rating-count">(57)</span></span>
+            </div>
+            <p class="card-meta">$ · Half day</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop" alt="Mountain valley lookout with pines" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="true" aria-label="Saved: Golden-hour viewpoint drive"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[4].title">Golden-hour viewpoint drive</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.7 out of 5 from 89 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.7</span><span class="rating-count">(89)</span></span>
+            </div>
+            <p class="card-meta">$ · Half day</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=80&auto=format&fit=crop" alt="A board game mid-play with dice and wooden pieces" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Game cafe afternoon"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[5].title">Game cafe afternoon</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.2 out of 5 from 19 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.2</span><span class="rating-count">(19)</span></span>
+            </div>
+            <p class="card-meta">$$ · Half day</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg>Board games</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800&q=80&auto=format&fit=crop" alt="A saxophone section playing under stage lights" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Dress-up night at a jazz club"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[6].title">Dress-up night at a jazz club</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.5 out of 5 from 64 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.5</span><span class="rating-count">(64)</span></span>
+            </div>
+            <p class="card-meta">$$$ · 1–2 hours</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop" alt="A home-baked pizza with cherry tomatoes and rosemary" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Pizza from scratch"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[7].title">Pizza from scratch</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.4 out of 5 from 112 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.4</span><span class="rating-count">(112)</span></span>
+            </div>
+            <p class="card-meta">$ · 1–2 hours</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop" alt="A relaxing massage at a spa" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="true" aria-label="Saved: Couples massage"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[8].title">Couples massage</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 36 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(36)</span></span>
+            </div>
+            <p class="card-meta">$$$ · Half day</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80&auto=format&fit=crop" alt="Salmon sushi rolls on a counter in low light" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Sushi counter night"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[9].title">Sushi counter night</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 73 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(73)</span></span>
+            </div>
+            <p class="card-meta">$$$ · 1–2 hours</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <div class="photo-empty" role="img" aria-label="No photo yet"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg></div>
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Backyard movie night"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[10].title">Backyard movie night</a></h3>
+              <span class="rating" role="img" aria-label="Rated 4.3 out of 5 from 41 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.3</span><span class="rating-count">(41)</span></span>
+            </div>
+            <p class="card-meta">$ · 1–2 hours</p>
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-component="Card">
+          <div class="card-media">
+            <img src="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80&auto=format&fit=crop" alt="A starry night sky with a shooting star" width="800" height="600" loading="lazy">
+          </div>
+          <button type="button" class="heart" aria-pressed="false" aria-label="Save Planetarium show"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" data-od-bind="ideas[11].title">Planetarium show</a></h3>
+              <span class="rating" role="img" aria-label="Rated 3.9 out of 5 from 8 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">3.9</span><span class="rating-count">(8)</span></span>
+            </div>
+            <!-- budget and duration are null (a migrated idea): the meta line is left out, not "null · null" -->
+            <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="more">
+        <!-- Loads the next 24 (&page=2). Hidden when every idea is already shown. -->
+        <button type="button" class="btn btn-secondary btn-md" data-component="Button">Show more</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== States board (design-only, behind a closed toggle) ===================== -->
+  <details class="design-states" data-od-id="design-states">
+    <summary class="design-states-summary">
+      <span class="design-states-label"><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg><span class="when-closed">Show design states</span><span class="when-open">Hide design states</span></span>
+      <span class="design-states-note">Design only, not part of the real page.</span>
+    </summary>
+  <section class="board" data-od-id="states-board" aria-labelledby="board-title">
+    <div class="container">
+      <div class="board-head">
+        <p class="eyebrow">States board</p>
+        <h2 id="board-title">Home, in <em>every</em> state</h2>
+        <p>Each frame is one state of this page, for the Phase 5 port. Filters live in the URL as <code>?q=&amp;tag=&amp;budget=&amp;duration=&amp;sort=</code>, so a filtered page can be shared. The grid above shows 12 cards to keep this page short; a real page holds 24 before "Show more".</p>
+      </div>
+
+      <!-- 1. Logged out -->
+      <div class="state" data-od-id="state-logged-out">
+        <p class="eyebrow">1 · Logged out</p>
+        <div class="frame">
+          <header class="site-header is-static">
+            <nav class="site-nav" aria-label="Main (logged out)">
+              <a class="wordmark" href="home.html" data-od-goto="home"><svg class="wordmark-heart" aria-hidden="true"><use href="#i-heart"/></svg>It's a Date</a>
+              <div class="nav-actions">
+                <a class="btn btn-ghost btn-sm nav-share" href="auth.html" data-od-goto="auth" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-label" aria-hidden="true">Share an idea</span><span class="nav-share-short" aria-hidden="true"></span></a>
+                <a class="btn btn-ghost btn-sm" href="auth.html" data-od-goto="auth" data-component="Button">Log in</a>
+                <a class="btn btn-secondary btn-sm" href="auth.html" data-od-goto="auth" data-component="Button">Sign up</a>
+              </div>
+            </nav>
+          </header>
+          <div class="frame-pad">
+            <div class="grid">
+              <article class="card" data-component="Card">
+                <div class="card-media">
+                  <img src="https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80&auto=format&fit=crop" alt="A crowded dance floor seen from above in warm light" width="800" height="600" loading="lazy">
+                  <span class="badge">New</span>
+                </div>
+                <a class="heart" href="auth.html" data-od-goto="auth" aria-label="Log in to save Salsa social night"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></a>
+                <div class="card-body">
+                  <div class="card-head">
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail">Salsa social night</a></h3>
+                    <!-- ratingCount is 0: no rating slot -->
+                  </div>
+                  <p class="card-meta">$$ · 1–2 hours</p>
+                  <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</span></div>
+                </div>
+              </article>
+              <article class="card hide-sm" data-component="Card">
+                <div class="card-media">
+                  <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop" alt="Market stalls piled high with fruit and vegetables" width="800" height="600" loading="lazy">
+                </div>
+                <a class="heart" href="auth.html" data-od-goto="auth" aria-label="Log in to save A slow Saturday at the farmers market, then a picnic lunch by the river for two!"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></a>
+                <div class="card-body">
+                  <div class="card-head">
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
+                    <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span>
+                  </div>
+                  <p class="card-meta">$ · Full day</p>
+                  <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+                </div>
+              </article>
+              <article class="card hide-sm hide-md" data-component="Card">
+                <div class="card-media">
+                  <img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&q=80&auto=format&fit=crop" alt="Dumplings on a wooden plate with chopsticks" width="800" height="600" loading="lazy">
+                </div>
+                <a class="heart" href="auth.html" data-od-goto="auth" aria-label="Log in to save Dumpling crawl"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></a>
+                <div class="card-body">
+                  <div class="card-head">
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail">Dumpling crawl</a></h3>
+                    <span class="rating" role="img" aria-label="Rated 4.6 out of 5 from 128 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.6</span><span class="rating-count">(128)</span></span>
+                  </div>
+                  <p class="card-meta">$$ · 1–2 hours</p>
+                  <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+                </div>
+              </article>
+              <article class="card hide-sm hide-md" data-component="Card">
+                <div class="card-media">
+                  <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop" alt="Long bookshelves under warm hanging bulbs" width="800" height="600" loading="lazy">
+                </div>
+                <a class="heart" href="auth.html" data-od-goto="auth" aria-label="Log in to save Bookshop and coffee afternoon"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></a>
+                <div class="card-body">
+                  <div class="card-head">
+                    <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail">Bookshop and coffee afternoon</a></h3>
+                    <span class="rating" role="img" aria-label="Rated 4.9 out of 5 from 57 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.9</span><span class="rating-count">(57)</span></span>
+                  </div>
+                  <p class="card-meta">$ · Half day</p>
+                  <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</span></div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Log in and Sign up replace the avatar menu, and "Your ideas" is not shown. The heart stays on every photo: for a logged-out visitor it is a link to Log in, which opens with "Log in to save ideas you like." "Share an idea" also goes to Log in, with "Log in to share your idea".</p>
+      </div>
+
+      <!-- 2. Loading -->
+      <div class="state" data-od-id="state-loading">
+        <p class="eyebrow">2 · Loading</p>
+        <div class="frame frame-pad" aria-busy="true">
+          <p class="loading-note" role="status">Loading ideas…</p>
+          <div class="grid">
+            <div class="skel-card" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+            <div class="skel-card hide-sm" data-component="Skeleton" aria-hidden="true"><div class="skel skel-photo"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div></div>
+          </div>
+        </div>
+        <p class="state-note">8 card skeletons (CardSkeleton) in the grid's shape (3 on phones, enough to fill the screen), so nothing jumps when ideas arrive. The header, search and categories stay usable. The shimmer stops under reduced motion.</p>
+      </div>
+
+      <!-- 3. No results -->
+      <div class="state" data-od-id="state-no-results">
+        <p class="eyebrow">3 · No ideas match the filters</p>
+        <div class="frame">
+          <div class="empty" data-component="EmptyState">
+            <svg class="icon" aria-hidden="true"><use href="#i-search-x"/></svg>
+            <h3>No ideas match those filters.</h3>
+            <p>Nothing for "rooftop" in Dancing at $$. Try another vibe or budget.</p>
+            <a class="btn btn-primary btn-md" href="home.html" data-component="Button">Clear filters</a>
+          </div>
+        </div>
+        <p class="state-note">Example URL: <code>?q=rooftop&amp;tag=dancing&amp;budget=2</code>. "Clear filters" goes back to <code>home.html</code> with no query, and keeps the sort.</p>
+      </div>
+
+      <!-- 4. No ideas at all -->
+      <div class="state" data-od-id="state-empty">
+        <p class="eyebrow">4 · No ideas yet</p>
+        <div class="frame">
+          <div class="empty" data-component="EmptyState">
+            <svg class="icon" aria-hidden="true"><use href="#i-lightbulb"/></svg>
+            <h3>No ideas here yet.</h3>
+            <p>Be the first to share one.</p>
+            <a class="btn btn-primary btn-md" href="share.html" data-od-goto="share" data-component="Button">Share an idea</a>
+          </div>
+        </div>
+        <p class="state-note">Shown when nothing is approved yet, or a vibe has no ideas and no other filter is set (for example a tag an admin just added).</p>
+      </div>
+
+      <!-- 5. Error -->
+      <div class="state" data-od-id="state-error">
+        <p class="eyebrow">5 · Couldn't load</p>
+        <div class="frame">
+          <div class="empty" data-component="EmptyState" role="alert">
+            <svg class="icon" aria-hidden="true"><use href="#i-wifi-off"/></svg>
+            <h3>We couldn't load ideas.</h3>
+            <p>Check your connection and try again.</p>
+            <button type="button" class="btn btn-primary btn-md" data-component="Button">Try again</button>
+          </div>
+        </div>
+        <p class="state-note">Only the grid shows the error; the search, categories and filters keep their values, so "Try again" repeats the same request.</p>
+      </div>
+
+      <!-- 6 + 7. Phone -->
+      <div class="state" data-od-id="state-phone">
+        <p class="eyebrow">6 · Phone, 360 px</p>
+        <div class="frame-row">
+          <div class="state phone">
+            <p class="eyebrow">Search collapsed</p>
+            <div class="frame">
+              <header class="site-header is-static">
+                <nav class="site-nav is-compact" aria-label="Main (phone)">
+                  <a class="wordmark" href="home.html" data-od-goto="home"><svg class="wordmark-heart" aria-hidden="true"><use href="#i-heart"/></svg>It's a Date</a>
+                  <div class="nav-actions">
+                    <a class="btn btn-ghost btn-sm nav-share" href="share.html" data-od-goto="share" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-short" aria-hidden="true"></span></a>
+                    <button type="button" class="account-btn" aria-label="Account menu for Maya Chen"><span class="avatar" aria-hidden="true">M</span><svg class="icon icon-muted" aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
+                  </div>
+                </nav>
+              </header>
+              <div class="phone-page">
+                <div class="hero"><p class="hero-title">Plans worth <em>saying yes</em>&nbsp;to.</p></div>
+                <button type="button" class="search-pill" aria-haspopup="dialog" aria-controls="search-sheet" data-open-sheet>
+                  <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+                  <span class="search-pill-text"><span class="search-pill-title">Find a date idea</span><span class="search-pill-sub">Any vibe · Any budget · Any length</span></span>
+                </button>
+                <div class="cat-scroll" data-component="CategoryRow">
+                  <ul class="cat-row is-compact" role="list">
+                    <li><button type="button" class="cat-btn" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg>All</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg>Board games</button></li>
+                  </ul>
+                </div>
+                <div class="toolbar">
+                  <h2>Date ideas</h2>
+                  <div class="toggle" role="group" aria-label="Sort ideas" data-single data-required>
+                    <button type="button" aria-pressed="true">New</button>
+                    <button type="button" aria-pressed="false">Top rated</button>
+                  </div>
+                </div>
+                <article class="card" data-component="Card">
+                  <div class="card-media">
+                    <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop" alt="Market stalls piled high with fruit and vegetables" width="800" height="600" loading="lazy">
+                  </div>
+                  <button type="button" class="heart" aria-pressed="true" aria-label="Saved: A slow Saturday at the farmers market, then a picnic lunch by the river for two!"><span class="heart-dot"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
+                  <div class="card-body">
+                    <div class="card-head">
+                      <h3 class="card-title"><a href="idea-detail.html" data-od-goto="idea-detail" title="A slow Saturday at the farmers market, then a picnic lunch by the river for two!">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</a></h3>
+                      <span class="rating" role="img" aria-label="Rated 4.8 out of 5 from 23 ratings" data-component="StarRating"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span class="rating-value">4.8</span><span class="rating-count">(23)</span></span>
+                    </div>
+                    <p class="card-meta">$ · Full day</p>
+                    <div class="card-foot"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span></div>
+                  </div>
+                </article>
+              </div>
+            </div>
+            <p class="state-note">The search bar collapses to one pill. "+ Share" keeps a label; "Your ideas" moves into the account menu. The 80-character title clamps to two lines.</p>
+          </div>
+
+          <div class="state phone">
+            <p class="eyebrow">Search sheet open</p>
+            <div class="frame" id="sheet-demo">
+              <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" data-component="SearchBar">
+                <div class="sheet-head">
+                  <button type="button" class="icon-btn" aria-label="Close search" data-close-sheet><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+                  <h3 id="sheet-title">Find a date idea</h3>
+                  <span aria-hidden="true"></span>
+                </div>
+                <div class="sheet-body">
+                  <div class="sheet-section">
+                    <label class="field" data-component="Input">
+                      <span class="field-label">What</span>
+                      <input class="input" type="text" name="q" placeholder="Search date ideas" value="picnic" autocomplete="off">
+                    </label>
+                  </div>
+                  <div class="sheet-section">
+                    <p class="field-label">Vibe</p>
+                    <div class="choice-group" role="group" aria-label="Vibe" data-single>
+                      <button type="button" class="choice" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</button>
+                      <button type="button" class="choice" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</button>
+                      <button type="button" class="choice" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</button>
+                      <button type="button" class="choice" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</button>
+                      <button type="button" class="choice" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg>Board games</button>
+                      <button type="button" class="choice" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</button>
+                      <button type="button" class="choice" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</button>
+                      <button type="button" class="choice" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</button>
+                    </div>
+                  </div>
+                  <div class="sheet-section">
+                    <p class="field-label">Budget</p>
+                    <div class="toggle is-full" role="group" aria-label="Budget" data-single>
+                      <button type="button" aria-pressed="true">$</button>
+                      <button type="button" aria-pressed="false">$$</button>
+                      <button type="button" aria-pressed="false">$$$</button>
+                    </div>
+                    <p class="helper">Tap again to clear.</p>
+                  </div>
+                  <div class="sheet-section">
+                    <p class="field-label">Duration</p>
+                    <div class="choice-group" role="group" aria-label="Duration" data-single>
+                      <button type="button" class="choice" aria-pressed="false">1–2 hours</button>
+                      <button type="button" class="choice" aria-pressed="false">Half day</button>
+                      <button type="button" class="choice" aria-pressed="true">Full day</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="sheet-foot">
+                  <button type="button" class="btn btn-ghost btn-sm" data-clear-sheet data-component="Button">Clear all</button>
+                  <a class="btn btn-primary btn-md" href="home.html" data-close-sheet data-component="Button">Show ideas</a>
+                </div>
+              </div>
+            </div>
+            <p class="state-note">Full screen. "Show ideas" writes <code>?q=picnic&amp;tag=food&amp;budget=1&amp;duration=full-day</code> and closes the sheet; the pill then reads "picnic · Food · $ · Full day".</p>
+          </div>
+
+          <div class="state phone">
+            <p class="eyebrow">7 · Category row, scrolled</p>
+            <div class="frame">
+              <div class="phone-cats">
+                <button type="button" class="search-pill" aria-haspopup="dialog" aria-controls="search-sheet" data-open-sheet>
+                  <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+                  <span class="search-pill-text"><span class="search-pill-title">Find a date idea</span><span class="search-pill-sub">Dancing · Any budget · Any length</span></span>
+                </button>
+                <div class="cat-scroll" data-component="CategoryRow" data-scroll-to="dancing">
+                  <ul class="cat-row is-compact" role="list">
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg>All</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg>Board games</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="true" data-cat="dancing"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</button></li>
+                    <li><button type="button" class="cat-btn" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</button></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <p class="state-note">The row scrolls sideways inside its own strip; the page never does. Items cut at both edges show there is more. The chosen vibe scrolls into view.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Controls -->
+      <div class="state" data-od-id="state-controls">
+        <p class="eyebrow">8 · Filters, account menu and saving</p>
+        <div class="frame frame-pad">
+          <div class="menu-demo">
+            <div class="popover-demo">
+              <button type="button" class="pill-btn" aria-expanded="true">
+                <svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg>
+                Filters <span class="pill-count" aria-label="1 filter on">1</span>
+              </button>
+              <div class="popover">
+                <p class="popover-title">Duration</p>
+                <div class="choice-group" role="group" aria-label="Duration" data-single>
+                  <button type="button" class="choice" aria-pressed="false">1–2 hours</button>
+                  <button type="button" class="choice" aria-pressed="true">Half day</button>
+                  <button type="button" class="choice" aria-pressed="false">Full day</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="helper demo-label">Account menu</p>
+              <div class="account-menu" role="group" aria-label="Account menu">
+                <a class="menu-item" href="profile.html#ideas" data-od-goto="profile">Your ideas</a>
+                <a class="menu-item" href="profile.html#saved" data-od-goto="profile">Saved ideas</a>
+                <button type="button" class="menu-item">Log out</button>
+              </div>
+            </div>
+            <div>
+              <p class="helper demo-label">Account menu, admin account</p>
+              <div class="account-menu" role="group" aria-label="Account menu, admin">
+                <a class="menu-item" href="profile.html#ideas" data-od-goto="profile">Your ideas</a>
+                <a class="menu-item" href="profile.html#saved" data-od-goto="profile">Saved ideas</a>
+                <a class="menu-item" href="admin.html" data-od-goto="admin">Admin</a>
+                <button type="button" class="menu-item">Log out</button>
+              </div>
+            </div>
+            <div class="toast-stack">
+              <p class="helper">Toasts after tapping the heart</p>
+              <div class="toast is-success" role="status" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Saved. You'll find it on your profile.</div>
+              <div class="toast is-success" role="status" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Removed from your saved ideas.</div>
+              <div class="toast is-error" role="status" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>We couldn't save that. Try again.</div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Duration applies as soon as it is picked (<code>&amp;duration=half-day</code>) and the Filters pill shows a count. Tapping the chosen duration again clears it. Admin appears in the menu only for admin accounts.</p>
+      </div>
+    </div>
+  </section>
+  </details>
+</main>
+
+<div class="sheet-overlay" id="search-sheet" hidden></div>
+
+<script>
+(function () {
+  var header = document.getElementById('site-header');
+  var band = document.querySelector('.search-band');
+  function onScroll() {
+    if (header) header.classList.toggle('is-scrolled', window.scrollY > 0);
+    if (band) {
+      var top = parseFloat(getComputedStyle(band).top) || 0;
+      band.classList.toggle('is-stuck', window.scrollY > 0 && band.getBoundingClientRect().top <= top + 0.5);
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Single-choice groups (sort, vibe, budget, duration). data-required keeps one pressed.
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-single] > button');
+    if (btn) {
+      var group = btn.parentElement;
+      var was = btn.getAttribute('aria-pressed') === 'true';
+      Array.prototype.forEach.call(group.children, function (b) { b.setAttribute('aria-pressed', 'false'); });
+      btn.setAttribute('aria-pressed', was && !group.hasAttribute('data-required') ? 'false' : 'true');
+      return;
+    }
+    var cat = e.target.closest('.cat-btn');
+    if (cat) {
+      cat.closest('.cat-row').querySelectorAll('.cat-btn').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+      cat.setAttribute('aria-pressed', 'true');
+      return;
+    }
+    var heart = e.target.closest('button.heart');
+    if (heart) {
+      var saved = heart.getAttribute('aria-pressed') !== 'true';
+      var title = heart.closest('.card').querySelector('.card-title a').textContent;
+      heart.setAttribute('aria-pressed', saved ? 'true' : 'false');
+      heart.setAttribute('aria-label', (saved ? 'Saved: ' : 'Save ') + title);
+      return;
+    }
+    var acct = e.target.closest('.account-btn[aria-controls]');
+    if (acct) {
+      var menu = document.getElementById(acct.getAttribute('aria-controls'));
+      var open = acct.getAttribute('aria-expanded') !== 'true';
+      acct.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (menu) menu.hidden = !open;
+      return;
+    }
+    var pop = e.target.closest('[data-pop]');
+    if (pop) {
+      var panel = document.getElementById(pop.getAttribute('data-pop'));
+      var show = pop.getAttribute('aria-expanded') !== 'true';
+      pop.setAttribute('aria-expanded', show ? 'true' : 'false');
+      if (panel) panel.hidden = !show;
+      return;
+    }
+    if (e.target.closest('[data-open-sheet]')) {
+      var overlay = document.getElementById('search-sheet');
+      var src = document.querySelector('#sheet-demo .sheet');
+      if (overlay && src) {
+        overlay.innerHTML = '';
+        var copy = src.cloneNode(true);
+        copy.removeAttribute('aria-labelledby');
+        copy.setAttribute('aria-label', 'Find a date idea');
+        copy.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
+        overlay.appendChild(copy);
+        overlay.hidden = false;
+        var first = copy.querySelector('input');
+        if (first) first.focus();
+      }
+      return;
+    }
+    if (e.target.closest('#search-sheet [data-close-sheet]')) {
+      e.preventDefault();
+      document.getElementById('search-sheet').hidden = true;
+      return;
+    }
+    var clear = e.target.closest('[data-clear-sheet]');
+    if (clear) {
+      var sheet = clear.closest('.sheet');
+      sheet.querySelectorAll('[aria-pressed]').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+      sheet.querySelectorAll('input').forEach(function (i) { i.value = ''; });
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var overlay = document.getElementById('search-sheet');
+    if (overlay && !overlay.hidden) overlay.hidden = true;
+    document.querySelectorAll('.account-btn[aria-expanded="true"], [data-pop][aria-expanded="true"]').forEach(function (b) {
+      b.setAttribute('aria-expanded', 'false');
+      var id = b.getAttribute('aria-controls') || b.getAttribute('data-pop');
+      var p = id && document.getElementById(id);
+      if (p) p.hidden = true;
+    });
+  });
+
+  // Empty selects read muted, like a placeholder.
+  document.querySelectorAll('select.seg-field').forEach(function (s) {
+    s.addEventListener('change', function () { s.classList.toggle('is-empty', !s.value); });
+  });
+
+  // Frame 7: show the category row scrolled sideways to the chosen vibe.
+  document.querySelectorAll('[data-scroll-to]').forEach(function (strip) {
+    var target = strip.querySelector('[data-cat="' + strip.getAttribute('data-scroll-to') + '"]');
+    if (target) strip.scrollLeft = target.offsetLeft - strip.clientWidth / 2 + target.offsetWidth / 2;
+  });
+})();
+</script>
+</body>
+</html>

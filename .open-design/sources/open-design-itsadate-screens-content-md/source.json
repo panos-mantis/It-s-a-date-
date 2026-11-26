@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "path": ".open-design/itsadate-screens/content.md",
+  "sha256": "4542c28f1a0f857ae94bb75782c0da357fc7b98ac97f46c4125f62289a215a7e",
+  "kind": "markdown",
+  "extractedAt": "2026-11-25T18:37:51.008Z",
+  "markdownPath": ".open-design/sources/open-design-itsadate-screens-content-md/source.md",
+  "lines": 180,
+  "chars": 17779,
+  "sections": [
+    {
+      "heading": "It's a Date screens: shared sample content",
+      "level": 1,
+      "startLine": 1,
+      "endLine": 6,
+      "chars": 479
+    },
+    {
+      "heading": "Labels (from constants.ts, use verbatim)",
+      "level": 2,
+      "startLine": 7,
+      "endLine": 15,
+      "chars": 612
+    },
+    {
+      "heading": "Tags (name, slug, Lucide icon)",
+      "level": 2,
+      "startLine": 16,
+      "endLine": 28,
+      "chars": 366
+    },
+    {
+      "heading": "Users",
+      "level": 2,
+      "startLine": 29,
+      "endLine": 38,
+      "chars": 720
+    },
+    {
+      "heading": "The 12 ideas",
+      "level": 2,
+      "startLine": 39,
+      "endLine": 61,
+      "chars": 2202
+    },
+    {
+      "heading": "Review Focus items",
+      "level": 3,
+      "startLine": 62,
+      "endLine": 75,
+      "chars": 834
+    },
+    {
+      "heading": "Maya's ideas that aren't public (Profile)",
+      "level": 3,
+      "startLine": 76,
+      "endLine": 89,
+      "chars": 1127
+    },
+    {
+      "heading": "The admin queue (Admin screen)",
+      "level": 3,
+      "startLine": 90,
+      "endLine": 103,
+      "chars": 1472
+    },
+    {
+      "heading": "Users on the Admin screen",
+      "level": 3,
+      "startLine": 104,
+      "endLine": 118,
+      "chars": 733
+    },
+    {
+      "heading": "Descriptions",
+      "level": 3,
+      "startLine": 119,
+      "endLine": 148,
+      "chars": 4326
+    },
+    {
+      "heading": "Photos",
+      "level": 2,
+      "startLine": 149,
+      "endLine": 177,
+      "chars": 4578
+    },
+    {
+      "heading": "Shared markup",
+      "level": 2,
+      "startLine": 178,
+      "endLine": 181,
+      "chars": 308
+    }
+  ],
+  "assets": [],
+  "warnings": []
+}

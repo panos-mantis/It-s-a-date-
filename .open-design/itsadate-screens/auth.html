@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>It's a Date · Log in and sign up</title>
+<meta name="description" content="Log in and sign up: get an account or log back in. Screen 4 of 7 in It's a Date screens.">
+<!--
+  It's a Date · Log in and sign up (screen 4 of 7, collection itsadate-screens)
+  Routes: /login and /signup. In the app each is its own page with one card (AuthLayout); this file
+  shows both cards on one page so they can be compared: side by side on desktop, Log in first and
+  Sign up under it on phones. On its own route, each card's title is the page's h1; here Log in's title is the h1 and Sign up's an h2.
+  Only Log in and Sign up (spec section 4): no forgot password, magic link or code screens, and no
+  social sign-in (the API has none).
+  Header: the logged-out variant (Log in / Sign up), as in Header.tsx when there is no user. It is
+  written here instead of _shared/nav.html, which holds Maya's avatar menu.
+  API: POST /auth/login { email, password } and POST /auth/register { name, email, password }
+    (registerSchema: name 2–50, password 8–72). Errors: 401 "Email or password is wrong",
+    409 "An account with this email already exists", 422 issues on fields, network NETWORK_MESSAGE.
+  ?next=<path> (from the route guard) shows a hint above Log in and is kept on the link to Sign up.
+  Copy that already exists in apps/web/src/features/auth and apps/web/src/lib is used verbatim.
+  The States board sits in a closed <details> ("Show design states") under the page. It is design-only
+  and not part of the real page: Phase 5 ports the frames, not the toggle.
+  Kit components carry data-component so the Phase 5 port maps them onto apps/web/src/components/ui/.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..600,0..100,0..1;1,9..144,400..600,0..100,0..1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FBF6F0;
+  --surface: #FFFDF9;
+  --surface-sunk: #F4EBE0;
+  --fg: #2A1A14;
+  --muted: #6E5D52;
+  --border: #E6D9CB;
+  --accent: #F06A4C;
+  --accent-hover: #F4826A;
+  --accent-ink: #B23E23;
+  --accent-soft: #FDE7DE;
+  --success: #2E7D4F;
+  --warn: #9A6400;
+  --danger: #B42C2C;
+  --overlay: rgba(255, 253, 249, 0.94);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --soft: "SOFT" 100, "WONK" 0;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --elev-raised: 0 1px 2px rgba(42, 26, 20, 0.06), 0 8px 24px rgba(42, 26, 20, 0.08);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --gutter: 16px;
+  --header-h: 64px;
+}
+@media (min-width: 640px) { :root { --gutter: 28px; } }
+@media (min-width: 1024px) { :root { --gutter: 40px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 500; }
+p, ol, ul, figure, fieldset { margin: 0; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+button, input { font: inherit; color: inherit; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+.icon-muted { color: var(--muted); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 50;
+  background: var(--accent); color: var(--fg); font-weight: 600;
+  padding: 8px 16px; border-radius: var(--radius-md); text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+.container { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter); }
+
+/* Buttons (data-component="Button") */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap; border: 1.5px solid transparent; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-weight: 600; letter-spacing: 0.02em;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.btn .icon { width: 18px; height: 18px; }
+.btn-md { padding: 12px 24px; font-size: 16px; min-height: 48px; }
+.btn-sm { padding: 8px 16px; font-size: 14px; min-height: 44px; }
+.btn-primary { background: var(--accent); color: var(--fg); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--fg); }
+.btn-secondary:hover { background: var(--surface-sunk); }
+.btn-ghost { background: transparent; color: var(--accent-ink); }
+.btn-ghost:hover { text-decoration: underline; }
+.btn-block { width: 100%; }
+.btn[aria-disabled="true"] { cursor: progress; }
+.btn-spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Header, logged out (matches apps/web Header.tsx with no user; same as the logged-out frames on home and idea detail) */
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms var(--ease);
+}
+.site-header.is-scrolled { border-bottom-color: var(--border); }
+.site-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  height: var(--header-h); width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter);
+}
+.wordmark {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-family: var(--font-display); font-variation-settings: var(--soft);
+  font-style: italic; font-weight: 500; font-size: 20px; text-decoration: none;
+  border-radius: var(--radius-sm); min-height: 44px;
+}
+.wordmark-heart { width: 16px; height: 16px; fill: var(--accent); stroke: var(--accent); stroke-width: 1.75; stroke-linejoin: round; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-share-icon, .nav-share-short { display: none; }
+.nav-share-short::before { content: "Share"; } /* phone label as CSS content, so the link text reads "Share an idea" */
+@media (max-width: 639px) {
+  .nav-actions { gap: 2px; flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
+  .btn-sm { padding: 0 10px; }
+  .wordmark { font-size: 18px; }
+  .site-nav { flex-wrap: wrap; height: auto; min-height: var(--header-h); padding-block: 8px; }
+  .site-nav .nav-share-label { display: none; }
+  .site-nav .nav-share-icon, .site-nav .nav-share-short { display: block; }
+  .site-nav .nav-share-icon { width: 16px; height: 16px; }
+  .site-nav .nav-share { gap: 2px; padding: 0 10px 0 8px; border-color: var(--border); border-width: 1px; border-radius: var(--radius-pill); }
+}
+
+@media (max-width: 399px) { .site-nav .nav-login { padding: 0 6px; } }
+
+/* The two cards: side by side on desktop, Log in then Sign up on phones */
+.auth { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; justify-items: center; padding-block: 64px 80px; }
+@media (min-width: 960px) {
+  .auth { grid-template-columns: repeat(2, minmax(0, 448px)); justify-content: center; align-items: start; gap: 32px; }
+}
+@media (max-width: 639px) { .auth { padding-block: 24px 48px; gap: 16px; } }
+
+.auth-card {
+  width: 100%; max-width: 448px; display: flex; flex-direction: column; gap: 24px; padding: 32px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+@media (max-width: 639px) { .auth-card { padding: 24px 20px; gap: 20px; } }
+.auth-card h1, .auth-card h2, .auth-card h3 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; }
+.auth-card h1 em, .auth-card h2 em, .auth-card h3 em { font-style: italic; font-weight: 400; }
+.auth-sub { margin-top: 8px; font-size: 14px; color: var(--muted); }
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-form[aria-busy="true"] .input { background: var(--surface-sunk); }
+.auth-foot { font-size: 14px; color: var(--muted); }
+.text-link {
+  display: inline-flex; align-items: center; min-height: 44px; vertical-align: middle;
+  font-weight: 600; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; border-radius: 6px;
+}
+.text-link:hover { text-decoration-thickness: 2px; }
+
+/* Input (data-component="Input") */
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field-label { font-size: 14px; font-weight: 600; }
+.input {
+  width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--muted); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: 16px;
+  transition: border-color 150ms var(--ease);
+}
+.input::placeholder { color: var(--muted); opacity: 1; }
+.input:focus-visible, .input.is-focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px rgba(240, 106, 76, 0.3); }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+/* Board frames draw the focus ring statically (.is-focus); real keyboard focus on them adds the outline */
+.input.is-focus:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+.helper { font-size: 12px; color: var(--muted); }
+.error { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 2px 6px; font-size: 12px; color: var(--danger); }
+.error .icon { width: 14px; height: 14px; margin-top: 2px; }
+.field-action {
+  align-self: flex-start; display: inline-flex; align-items: center; padding: 4px 0;
+  font-size: 14px; font-weight: 600; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; border-radius: 6px;
+}
+.field-action:hover { text-decoration-thickness: 2px; }
+.error-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 12px; }
+.pw { position: relative; }
+.pw .input { padding-right: 76px; }
+.pw-toggle {
+  position: absolute; right: 2px; top: 2px; bottom: 2px; min-width: 64px; padding: 0 12px;
+  border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--accent-ink);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.pw-toggle:hover { text-decoration: underline; }
+
+/* Form-level error (mirrors FormError in AuthLayout.tsx, with an icon) */
+.form-error {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
+  border: 1px solid var(--danger); border-radius: var(--radius-sm); background: var(--surface);
+  color: var(--danger); font-size: 14px; font-weight: 600;
+}
+.form-error .icon { width: 18px; height: 18px; margin-top: 1px; }
+
+/* ?next hint above Log in */
+.next-hint {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  border-radius: var(--radius-sm); background: var(--surface-sunk); font-size: 14px; font-weight: 500;
+}
+.next-hint .icon { width: 18px; height: 18px; color: var(--muted); }
+
+.status-line { font-size: 14px; font-weight: 500; }
+
+/* Toast (data-component="Toast") */
+.toast {
+  display: inline-flex; align-items: center; gap: 12px; max-width: 100%;
+  padding: 12px 16px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--elev-raised); font-size: 14px; font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.toast .icon { width: 18px; height: 18px; }
+.toast.is-success .icon { color: var(--success); }
+.toast-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+
+/* Design states toggle: design-only, closed by default, not part of the real page */
+.design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }
+.design-states-summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  width: 100%; max-width: 1200px; margin-inline: auto; padding: 12px var(--gutter);
+  list-style: none; cursor: pointer;
+}
+.design-states-summary::-webkit-details-marker { display: none; }
+.design-states-label {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 600;
+}
+.design-states-label .icon { width: 18px; height: 18px; transition: transform 150ms var(--ease); }
+.design-states[open] .design-states-label .icon { transform: rotate(180deg); }
+.design-states-note { font-size: 14px; color: var(--muted); }
+.design-states .when-open, .design-states[open] .when-closed { display: none; }
+.design-states[open] .when-open { display: inline; }
+/* Closed: no box at all (Chromium otherwise keeps the hidden board laid out at zero size) */
+.design-states:not([open]) > .board { display: none; }
+
+/* States board */
+.board { background: var(--surface-sunk); padding: 24px 0 96px; }
+.board-head { max-width: 65ch; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.board-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; margin-top: 8px; }
+.board-head h2 em { font-style: italic; font-weight: 400; }
+.board-head p { margin-top: 12px; color: var(--muted); }
+.board code {
+  font-family: ui-monospace, Consolas, monospace; font-size: 14px; color: var(--fg);
+  background: var(--bg); padding: 1px 6px; border-radius: 6px; word-break: break-all;
+}
+.state { margin-top: 48px; scroll-margin-top: calc(var(--header-h) + 16px); }
+.state > .eyebrow { margin-bottom: 12px; }
+.state-note { margin-top: 12px; max-width: 65ch; font-size: 14px; color: var(--muted); }
+.frame { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); min-width: 0; }
+.frame-pad { padding: 32px; }
+.frame-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; justify-items: center; }
+@media (min-width: 960px) { .frame-row.is-two { grid-template-columns: repeat(2, minmax(0, 448px)); justify-content: center; align-items: start; } }
+.frame-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
+.frame-col { width: 100%; max-width: 448px; }
+@media (max-width: 767px) {
+  .board { padding: 16px 0 64px; }
+  .frame-pad { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" class="sr-only" aria-hidden="true" focusable="false">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="i-loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+</svg>
+
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header class="site-header" id="site-header" data-od-id="header">
+  <nav class="site-nav" aria-label="Main">
+    <a class="wordmark" href="home.html" data-od-goto="home"><svg class="wordmark-heart" aria-hidden="true"><use href="#i-heart"/></svg>It's a Date</a>
+    <div class="nav-actions">
+      <a class="btn btn-ghost btn-sm nav-share" href="auth.html#state-next" data-od-goto="share" aria-label="Share an idea" data-component="Button"><svg class="icon nav-share-icon" aria-hidden="true"><use href="#i-plus"/></svg><span class="nav-share-label" aria-hidden="true">Share an idea</span><span class="nav-share-short" aria-hidden="true"></span></a>
+      <a class="btn btn-ghost btn-sm nav-login" href="#log-in" data-component="Button">Log in</a>
+      <a class="btn btn-secondary btn-sm" href="#sign-up" data-component="Button">Sign up</a>
+    </div>
+  </nav>
+</header>
+
+<main id="content" tabindex="-1">
+  <div class="container auth" data-od-id="auth">
+    <!-- Log in (/login) -->
+    <section class="auth-card" id="log-in" data-od-id="log-in" aria-labelledby="login-title">
+      <div>
+        <h1 id="login-title">Welcome <em>back</em></h1>
+        <p class="auth-sub">Log in to save ideas, rate them and share your own.</p>
+      </div>
+      <form class="auth-form" novalidate data-auth-form>
+        <div class="field" data-component="Input">
+          <label class="field-label" for="login-email">Email</label>
+          <input class="input" id="login-email" name="email" type="email" autocomplete="email" placeholder="name@example.com">
+        </div>
+        <div class="field" data-component="Input">
+          <label class="field-label" for="login-password">Password</label>
+          <div class="pw">
+            <input class="input" id="login-password" name="password" type="password" autocomplete="current-password">
+            <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="login-password" data-pw-toggle>Show</button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-md btn-block" data-component="Button">Log in</button>
+      </form>
+      <p class="auth-foot">New here? <a class="text-link" href="#sign-up">Create an account</a></p>
+    </section>
+
+    <!-- Sign up (/signup) -->
+    <section class="auth-card" id="sign-up" data-od-id="sign-up" aria-labelledby="signup-title">
+      <div>
+        <h2 id="signup-title">Create your <em>account</em></h2>
+        <p class="auth-sub">Free, and all it takes is a name, an email and a password.</p>
+      </div>
+      <form class="auth-form" novalidate data-auth-form>
+        <div class="field" data-component="Input">
+          <label class="field-label" for="signup-name">Name</label>
+          <input class="input" id="signup-name" name="name" type="text" autocomplete="name" placeholder="Maya Chen">
+        </div>
+        <div class="field" data-component="Input">
+          <label class="field-label" for="signup-email">Email</label>
+          <input class="input" id="signup-email" name="email" type="email" autocomplete="email" placeholder="name@example.com">
+        </div>
+        <div class="field" data-component="Input">
+          <label class="field-label" for="signup-password">Password</label>
+          <div class="pw">
+            <input class="input" id="signup-password" name="password" type="password" autocomplete="new-password" aria-describedby="signup-password-hint">
+            <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="signup-password" data-pw-toggle>Show</button>
+          </div>
+          <p class="error" id="signup-password-err" hidden><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Use at least 8 characters.</p>
+          <p class="helper" id="signup-password-hint">At least 8 characters.</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-md btn-block" data-component="Button">Sign up</button>
+      </form>
+      <p class="auth-foot">Already have an account? <a class="text-link" href="#log-in">Log in</a></p>
+    </section>
+  </div>
+
+  <!-- ===================== States board (design-only, behind a closed toggle) ===================== -->
+  <details class="design-states" data-od-id="design-states">
+    <summary class="design-states-summary">
+      <span class="design-states-label"><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg><span class="when-closed">Show design states</span><span class="when-open">Hide design states</span></span>
+      <span class="design-states-note">Design only, not part of the real page.</span>
+    </summary>
+  <section class="board" data-od-id="states-board" aria-labelledby="board-title">
+    <div class="container">
+      <div class="board-head">
+        <p class="eyebrow">States board</p>
+        <h2 id="board-title">Log in and sign up, in <em>every</em> state</h2>
+        <p>Each frame is one state of a card, for the Phase 5 port. The page above is a first visit to <code>/login</code> and <code>/signup</code>, with nothing typed. Every error keeps what was typed (except a wrong password, which is cleared so it can be typed again).</p>
+      </div>
+
+      <!-- 1. Wrong password -->
+      <div class="state" id="state-wrong-password" data-od-id="state-wrong-password">
+        <p class="eyebrow">1 · Wrong email or password</p>
+        <div class="frame frame-pad">
+          <div class="frame-row">
+            <section class="auth-card" aria-labelledby="f1-title">
+              <h3 id="f1-title">Welcome <em>back</em></h3>
+              <form class="auth-form" novalidate>
+                <div class="form-error" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Email or password is wrong</div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f1-email">Email</label>
+                  <input class="input" id="f1-email" type="email" value="maya.chen@example.com" autocomplete="off">
+                </div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f1-password">Password</label>
+                  <div class="pw">
+                    <input class="input is-focus" id="f1-password" type="password" autocomplete="off">
+                    <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="f1-password" data-pw-toggle>Show</button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-md btn-block" data-component="Button">Log in</button>
+              </form>
+              <p class="auth-foot">New here? <a class="text-link" href="#sign-up">Create an account</a></p>
+            </section>
+          </div>
+        </div>
+        <p class="state-note">The API answers <code>401</code> with "Email or password is wrong" and the message shows in the box at the top of the card. It never says which one was wrong. The email stays; the password is cleared and gets focus (shown with the focus ring), so Maya can try again straight away.</p>
+      </div>
+
+      <!-- 2. Email taken -->
+      <div class="state" id="state-email-taken" data-od-id="state-email-taken">
+        <p class="eyebrow">2 · Email already has an account</p>
+        <div class="frame frame-pad">
+          <div class="frame-row">
+            <section class="auth-card" aria-labelledby="f2-title">
+              <h3 id="f2-title">Create your <em>account</em></h3>
+              <form class="auth-form" novalidate>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f2-name">Name</label>
+                  <input class="input" id="f2-name" type="text" value="Maya Chen" autocomplete="off">
+                </div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f2-email">Email</label>
+                  <input class="input is-focus" id="f2-email" type="email" value="maya.chen@example.com" aria-invalid="true" aria-describedby="f2-email-err" autocomplete="off">
+                  <p class="error" id="f2-email-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>An account with this email already exists</p>
+                  <a class="field-action" href="#log-in">Log in instead</a>
+                </div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f2-password">Password</label>
+                  <div class="pw">
+                    <input class="input" id="f2-password" type="password" value="saturday-mornings" aria-describedby="f2-password-hint" autocomplete="off">
+                    <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="f2-password" data-pw-toggle>Show</button>
+                  </div>
+                  <p class="helper" id="f2-password-hint">At least 8 characters.</p>
+                </div>
+                <button type="button" class="btn btn-primary btn-md btn-block" data-component="Button">Sign up</button>
+              </form>
+              <p class="auth-foot">Already have an account? <a class="text-link" href="#log-in">Log in</a></p>
+            </section>
+          </div>
+        </div>
+        <p class="state-note">The API answers <code>409</code>; the message lands on the Email field and focus moves there (as <code>SignupPage</code> does now). "Log in instead" is new: it opens Log in with the same email filled in, and keeps any <code>next</code>.</p>
+      </div>
+
+      <!-- 3. Field validation -->
+      <div class="state" id="state-validation" data-od-id="state-validation">
+        <p class="eyebrow">3 · Field checks</p>
+        <div class="frame frame-pad">
+          <div class="frame-row is-two">
+            <div class="frame-col">
+              <p class="frame-label">Sign up: name under 2 characters, password under 8</p>
+              <section class="auth-card" aria-labelledby="f3a-title">
+                <h3 id="f3a-title">Create your <em>account</em></h3>
+                <form class="auth-form" novalidate>
+                  <div class="field" data-component="Input">
+                    <label class="field-label" for="f3-name">Name</label>
+                    <input class="input" id="f3-name" type="text" value="J" aria-invalid="true" aria-describedby="f3-name-err" autocomplete="off">
+                    <p class="error" id="f3-name-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Enter at least 2 characters.</p>
+                  </div>
+                  <div class="field" data-component="Input">
+                    <label class="field-label" for="f3-email">Email</label>
+                    <input class="input" id="f3-email" type="email" value="jonah.reyes@" aria-invalid="true" aria-describedby="f3-email-err" autocomplete="off">
+                    <p class="error" id="f3-email-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Enter an email like name@example.com.</p>
+                  </div>
+                  <div class="field" data-component="Input">
+                    <label class="field-label" for="f3-password">Password</label>
+                    <div class="pw">
+                      <input class="input" id="f3-password" type="password" value="salsa" aria-invalid="true" aria-describedby="f3-password-err" autocomplete="off">
+                      <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="f3-password" data-pw-toggle>Show</button>
+                    </div>
+                    <p class="error" id="f3-password-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Use at least 8 characters.</p>
+                  </div>
+                  <button type="button" class="btn btn-primary btn-md btn-block" data-component="Button">Sign up</button>
+                </form>
+              </section>
+            </div>
+            <div class="frame-col">
+              <p class="frame-label">Log in: sent with nothing typed</p>
+              <section class="auth-card" aria-labelledby="f3b-title">
+                <h3 id="f3b-title">Welcome <em>back</em></h3>
+                <form class="auth-form" novalidate>
+                  <div class="field" data-component="Input">
+                    <label class="field-label" for="f3-lemail">Email</label>
+                    <input class="input" id="f3-lemail" type="email" aria-invalid="true" aria-describedby="f3-lemail-err" autocomplete="off">
+                    <p class="error" id="f3-lemail-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Enter your email.</p>
+                  </div>
+                  <div class="field" data-component="Input">
+                    <label class="field-label" for="f3-lpassword">Password</label>
+                    <div class="pw">
+                      <input class="input" id="f3-lpassword" type="password" aria-invalid="true" aria-describedby="f3-lpassword-err" autocomplete="off">
+                      <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="f3-lpassword" data-pw-toggle>Show</button>
+                    </div>
+                    <p class="error" id="f3-lpassword-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Enter your password.</p>
+                  </div>
+                  <button type="button" class="btn btn-primary btn-md btn-block" data-component="Button">Log in</button>
+                </form>
+              </section>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Messages are the current ones from <code>authErrorMap</code> (<code>apps/web/src/lib/form-errors.ts</code>). While the password error shows, it takes the place of the hint "At least 8 characters." (and <code>aria-describedby</code> points at the error only); the hint comes back once the password has 8 or more characters. Checked on submit, then again as each field changes; the message goes as soon as the value is fine. A 422 from the API lands on the same fields. Other limits: name up to 50 characters ("Use 50 characters or fewer."), password up to 72 ("Use 72 characters or fewer.").</p>
+      </div>
+
+      <!-- 4. Busy -->
+      <div class="state" id="state-busy" data-od-id="state-busy">
+        <p class="eyebrow">4 · Busy</p>
+        <div class="frame frame-pad">
+          <div class="frame-row is-two">
+            <section class="auth-card" aria-labelledby="f4a-title">
+              <h3 id="f4a-title">Welcome <em>back</em></h3>
+              <form class="auth-form" novalidate aria-busy="true">
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f4-email">Email</label>
+                  <input class="input" id="f4-email" type="email" value="maya.chen@example.com" readonly autocomplete="off">
+                </div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f4-password">Password</label>
+                  <input class="input" id="f4-password" type="password" value="saturday-mornings" readonly autocomplete="off">
+                </div>
+                <button type="button" class="btn btn-primary btn-md btn-block" aria-disabled="true" aria-describedby="f4a-status" data-component="Button"><svg class="icon btn-spin" aria-hidden="true"><use href="#i-loader"/></svg>Log in</button>
+                <p class="status-line" id="f4a-status" role="status">Logging you in…</p>
+              </form>
+            </section>
+            <section class="auth-card" aria-labelledby="f4b-title">
+              <h3 id="f4b-title">Create your <em>account</em></h3>
+              <form class="auth-form" novalidate aria-busy="true">
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f4-name">Name</label>
+                  <input class="input" id="f4-name" type="text" value="Priya Natarajan" readonly autocomplete="off">
+                </div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f4-semail">Email</label>
+                  <input class="input" id="f4-semail" type="email" value="priya.n@example.com" readonly autocomplete="off">
+                </div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f4-spassword">Password</label>
+                  <input class="input" id="f4-spassword" type="password" value="jazz-on-fridays" readonly aria-describedby="f4-spassword-hint" autocomplete="off">
+                  <p class="helper" id="f4-spassword-hint">At least 8 characters.</p>
+                </div>
+                <button type="button" class="btn btn-primary btn-md btn-block" aria-disabled="true" aria-describedby="f4b-status" data-component="Button"><svg class="icon btn-spin" aria-hidden="true"><use href="#i-loader"/></svg>Sign up</button>
+                <p class="status-line" id="f4b-status" role="status">Creating your account…</p>
+              </form>
+            </section>
+          </div>
+        </div>
+        <p class="state-note">The button keeps its label and size and adds the spinner (as <code>Button loading</code> does). Phase 5 change: the kit's Button sets <code>disabled</code> while loading; this design asks for <code>aria-disabled</code> with repeat clicks ignored, so focus stays on the button. Fields are read-only, nothing is cleared, and the status line is announced. After about 10 seconds with no answer, the network error (frame 5) shows.</p>
+      </div>
+
+      <!-- 5. Network error -->
+      <div class="state" id="state-network" data-od-id="state-network">
+        <p class="eyebrow">5 · Can't reach the server</p>
+        <div class="frame frame-pad">
+          <div class="frame-row">
+            <section class="auth-card" aria-labelledby="f5-title">
+              <h3 id="f5-title">Welcome <em>back</em></h3>
+              <form class="auth-form" novalidate>
+                <div class="form-error" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-wifi-off"/></svg>We can't reach the server. Check your connection and try again.</div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f5-email">Email</label>
+                  <input class="input" id="f5-email" type="email" value="maya.chen@example.com" autocomplete="off">
+                </div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f5-password">Password</label>
+                  <div class="pw">
+                    <input class="input" id="f5-password" type="password" value="saturday-mornings" autocomplete="off">
+                    <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="f5-password" data-pw-toggle>Show</button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-md btn-block" data-component="Button">Log in</button>
+              </form>
+              <p class="auth-foot">New here? <a class="text-link" href="#sign-up">Create an account</a></p>
+            </section>
+          </div>
+        </div>
+        <p class="state-note"><code>NETWORK_MESSAGE</code> from <code>apps/web/src/lib/api.ts</code>, shown in the same box as frame 1, for a failed request and for a 5xx. Both fields keep their values, so "Log in" works again as soon as the connection is back. Sign up shows the same box at the top of its card.</p>
+      </div>
+
+      <!-- 6. ?next hint -->
+      <div class="state" id="state-next" data-od-id="state-next">
+        <p class="eyebrow">6 · Sent here from Share an idea</p>
+        <div class="frame frame-pad">
+          <div class="frame-row">
+            <section class="auth-card" aria-labelledby="f6-title">
+              <p class="next-hint"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Log in to share your idea</p>
+              <h3 id="f6-title">Welcome <em>back</em></h3>
+              <form class="auth-form" novalidate>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f6-email">Email</label>
+                  <input class="input" id="f6-email" type="email" placeholder="name@example.com" autocomplete="off">
+                </div>
+                <div class="field" data-component="Input">
+                  <label class="field-label" for="f6-password">Password</label>
+                  <div class="pw">
+                    <input class="input" id="f6-password" type="password" autocomplete="off">
+                    <button type="button" class="pw-toggle" aria-pressed="false" aria-controls="f6-password" data-pw-toggle>Show</button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-md btn-block" data-component="Button">Log in</button>
+              </form>
+              <p class="auth-foot">New here? <a class="text-link" href="#sign-up">Create an account</a></p>
+            </section>
+          </div>
+        </div>
+        <p class="state-note"><code>/login?next=%2Fshare</code>. The hint sits at the top of the card, above "Welcome back". "Create an account" keeps the target (<code>/signup?next=%2Fshare</code>), and Sign up shows the same hint. After logging in, <code>safeNext</code> sends Maya to <code>/share</code>. Other senders use the same box: "Log in to save ideas you like." from a heart, "Log in to rate this idea." from Idea detail.</p>
+      </div>
+
+      <!-- 7. After logging in -->
+      <div class="state" id="state-after" data-od-id="state-after">
+        <p class="eyebrow">7 · Done: the toast after logging in or signing up</p>
+        <div class="frame frame-pad">
+          <div class="toast-stack">
+            <div class="toast is-success" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Welcome back, Maya Chen.</div>
+            <div class="toast is-success" data-component="Toast"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>You're in. Welcome, Maria Fernanda Castellanos-Villalobos y de la Cruz.</div>
+          </div>
+        </div>
+        <p class="state-note">Copy from <code>LoginPage</code> and <code>SignupPage</code>. The page goes to <code>next</code> (or Home) and the toast shows bottom centre, as on Home and Idea detail. The second one is the 50-character name; it wraps on phones.</p>
+      </div>
+    </div>
+  </section>
+  </details>
+</main>
+
+<script>
+(function () {
+  var header = document.getElementById('site-header');
+  function onScroll() { if (header) header.classList.toggle('is-scrolled', window.scrollY > 0); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Show / Hide password
+  document.querySelectorAll('[data-pw-toggle]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var input = document.getElementById(b.getAttribute('aria-controls'));
+      var show = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', show ? 'true' : 'false');
+      b.textContent = show ? 'Hide' : 'Show';
+      if (input) input.type = show ? 'text' : 'password';
+    });
+  });
+
+  // Sign up password: after the first blur, an error under 8 characters takes the hint's place.
+  var pw = document.getElementById('signup-password');
+  var pwErr = document.getElementById('signup-password-err');
+  var pwHint = document.getElementById('signup-password-hint');
+  var touched = false;
+  function checkPw() {
+    if (!touched) return;
+    var bad = pw.value.length > 0 && pw.value.length < 8;
+    pwErr.hidden = !bad; pwHint.hidden = bad;
+    pw.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    pw.setAttribute('aria-describedby', bad ? 'signup-password-err' : 'signup-password-hint');
+  }
+  pw.addEventListener('blur', function () { touched = true; checkPw(); });
+  pw.addEventListener('input', checkPw);
+
+  // Prototype only: the forms don't send anything.
+  document.querySelectorAll('[data-auth-form]').forEach(function (f) {
+    f.addEventListener('submit', function (e) { e.preventDefault(); });
+  });
+})();
+</script>
+</body>
+</html>

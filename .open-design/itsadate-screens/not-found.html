@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found · It's a Date</title>
+<meta name="description" content="Page not found: a friendly 404 with a way home. Screen 7 of 7 in It's a Date screens.">
+<!--
+  It's a Date · Page not found (screen 7 of 7, collection itsadate-screens)
+  Route: any path the router doesn't know (path "*", apps/web/src/app/pages/NotFoundPage.tsx), and an idea that
+  no longer exists (GET /ideas/:id answers 404). Shown logged in as Maya Chen with the shared header; logged out,
+  the header shows Log in / Sign up instead and the page is otherwise the same.
+  Copy: the task brief's words replace Phase 3's "We couldn't find that page." / "Back to home" (Phase 5 restyles).
+  One state only, so there is no States board. No illustration (DESIGN.md: no decorative illustrations).
+  Kit components carry data-component so the Phase 5 port maps them onto apps/web/src/components/ui/
+  (this page is the EmptyState with headingLevel 1 and a primary action).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..600,0..100,0..1;1,9..144,400..600,0..100,0..1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FBF6F0;
+  --surface: #FFFDF9;
+  --surface-sunk: #F4EBE0;
+  --fg: #2A1A14;
+  --muted: #6E5D52;
+  --border: #E6D9CB;
+  --accent: #F06A4C;
+  --accent-hover: #F4826A;
+  --accent-ink: #B23E23;
+  --accent-soft: #FDE7DE;
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --soft: "SOFT" 100, "WONK" 0;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-pill: 999px;
+
+  --elev-raised: 0 1px 2px rgba(42, 26, 20, 0.06), 0 8px 24px rgba(42, 26, 20, 0.08);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --gutter: 16px;
+  --header-h: 64px;
+}
+@media (min-width: 640px) { :root { --gutter: 28px; } }
+@media (min-width: 1024px) { :root { --gutter: 40px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1 { margin: 0; font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 500; }
+p { margin: 0; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+.icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+.icon-muted { color: var(--muted); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 50;
+  background: var(--accent); color: var(--fg); font-weight: 600;
+  padding: 8px 16px; border-radius: var(--radius-md); text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+/* Buttons (data-component="Button") */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap; border: 1.5px solid transparent; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-weight: 600; letter-spacing: 0.02em;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.btn .icon { width: 18px; height: 18px; }
+.btn-md { padding: 12px 24px; font-size: 16px; min-height: 48px; }
+.btn-sm { padding: 8px 16px; font-size: 14px; min-height: 44px; }
+.btn-primary { background: var(--accent); color: var(--fg); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-ghost { background: transparent; color: var(--accent-ink); }
+.btn-ghost:hover { text-decoration: underline; }
+
+/* Header (matches apps/web Header.tsx + AccountMenu.tsx; the shared _shared/nav.html, as on the other screens) */
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms var(--ease);
+}
+.site-header.is-scrolled { border-bottom-color: var(--border); }
+.site-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  height: var(--header-h); width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter);
+}
+.wordmark {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-family: var(--font-display); font-variation-settings: var(--soft);
+  font-style: italic; font-weight: 500; font-size: 20px; text-decoration: none;
+  border-radius: var(--radius-sm); min-height: 44px;
+}
+.wordmark-heart { width: 16px; height: 16px; fill: var(--accent); stroke: var(--accent); stroke-width: 1.75; stroke-linejoin: round; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-share-icon { display: none; }
+.account { position: relative; }
+.account-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: 4px 12px 4px 4px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+  background: var(--surface); font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.account-btn:hover { background: var(--surface-sunk); }
+.avatar {
+  width: 32px; height: 32px; border-radius: var(--radius-pill); flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 14px; font-weight: 600;
+}
+.account-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 192px;
+  display: flex; flex-direction: column; gap: 4px; padding: 8px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  box-shadow: var(--elev-raised);
+}
+.account-menu[hidden] { display: none; }
+.menu-item {
+  display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: var(--radius-sm);
+  background: none; text-align: left; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.menu-item:hover { background: var(--surface-sunk); }
+.nav-share-short { display: none; }
+.nav-share-short::before { content: "Share"; } /* phone label as CSS content, so the link text reads "Share an idea" */
+@media (max-width: 639px) {
+  .nav-actions { gap: 4px; }
+  .site-nav .btn-sm { padding: 0 10px; }
+  .wordmark { font-size: 18px; }
+  .site-nav .nav-share-label, .site-nav .account-name, .site-nav .nav-ideas { display: none; }
+  .site-nav .nav-share-icon, .site-nav .nav-share-short { display: block; }
+  .site-nav .nav-share-icon { width: 16px; height: 16px; }
+  .site-nav .nav-share { gap: 2px; padding: 0 10px 0 8px; border-color: var(--border); border-width: 1px; border-radius: var(--radius-pill); }
+  .site-nav .account-btn { padding-right: 8px; }
+}
+@media (max-width: 359px) {
+  .site-nav { height: auto; min-height: var(--header-h); flex-wrap: wrap; padding-block: 8px; }
+}
+
+/* The page: one centred message (data-component="EmptyState", headingLevel 1), a little above the middle */
+.lost {
+  min-height: calc(100dvh - var(--header-h));
+  display: flex; align-items: center; justify-content: center;
+  padding: 48px var(--gutter) 96px;
+}
+.lost-inner { max-width: 560px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lost h1 { font-size: 48px; line-height: 1.08; letter-spacing: -0.025em; text-wrap: balance; }
+.lost h1 em { font-style: italic; font-weight: 400; }
+.lost p.lead { font-size: 18px; color: var(--muted); max-width: 40ch; }
+.lost .btn { margin-top: 16px; }
+@media (max-width: 639px) {
+  .lost { align-items: flex-start; padding-top: 72px; }
+  .lost h1 { font-size: 38px; }
+  .lost p.lead { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body data-od-current="not-found">
+
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header class="site-header" id="site-header" data-od-id="header">
+  <template data-od-include="_shared/nav.html"></template>
+</header>
+
+<main id="content" tabindex="-1">
+  <section class="lost" data-od-id="not-found" aria-labelledby="lost-title">
+    <div class="lost-inner" data-component="EmptyState">
+      <p class="eyebrow">Page not found</p>
+      <h1 id="lost-title">This page <em>wandered off</em>.</h1>
+      <p class="lead">The link may be old, or the idea was removed.</p>
+      <a class="btn btn-primary btn-md" href="home.html" data-od-goto="home" data-component="Button">Back to all ideas</a>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var header = document.getElementById('site-header');
+  function onScroll() { if (header) header.classList.toggle('is-scrolled', window.scrollY > 0); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ---- Account menu (shared header)
+  document.addEventListener('click', function (e) {
+    var acct = e.target.closest('.account-btn[aria-controls]');
+    if (acct) {
+      var menu = document.getElementById(acct.getAttribute('aria-controls'));
+      var open = acct.getAttribute('aria-expanded') !== 'true';
+      acct.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (menu) menu.hidden = !open;
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.account-btn[aria-expanded="true"]').forEach(function (b) {
+      b.setAttribute('aria-expanded', 'false');
+      var p = document.getElementById(b.getAttribute('aria-controls'));
+      if (p) p.hidden = true;
+      b.focus();
+    });
+  });
+})();
+</script>
+</body>
+</html>

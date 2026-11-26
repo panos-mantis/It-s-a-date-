@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "Admin",
+  "entry": ".open-design/itsadate-screens/admin.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "standalone",
+    "site",
+    "png",
+    "jpeg",
+    "pdf"
+  ],
+  "supportingFiles": [
+    "_shared/data.json",
+    "content.md"
+  ],
+  "createdAt": "2026-11-25T18:37:51.034Z",
+  "updatedAt": "2026-11-25T18:37:51.034Z",
+  "sourceSkillId": "od:prototype:app-table",
+  "collectionId": "itsadate-screens",
+  "collectionName": "It's a Date screens",
+  "screenRole": "admin",
+  "screenIndex": 5,
+  "sources": [
+    {
+      "path": ".open-design/itsadate-screens/content.md",
+      "sha256": "4542c28f1a0f857ae94bb75782c0da357fc7b98ac97f46c4125f62289a215a7e"
+    },
+    {
+      "path": "DESIGN.md",
+      "sha256": "d32b2f61e802aff2b3c058678f971eb878af45c2c804a063ca00950ad4e82574"
+    }
+  ],
+  "metadata": {
+    "brief": {
+      "text": "The Admin page of It's a Date (/admin, logged in as Panos): site header with Panos's menu, tabs Pending (oldest first, Approve / Edit / Reject), All ideas (status filter and search), Tags (add, rename, delete) and Users (role chip, Make admin / Remove admin); Edit side panel (full-screen sheet on phone) with Not set for migrated ideas; stacked cards at 360px; States board behind a closed toggle with 9 states.",
+      "answers": {
+        "platform": "Web app",
+        "density": "Medium"
+      },
+      "assumptions": [
+        "Light theme only (spec section 4)",
+        "Logged in as Panos (admin); header from _shared/nav.html with the Admin menu item current",
+        "Pending queue oldest first: idea 13 plus two more pending ideas added to content.md",
+        "States board is design-only, in a closed details toggle under the page",
+        "Tags, place types, budget and duration labels from packages/shared constants",
+        "Photos reuse verified photos from content.md, or the no-photo placeholder"
+      ]
+    },
+    "flow": {
+      "plan": {
+        "screens": [
+          {
+            "id": "home",
+            "title": "Home",
+            "role": "Browse and filter approved date ideas"
+          },
+          {
+            "id": "idea-detail",
+            "title": "Idea detail",
+            "role": "Read one idea, rate it, save it, find places near me"
+          },
+          {
+            "id": "share",
+            "title": "Share an idea",
+            "role": "Submit a new idea for review",
+            "end": true
+          },
+          {
+            "id": "auth",
+            "title": "Log in and sign up",
+            "role": "Get an account or log back in"
+          },
+          {
+            "id": "profile",
+            "title": "Profile",
+            "role": "My ideas with their status, and my saved ideas"
+          },
+          {
+            "id": "admin",
+            "title": "Admin",
+            "role": "Review pending ideas, edit ideas, manage tags and users"
+          },
+          {
+            "id": "not-found",
+            "title": "Page not found",
+            "role": "A friendly 404 with a way home"
+          }
+        ],
+        "links": [
+          {
+            "from": "home",
+            "trigger": "an idea card",
+            "to": "idea-detail"
+          },
+          {
+            "from": "home",
+            "trigger": "Share an idea",
+            "to": "share"
+          },
+          {
+            "from": "home",
+            "trigger": "Log in",
+            "to": "auth"
+          },
+          {
+            "from": "home",
+            "trigger": "Profile",
+            "to": "profile"
+          },
+          {
+            "from": "home",
+            "trigger": "Admin",
+            "to": "admin"
+          },
+          {
+            "from": "idea-detail",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "idea-detail",
+            "trigger": "Log in to rate",
+            "to": "auth"
+          },
+          {
+            "from": "share",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "auth",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "profile",
+            "trigger": "an idea card",
+            "to": "idea-detail"
+          },
+          {
+            "from": "profile",
+            "trigger": "Share an idea",
+            "to": "share"
+          },
+          {
+            "from": "admin",
+            "trigger": "It's a Date",
+            "to": "home"
+          },
+          {
+            "from": "not-found",
+            "trigger": "Back to all ideas",
+            "to": "home"
+          }
+        ],
+        "nav": [
+          {
+            "label": "It's a Date",
+            "to": "home"
+          },
+          {
+            "label": "Share an idea",
+            "to": "share"
+          },
+          {
+            "label": "Your ideas",
+            "to": "profile"
+          }
+        ],
+        "tasks": [
+          {
+            "name": "Find an idea and the places near me",
+            "start": "home",
+            "end": "idea-detail",
+            "maxSteps": 1
+          },
+          {
+            "name": "Share an idea",
+            "start": "home",
+            "end": "share",
+            "maxSteps": 1
+          },
+          {
+            "name": "Check on an idea I shared",
+            "start": "home",
+            "end": "profile",
+            "maxSteps": 1
+          }
+        ]
+      },
+      "screenId": "admin"
+    },
+    "critique": {
+      "verdict": "polish",
+      "findings": [
+        {
+          "area": "task",
+          "fix": "Under each pending title add a 2-line clamped description excerpt and the place type (\"Park · $ · 1–2 hours\"), make the title a button that opens the Edit panel, and in All ideas make approved titles link to idea-detail.html (same tab, Back returns to the All ideas tab).",
+          "where": "Pending tab, queue rows (desktop table and 360px cards); All ideas titles",
+          "problem": "A pending row shows only title, creator, tags and date, and Approve works in one click, so the admin can approve without reading the description or place type; titles aren't links."
+        },
+        {
+          "area": "layout-rhythm",
+          "fix": "Put the status chip on the \"By …\" line and merge the rest into one muted meta line (\"★ 4.8 (23) · 61 saves · Nov 22, 2026\") with Edit as a 44px text button at its right end; drop the separate action row, about 200px per card.",
+          "where": "All ideas tab, 360px",
+          "problem": "Each card stacks By, Status, Rating, Saves and Created on separate lines plus an Edit row, about 370px per card."
+        },
+        {
+          "area": "states",
+          "fix": "Move the h2 and its description into the default slot; loading shows \"Ideas waiting for review\" with no number; empty shows no heading.",
+          "where": "Pending tab, check frames empty and loading",
+          "problem": "The \"3 ideas waiting for review\" heading sits outside the state slot, so empty and loading frames show a count of 3."
+        },
+        {
+          "area": "states",
+          "fix": "Render the board's phone frames with the same card markup and classes as the live 360px queue, icons included.",
+          "where": "States board, frames 6 and 8, 360px",
+          "problem": "The board's phone cards drop the action icons while the live 360px queue shows them: two versions of one card."
+        },
+        {
+          "area": "fit",
+          "fix": "Give every selected Budget and Duration segment the same leading check as Status; add user-plus to Make admin and shield-off to Remove admin.",
+          "where": "Edit panel (Budget, Duration); Users row actions",
+          "problem": "Selected \"Not set\" has no leading check while Status and tags do; Make admin and Remove admin are the only text buttons without icons."
+        }
+      ],
+      "at": "2026-11-25T17:51:28.421Z",
+      "checkRunId": "2026-11-25T17-39-38"
+    }
+  }
+}

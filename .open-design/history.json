@@ -45,6 +45,104 @@
         "theme": "light",
         "hero": "split"
       }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/home.html",
+      "title": "Home",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T18:07:08.173Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/idea-detail.html",
+      "title": "Idea detail",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T18:07:57.569Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/profile.html",
+      "title": "Profile",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T18:07:57.687Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/not-found.html",
+      "title": "Page not found",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T18:07:57.772Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/admin.html",
+      "title": "Admin",
+      "skillId": "od:prototype:app-table",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T18:37:51.134Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/share.html",
+      "title": "Share an idea",
+      "skillId": "od:prototype:web-prototype",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T18:38:50.336Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "split"
+      }
+    },
+    {
+      "entryPath": ".open-design/itsadate-screens/auth.html",
+      "title": "Log in and sign up",
+      "skillId": "od:prototype:flow-sign-in",
+      "collectionId": "itsadate-screens",
+      "date": "2026-11-25T18:39:21.745Z",
+      "signature": {
+        "accent": "#f06a4c",
+        "displayFont": "Fraunces",
+        "bodyFont": "DM Sans",
+        "theme": "light",
+        "hero": "centred"
+      }
     }
   ]
 }

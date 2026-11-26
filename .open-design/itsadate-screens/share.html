@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>It's a Date · Share an idea</title>
+<meta name="description" content="Share an idea: submit a new date idea for review. Screen 3 of 7 in It's a Date screens.">
+<!--
+  It's a Date · Share an idea (screen 3 of 7, collection itsadate-screens)
+  Route: /share (protected: a logged-out visitor is sent to /login?next=%2Fshare).
+  Main view: Maya Chen, logged in, part way through the form. She has added a photo, a title, a
+  description, two tags, a place type and a budget; duration is still to pick.
+  Submits POST /ideas with ideaCreateSchema (packages/shared/src/schemas/ideas.ts):
+    image     { url, publicId } from POST /uploads/image (auth, 5 MB, JPEG/PNG/WebP, spec 8.5)
+    title     3–80 characters
+    description 20–2000 characters
+    tagIds    1–3 tag ids, no duplicates
+    placeType one of PLACE_TYPES ("none" = No place needed)
+    budget    1 | 2 | 3   ($ / $$ / $$$)
+    duration  short | half-day | full-day   (1–2 hours / Half day / Full day)
+  New ideas start as status "pending"; an admin approves them before they show on Home.
+  The photo is a checked photo from content.md (the spare "croissants" photo).
+  The States board sits in a closed <details> ("Show design states") under the page. It is design-only
+  and not part of the real page: Phase 5 ports the frames, not the toggle.
+  Kit components carry data-component so the Phase 5 port maps them onto apps/web/src/components/ui/.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..600,0..100,0..1;1,9..144,400..600,0..100,0..1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FBF6F0;
+  --surface: #FFFDF9;
+  --surface-sunk: #F4EBE0;
+  --fg: #2A1A14;
+  --muted: #6E5D52;
+  --border: #E6D9CB;
+  --accent: #F06A4C;
+  --accent-hover: #F4826A;
+  --accent-ink: #B23E23;
+  --accent-soft: #FDE7DE;
+  --success: #2E7D4F;
+  --warn: #9A6400;
+  --danger: #B42C2C;
+  --overlay: rgba(255, 253, 249, 0.94);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --soft: "SOFT" 100, "WONK" 0;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --elev-raised: 0 1px 2px rgba(42, 26, 20, 0.06), 0 8px 24px rgba(42, 26, 20, 0.08);
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --gutter: 16px;
+  --header-h: 64px;
+}
+@media (min-width: 640px) { :root { --gutter: 28px; } }
+@media (min-width: 1024px) { :root { --gutter: 40px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { margin: 0; font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 500; }
+p, ol, ul, figure, fieldset { margin: 0; }
+fieldset { padding: 0; border: 0; min-width: 0; }
+legend { padding: 0; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+}
+.icon-muted { color: var(--muted); }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 50;
+  background: var(--accent); color: var(--fg); font-weight: 600;
+  padding: 8px 16px; border-radius: var(--radius-md); text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+.container { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter); }
+
+/* Buttons (data-component="Button") */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap; border: 1.5px solid transparent; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-weight: 600; letter-spacing: 0.02em;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.btn .icon { width: 18px; height: 18px; }
+.btn-md { padding: 12px 24px; font-size: 16px; min-height: 48px; }
+.btn-sm { padding: 8px 16px; font-size: 14px; min-height: 44px; }
+.btn-primary { background: var(--accent); color: var(--fg); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--fg); }
+.btn-secondary:hover { background: var(--surface-sunk); }
+.btn-ghost { background: transparent; color: var(--accent-ink); }
+.btn-ghost:hover { text-decoration: underline; }
+.btn.btn-flush { padding-inline: 0; }
+.btn[hidden] { display: none; }
+.btn:disabled { cursor: not-allowed; opacity: 0.6; }
+.btn:disabled:hover { background: var(--accent); }
+.btn[aria-disabled="true"] { cursor: progress; }
+.btn-spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Header (matches apps/web Header.tsx + AccountMenu.tsx; same as home.html) */
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--surface);
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms var(--ease);
+}
+.site-header.is-scrolled, .site-header.is-static { border-bottom-color: var(--border); }
+.site-header.is-static { position: relative; z-index: 2; }
+.site-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  height: var(--header-h); width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: var(--gutter);
+}
+.wordmark {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-family: var(--font-display); font-variation-settings: var(--soft);
+  font-style: italic; font-weight: 500; font-size: 20px; text-decoration: none;
+  border-radius: var(--radius-sm); min-height: 44px;
+}
+.wordmark-heart { width: 16px; height: 16px; fill: var(--accent); stroke: var(--accent); stroke-width: 1.75; stroke-linejoin: round; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-share-icon { display: none; }
+.account { position: relative; }
+.account-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: 4px 12px 4px 4px; border: 1px solid var(--border); border-radius: var(--radius-pill);
+  background: var(--surface); font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background-color 150ms var(--ease);
+}
+.account-btn:hover { background: var(--surface-sunk); }
+.avatar {
+  width: 32px; height: 32px; border-radius: var(--radius-pill); flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 14px; font-weight: 600;
+}
+.account-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 192px;
+  display: flex; flex-direction: column; gap: 4px; padding: 8px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  box-shadow: var(--elev-raised);
+}
+.account-menu[hidden] { display: none; }
+.menu-item {
+  display: block; width: 100%; padding: 10px 12px; border: 0; border-radius: var(--radius-sm);
+  background: none; text-align: left; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.menu-item:hover { background: var(--surface-sunk); }
+.nav-share-short { display: none; }
+.nav-share-short::before { content: "Share"; } /* phone label as CSS content, so the link text reads "Share an idea" */
+/* On this page "Share an idea" is the current place: no underline, just the current-page mark */
+.site-nav [aria-current="page"] { color: var(--fg); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+@media (max-width: 639px) { .site-nav .nav-share[aria-current="page"] { text-decoration: none; border-color: var(--fg); } }
+@media (max-width: 639px) {
+  .nav-actions { gap: 4px; }
+  .btn-sm { padding: 0 10px; }
+  .wordmark { font-size: 18px; }
+  .site-nav .nav-share-label, .site-nav .account-name, .site-nav .nav-ideas { display: none; }
+  .site-nav .nav-share-icon, .site-nav .nav-share-short { display: block; }
+  .site-nav .nav-share-icon { width: 16px; height: 16px; }
+  .site-nav .nav-share { gap: 2px; padding: 0 10px 0 8px; border-color: var(--border); border-width: 1px; border-radius: var(--radius-pill); }
+  .site-nav .account-btn { padding-right: 8px; }
+}
+@media (max-width: 359px) {
+  .site-nav { height: auto; min-height: var(--header-h); flex-wrap: wrap; padding-block: 8px; }
+}
+
+/* Back link */
+.backbar { padding-top: 16px; }
+.back { gap: 6px; }
+
+/* Page: one column, max 640px */
+.share { max-width: 640px; margin-inline: auto; padding: 8px 0 64px; }
+.share-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+.share-head h1 { font-size: 38px; line-height: 1.08; letter-spacing: -0.025em; }
+.share-head h1 em { font-style: italic; font-weight: 400; }
+.share-head p { color: var(--muted); max-width: 52ch; }
+@media (max-width: 639px) { .share-head h1 { font-size: 30px; } .share-head { margin-bottom: 24px; } }
+
+.form { display: flex; flex-direction: column; gap: 32px; }
+.form[aria-busy="true"] .input, .form[aria-busy="true"] .select { background: var(--surface-sunk); }
+
+/* Input (data-component="Input") */
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field-label { font-size: 14px; font-weight: 600; }
+.field-label .opt { font-weight: 400; color: var(--muted); }
+.input, .select {
+  width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--muted); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: 16px;
+  transition: border-color 150ms var(--ease);
+}
+textarea.input { min-height: 168px; resize: vertical; line-height: 1.55; }
+textarea.input.is-title { min-height: 0; resize: none; }
+.input::placeholder { color: var(--muted); opacity: 1; }
+.input:focus-visible, .select:focus-visible { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px rgba(240, 106, 76, 0.3); }
+.input[aria-invalid="true"], .select[aria-invalid="true"] { border-color: var(--danger); }
+.helper-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.helper-row .error { min-width: 0; }
+.helper { font-size: 12px; color: var(--muted); }
+.count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; flex-shrink: 0; margin-left: auto; }
+.count.is-full { color: var(--fg); font-weight: 600; }
+.error { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; color: var(--danger); }
+.error .icon { width: 14px; height: 14px; margin-top: 2px; }
+
+/* Select with a drawn chevron */
+.select-wrap { position: relative; }
+.select { appearance: none; -webkit-appearance: none; padding-right: 44px; cursor: pointer; }
+.select-wrap > .icon { position: absolute; right: 14px; top: 50%; width: 18px; height: 18px; margin-top: -9px; color: var(--muted); pointer-events: none; }
+
+/* Photo: drop zone, then the 4:3 preview */
+.dropzone {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  min-height: 240px; padding: 32px 24px; text-align: center; cursor: pointer;
+  background: var(--surface); border: 1.5px dashed var(--muted); border-radius: var(--radius-lg);
+  transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.dropzone:hover, .dropzone.is-over { background: var(--surface-sunk); }
+.dropzone:focus-within { border-color: var(--accent-ink); box-shadow: 0 0 0 3px rgba(240, 106, 76, 0.3); }
+.dropzone > .icon { width: 32px; height: 32px; color: var(--muted); }
+.dropzone-title { font-size: 16px; font-weight: 600; }
+.dropzone-sub { font-size: 14px; color: var(--muted); }
+.dropzone-sub u { color: var(--accent-ink); text-underline-offset: 2px; }
+.dropzone.is-error { border-color: var(--danger); border-style: solid; }
+.dropzone.is-error > .icon { color: var(--danger); }
+@media (max-width: 639px) { .dropzone { min-height: 200px; padding: 24px 16px; } }
+
+.media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; background: var(--surface-sunk); }
+.media img { width: 100%; height: 100%; object-fit: cover; }
+.media.is-uploading img { opacity: 0.55; }
+.photo-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; margin-top: 8px; }
+.photo-file { min-width: 0; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.photo-file strong { color: var(--fg); font-weight: 500; }
+.photo-actions { display: flex; align-items: center; gap: 8px; }
+
+.progress { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.progress-top { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.progress-top span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
+.progress-track { height: 6px; border-radius: var(--radius-pill); background: var(--surface-sunk); overflow: hidden; }
+.progress-fill { height: 100%; width: 64%; border-radius: var(--radius-pill); background: var(--fg); }
+
+/* Tags: selectable chips (data-component="Chip"), pick 1–3 */
+.chip-pick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.pick {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px;
+  border: 1px solid var(--muted); border-radius: var(--radius-pill); background: var(--surface);
+  font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background-color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.pick .icon { width: 16px; height: 16px; }
+.pick:hover { background: var(--surface-sunk); }
+.pick .i-on { display: none; }
+.pick[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent-ink); color: var(--accent-ink); font-weight: 600; }
+.pick[aria-pressed="true"] .i-on { display: block; }
+.pick[aria-pressed="true"] .i-off { display: none; }
+.pick[aria-disabled="true"] { background: var(--surface-sunk); border-color: var(--border); color: var(--muted); cursor: not-allowed; }
+.pick[aria-disabled="true"]:hover { background: var(--surface-sunk); }
+.chip-pick.is-invalid .pick:not([aria-pressed="true"]) { border-color: var(--danger); }
+
+/* Budget and duration: segmented radios. Selected = dark fill with cream text (not coral). */
+.seg {
+  display: flex; width: 100%; max-width: 420px; padding: 4px; gap: 4px; margin-top: 4px;
+  background: var(--surface); border: 1px solid var(--muted); border-radius: var(--radius-pill);
+}
+.seg.is-invalid { border-color: var(--danger); }
+.seg label { position: relative; flex: 1 1 0; min-width: 0; }
+.seg span {
+  display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 8px;
+  border-radius: var(--radius-pill); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease);
+}
+.seg span:hover { background: var(--surface-sunk); }
+.seg span { gap: 4px; border: 1px solid transparent; }
+.seg-check { display: none; width: 14px; height: 14px; }
+.seg input:checked + span { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; border-color: var(--accent-ink); }
+.seg input:checked + span .seg-check { display: block; }
+.seg input:focus-visible + span { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+.seg input:disabled + span { cursor: default; }
+.seg-hint { display: flex; justify-content: space-between; max-width: 420px; font-size: 12px; color: var(--muted); padding-inline: 16px; }
+
+/* Submit */
+.submit { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-top: 8px; border-top: 1px solid var(--border); }
+.submit-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding-top: 16px; }
+.submit .btn-primary { min-width: 200px; }
+.submit-note { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.submit-note .icon { width: 16px; height: 16px; }
+.submit-status { font-size: 14px; font-weight: 500; }
+@media (max-width: 639px) { .submit-row { flex-direction: column; align-items: stretch; } .submit .btn-primary { width: 100%; } }
+
+/* Form-level error summary (mirrors FormError in apps/web) */
+.form-error {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
+  border: 1px solid var(--danger); border-radius: var(--radius-sm); background: var(--surface);
+  color: var(--danger); font-size: 14px; font-weight: 600;
+}
+.form-error .icon { width: 18px; height: 18px; margin-top: 1px; }
+.form-error ul { margin: 4px 0 0; padding-left: 18px; font-weight: 400; }
+.form-error a { color: var(--danger); }
+
+/* Chip (data-component="Chip"), as on the cards */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: var(--radius-pill);
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.chip .icon { width: 14px; height: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Success (replaces the form) */
+.done { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.done > .icon { width: 40px; height: 40px; color: var(--success); }
+.done h3 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; }
+.done h3 em { font-style: italic; font-weight: 400; }
+.done-copy { color: var(--muted); max-width: 52ch; }
+.done-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+@media (max-width: 639px) { .done h3 { font-size: 24px; line-height: 1.2; } .done-actions { flex-direction: column; align-items: stretch; width: 100%; } }
+.mini-card { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 8px; }
+.badge {
+  position: absolute; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: var(--radius-pill); background: var(--overlay); box-shadow: var(--elev-raised);
+  font-size: 12px; font-weight: 600; color: var(--warn);
+}
+.badge .icon { width: 14px; height: 14px; }
+.card-title { font-family: var(--font-display); font-variation-settings: var(--soft); font-weight: 600; font-size: 20px; line-height: 1.2; letter-spacing: -0.01em; }
+.meta { font-size: 14px; color: var(--muted); }
+
+/* Toast (data-component="Toast") */
+.toast {
+  display: inline-flex; align-items: center; gap: 12px; max-width: 100%;
+  padding: 12px 16px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--elev-raised); font-size: 14px; font-weight: 500;
+}
+.toast .icon { width: 18px; height: 18px; }
+.toast.is-success .icon { color: var(--success); }
+.toast-region { position: fixed; left: 50%; bottom: 24px; z-index: 70; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px); }
+/* The live region stays rendered while empty (an empty fixed box has no size), never display:none, so screen readers already track it when a toast is put in. The toast inside has the box styles. */
+.toast-region:empty { pointer-events: none; }
+
+/* Design states toggle: design-only, closed by default, not part of the real page */
+.design-states { background: var(--surface-sunk); border-top: 1px solid var(--border); }
+.design-states-summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  width: 100%; max-width: 1200px; margin-inline: auto; padding: 12px var(--gutter);
+  list-style: none; cursor: pointer;
+}
+.design-states-summary::-webkit-details-marker { display: none; }
+.design-states-label {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; font-weight: 600;
+}
+.design-states-label .icon { width: 18px; height: 18px; transition: transform 150ms var(--ease); }
+.design-states[open] .design-states-label .icon { transform: rotate(180deg); }
+.design-states-note { font-size: 14px; color: var(--muted); }
+.design-states .when-open, .design-states[open] .when-closed { display: none; }
+.design-states[open] .when-open { display: inline; }
+/* Closed: no box at all (Chromium otherwise keeps the hidden board laid out at zero size) */
+.design-states:not([open]) > .board { display: none; }
+
+/* States board */
+.board { background: var(--surface-sunk); padding: 24px 0 96px; }
+.board-head { max-width: 65ch; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.board-head h2 { font-size: 30px; line-height: 1.08; letter-spacing: -0.025em; margin-top: 8px; }
+.board-head h2 em { font-style: italic; font-weight: 400; }
+.board-head p { margin-top: 12px; color: var(--muted); }
+.board code {
+  font-family: ui-monospace, Consolas, monospace; font-size: 14px; color: var(--fg);
+  background: var(--bg); padding: 1px 6px; border-radius: 6px; word-break: break-all;
+}
+.state { margin-top: 48px; }
+.state > .eyebrow { margin-bottom: 12px; }
+.state-note { margin-top: 12px; max-width: 65ch; font-size: 14px; color: var(--muted); }
+.state-note strong { font-weight: 600; }
+.frame { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); min-width: 0; }
+.frame-pad { padding: 32px; }
+.frame .share { padding: 0; }
+.frame .form { gap: 28px; }
+.frame-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+@media (min-width: 900px) { .frame-split { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.frame-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
+.redirect { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; }
+.redirect .icon { width: 18px; height: 18px; color: var(--muted); }
+.note-panel {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 12px; max-width: 640px;
+  padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+.note-panel h3 { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
+.note-panel p { color: var(--muted); }
+@media (max-width: 767px) {
+  .board { padding: 16px 0 64px; }
+  .frame-pad { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body data-od-current="share" data-od-end>
+
+<svg width="0" height="0" class="sr-only" aria-hidden="true" focusable="false">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+  <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-dice" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M16 8h.01"/><path d="M8 8h.01"/><path d="M8 16h.01"/><path d="M16 16h.01"/><path d="M12 12h.01"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="i-flower" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 1 3 3m-3-3a3 3 0 1 0-3 3m3-3v1M9 8a3 3 0 1 0 3 3M9 8h1m5 0a3 3 0 1 1-3 3m3-3h-1m-2 3v-1"/><circle cx="12" cy="8" r="2"/><path d="M12 10v12"/><path d="M12 22c4.2 0 7-1.667 7-5-4.2 0-7 1.667-7 5Z"/><path d="M12 22c-4.2 0-7-1.667-7-5 4.2 0 7 1.667 7 5Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+  <symbol id="i-image-plus" viewBox="0 0 24 24"><path d="M16 5h6"/><path d="M19 2v6"/><path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/><circle cx="9" cy="9" r="2"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></symbol>
+  <symbol id="i-loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+</svg>
+
+<a class="skip-link" href="#content">Skip to content</a>
+
+<header class="site-header" id="site-header" data-od-id="header">
+  <template data-od-include="_shared/nav.html"></template>
+</header>
+
+<main id="content" tabindex="-1">
+  <div class="container backbar" data-od-id="back">
+    <a class="btn btn-ghost btn-sm btn-flush back" href="home.html" data-od-goto="home" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>All ideas</a>
+  </div>
+
+  <!-- ===================== Share form ===================== -->
+  <section class="container" data-od-id="share" aria-labelledby="share-title">
+    <div class="share">
+      <div class="share-head">
+        <h1 id="share-title">Share <em>an idea</em></h1>
+        <p>Tell people about a date you'd happily go on again. A good photo, a few lines on what to do, and roughly what it costs.</p>
+      </div>
+
+      <form class="form" id="share-form" novalidate data-share-form>
+        <!-- Photo: drop zone until a file is picked, then the 4:3 preview with Replace and Remove -->
+        <div class="field" data-photo data-od-id="photo">
+          <span class="field-label" id="photo-label">Photo</span>
+          <label class="dropzone" data-dropzone hidden>
+            <input class="sr-only" type="file" name="image" accept="image/jpeg,image/png,image/webp" aria-labelledby="photo-label photo-add" aria-describedby="photo-help" data-photo-input>
+            <svg class="icon" aria-hidden="true"><use href="#i-image-plus"/></svg>
+            <span class="dropzone-title" id="photo-add">Add a photo</span>
+            <span class="dropzone-sub">Drag it here or <u>choose a file</u></span>
+            <span class="helper" id="photo-help">JPEG, PNG or WebP, up to 5 MB</span>
+          </label>
+          <div data-preview>
+            <div class="media">
+              <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="Your photo: croissants on a bakery counter" width="800" height="600" data-preview-img>
+            </div>
+            <div class="photo-bar">
+              <p class="photo-file"><strong data-preview-name>pastry-walk.jpg</strong> · 2.4 MB</p>
+              <div class="photo-actions">
+                <button type="button" class="btn btn-secondary btn-sm" data-photo-replace data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Replace</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-photo-remove data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div class="field" data-component="Input">
+          <label class="field-label" for="title">Title</label>
+          <input class="input" id="title" name="title" type="text" maxlength="80" value="Sunday pastry walk" placeholder="Pottery for two" aria-describedby="title-count" data-count-for="title-count">
+          <div class="helper-row"><span class="helper">Short and concrete works best.</span><span class="count" id="title-count">18/80</span></div>
+        </div>
+
+        <!-- Description -->
+        <div class="field" data-component="Input">
+          <label class="field-label" for="description">Description</label>
+          <textarea class="input" id="description" name="description" maxlength="2000" rows="5" placeholder="What do you do, and what makes it fun?" aria-describedby="desc-help desc-count" data-count-for="desc-count">Pick three bakeries within walking distance and buy one pastry at each. Share everything, score them out of ten on a napkin, and finish with a coffee at the winner.</textarea>
+          <div class="helper-row"><span class="helper" id="desc-help">At least 20 characters</span><span class="count" id="desc-count">164/2000</span></div>
+        </div>
+
+        <!-- Tags: pick 1–3 -->
+        <fieldset class="field" data-tags>
+          <legend class="field-label">Tags</legend>
+          <p class="helper" id="tags-help" data-tags-help>Pick up to 3</p>
+          <div class="chip-pick" role="group" aria-describedby="tags-help">
+            <button type="button" class="pick" aria-pressed="true" data-component="Chip" data-tag="food"><svg class="icon i-off" aria-hidden="true"><use href="#i-utensils"/></svg><svg class="icon i-on" aria-hidden="true"><use href="#i-check"/></svg>Food</button>
+            <button type="button" class="pick" aria-pressed="true" data-component="Chip" data-tag="adventure"><svg class="icon i-off" aria-hidden="true"><use href="#i-mountain"/></svg><svg class="icon i-on" aria-hidden="true"><use href="#i-check"/></svg>Adventure</button>
+            <button type="button" class="pick" aria-pressed="false" data-component="Chip" data-tag="home"><svg class="icon i-off" aria-hidden="true"><use href="#i-house"/></svg><svg class="icon i-on" aria-hidden="true"><use href="#i-check"/></svg>Home</button>
+            <button type="button" class="pick" aria-pressed="false" data-component="Chip" data-tag="self-date"><svg class="icon i-off" aria-hidden="true"><use href="#i-heart"/></svg><svg class="icon i-on" aria-hidden="true"><use href="#i-check"/></svg>Self-date</button>
+            <button type="button" class="pick" aria-pressed="false" data-component="Chip" data-tag="board-game"><svg class="icon i-off" aria-hidden="true"><use href="#i-dice"/></svg><svg class="icon i-on" aria-hidden="true"><use href="#i-check"/></svg>Board games</button>
+            <button type="button" class="pick" aria-pressed="false" data-component="Chip" data-tag="dancing"><svg class="icon i-off" aria-hidden="true"><use href="#i-music"/></svg><svg class="icon i-on" aria-hidden="true"><use href="#i-check"/></svg>Dancing</button>
+            <button type="button" class="pick" aria-pressed="false" data-component="Chip" data-tag="self-care"><svg class="icon i-off" aria-hidden="true"><use href="#i-flower"/></svg><svg class="icon i-on" aria-hidden="true"><use href="#i-check"/></svg>Self-care</button>
+            <button type="button" class="pick" aria-pressed="false" data-component="Chip" data-tag="learning"><svg class="icon i-off" aria-hidden="true"><use href="#i-book"/></svg><svg class="icon i-on" aria-hidden="true"><use href="#i-check"/></svg>Learning</button>
+          </div>
+        </fieldset>
+
+        <!-- Place type: readable labels for PLACE_TYPES -->
+        <div class="field" data-component="Input">
+          <label class="field-label" for="place-type">Place type</label>
+          <div class="select-wrap">
+            <select class="select" id="place-type" name="placeType" aria-describedby="place-help">
+              <option value="" disabled>Choose a place type</option>
+              <option value="none">No place needed</option>
+              <option value="restaurant">Restaurant</option>
+              <option value="sushi">Sushi</option>
+              <option value="cafe" selected>Cafe</option>
+              <option value="bar">Bar</option>
+              <option value="park">Park</option>
+              <option value="viewpoint">Viewpoint</option>
+              <option value="museum">Museum</option>
+              <option value="cinema">Cinema</option>
+              <option value="theatre">Theatre</option>
+              <option value="climbing_gym">Climbing gym</option>
+              <option value="bowling">Bowling</option>
+              <option value="escape_room">Escape room</option>
+              <option value="spa">Spa</option>
+              <option value="beach">Beach</option>
+            </select>
+            <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+          </div>
+          <p class="helper" id="place-help">We use it to find places near whoever reads your idea. Pick "No place needed" for dates at home.</p>
+        </div>
+
+        <!-- Budget -->
+        <fieldset class="field">
+          <legend class="field-label">Budget</legend>
+          <div class="seg">
+            <label><input class="sr-only" type="radio" name="budget" value="1" aria-label="$, low budget" checked><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$</span></label>
+            <label><input class="sr-only" type="radio" name="budget" value="2" aria-label="$$, medium budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$</span></label>
+            <label><input class="sr-only" type="radio" name="budget" value="3" aria-label="$$$, high budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$$</span></label>
+          </div>
+          <p class="seg-hint" aria-hidden="true"><span>Low</span><span>High</span></p>
+        </fieldset>
+
+        <!-- Duration -->
+        <fieldset class="field">
+          <legend class="field-label">Duration</legend>
+          <div class="seg">
+            <label><input class="sr-only" type="radio" name="duration" value="short"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>1–2 hours</span></label>
+            <label><input class="sr-only" type="radio" name="duration" value="half-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Half day</span></label>
+            <label><input class="sr-only" type="radio" name="duration" value="full-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Full day</span></label>
+          </div>
+        </fieldset>
+
+        <!-- Submit -->
+        <div class="submit">
+          <div class="submit-row">
+            <button type="submit" class="btn btn-primary btn-md" data-submit data-component="Button">Send for review</button>
+            <p class="submit-note"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>An admin checks every idea before it goes live.</p>
+          </div>
+          <p class="submit-status sr-only" role="status" data-submit-status></p>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== States board (design-only, behind a closed toggle) ===================== -->
+  <details class="design-states" data-od-id="design-states">
+    <summary class="design-states-summary">
+      <span class="design-states-label"><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg><span class="when-closed">Show design states</span><span class="when-open">Hide design states</span></span>
+      <span class="design-states-note">Design only, not part of the real page.</span>
+    </summary>
+  <section class="board" data-od-id="states-board" aria-labelledby="board-title">
+    <div class="container">
+      <div class="board-head">
+        <p class="eyebrow">States board</p>
+        <h2 id="board-title">Share an idea, in <em>every</em> state</h2>
+        <p>Each frame is one state of this page, for the Phase 5 port and the upload work in Phase 7. The page above is Maya Chen, logged in, part way through: photo, title, description, two tags, place type and budget done, duration still to pick. Frames show the form only; the header and the "All ideas" link stay as they are.</p>
+      </div>
+
+      <!-- 1. Field errors -->
+      <div class="state" id="state-errors" data-od-id="state-errors">
+        <p class="eyebrow">1 · Field errors</p>
+        <div class="frame frame-pad">
+          <div class="share">
+            <form class="form" novalidate aria-label="Share an idea, with errors">
+              <div class="form-error" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><div>Check the 4 fields marked below.<ul><li><a href="#e-title">Title</a></li><li><a href="#e-desc">Description</a></li><li><a href="#e-tags">Tags</a></li><li><a href="#e-duration">Duration</a></li></ul></div></div>
+              <div class="field">
+                <span class="field-label">Photo</span>
+                <div class="media"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="Your photo: croissants on a bakery counter" width="800" height="600" loading="lazy"></div>
+                <div class="photo-bar"><p class="photo-file"><strong>pastry-walk.jpg</strong> · 2.4 MB</p><div class="photo-actions"><button type="button" class="btn btn-secondary btn-sm" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Replace</button><button type="button" class="btn btn-ghost btn-sm" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Remove</button></div></div>
+              </div>
+              <div class="field" data-component="Input">
+                <label class="field-label" for="e-title">Title</label>
+                <input class="input" id="e-title" type="text" maxlength="80" value="Go" aria-invalid="true" aria-describedby="e-title-err e-title-count">
+                <div class="helper-row"><p class="error" id="e-title-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Use at least 3 characters.</p><span class="count" id="e-title-count">2/80</span></div>
+              </div>
+              <div class="field" data-component="Input">
+                <label class="field-label" for="e-desc">Description</label>
+                <textarea class="input" id="e-desc" maxlength="2000" rows="3" aria-invalid="true" aria-describedby="e-desc-err e-desc-count">Pastries :)</textarea>
+                <div class="helper-row"><p class="error" id="e-desc-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Write at least 20 characters. You have 11 so far.</p><span class="count" id="e-desc-count">11/2000</span></div>
+              </div>
+              <fieldset class="field">
+                <legend class="field-label" id="e-tags">Tags</legend>
+                <p class="error" id="e-tags-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Pick at least 1 tag.</p>
+                <div class="chip-pick is-invalid" role="group" aria-labelledby="e-tags" aria-describedby="e-tags-err">
+                  <button type="button" class="pick" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</button>
+                  <button type="button" class="pick" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</button>
+                  <button type="button" class="pick" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</button>
+                  <button type="button" class="pick" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</button>
+                  <button type="button" class="pick" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg>Board games</button>
+                  <button type="button" class="pick" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</button>
+                  <button type="button" class="pick" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</button>
+                  <button type="button" class="pick" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg>Learning</button>
+                </div>
+              </fieldset>
+              <div class="field" data-component="Input">
+                <label class="field-label" for="e-place">Place type</label>
+                <div class="select-wrap">
+                  <select class="select" id="e-place"><option value="cafe" selected>Cafe</option><option value="none">No place needed</option></select>
+                  <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+                </div>
+              </div>
+              <fieldset class="field">
+                <legend class="field-label">Budget</legend>
+                <div class="seg">
+                  <label><input class="sr-only" type="radio" name="e-budget" value="1" aria-label="$, low budget" checked><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$</span></label>
+                  <label><input class="sr-only" type="radio" name="e-budget" value="2" aria-label="$$, medium budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$</span></label>
+                  <label><input class="sr-only" type="radio" name="e-budget" value="3" aria-label="$$$, high budget"><span aria-hidden="true"><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>$$$</span></label>
+                </div>
+              </fieldset>
+              <fieldset class="field" aria-describedby="e-duration-err">
+                <legend class="field-label" id="e-duration">Duration</legend>
+                <div class="seg is-invalid">
+                  <label><input class="sr-only" type="radio" name="e-duration" value="short"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>1–2 hours</span></label>
+                  <label><input class="sr-only" type="radio" name="e-duration" value="half-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Half day</span></label>
+                  <label><input class="sr-only" type="radio" name="e-duration" value="full-day"><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Full day</span></label>
+                </div>
+                <p class="error" id="e-duration-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Pick how long it takes.</p>
+              </fieldset>
+              <div class="submit">
+                <div class="submit-row">
+                  <button type="button" class="btn btn-primary btn-md" data-component="Button">Send for review</button>
+                  <p class="submit-note"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>An admin checks every idea before it goes live.</p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <p class="state-note">The same messages show on blur (client check with <code>ideaCreateSchema</code>) and when the API answers 422: each issue whose path matches a field lands on that field (as <code>applyServerErrors</code> does for Log in), and focus moves to the first one. The summary links jump to each field. While a field is invalid, its error takes the place of the helper text, on the same row as the counter; the helper comes back once the value is fine. Everything Maya typed stays. A 422 issue that matches no field, or any other error, shows only in the summary box.</p>
+      </div>
+
+      <!-- 2. Uploading -->
+      <div class="state" id="state-uploading" data-od-id="state-uploading">
+        <p class="eyebrow">2 · Uploading the photo</p>
+        <div class="frame frame-pad">
+          <div class="share">
+            <div class="form" aria-busy="true">
+              <div class="field">
+                <span class="field-label">Photo</span>
+                <div class="media is-uploading"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="Your photo, uploading: croissants on a bakery counter" width="800" height="600" loading="lazy"></div>
+                <div class="progress">
+                  <div class="progress-top"><span>Uploading pastry-walk.jpg…</span><span>64%</span></div>
+                  <div class="progress-track" role="progressbar" aria-label="Photo upload" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64"><div class="progress-fill"></div></div>
+                </div>
+                <div class="photo-bar"><p class="photo-file">2.4 MB</p><div class="photo-actions"><button type="button" class="btn btn-ghost btn-sm" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>Cancel upload</button></div></div>
+              </div>
+              <div class="submit">
+                <div class="submit-row">
+                  <button type="button" class="btn btn-primary btn-md" disabled data-component="Button">Send for review</button>
+                  <p class="submit-note" id="wait-note"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>You can send it once the photo has uploaded.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Picking a file starts <code>POST /uploads/image</code> at once, so the photo is ready by the time the rest is filled in. The preview shows straight away from the local file, faded until the upload finishes. "Send for review" stays disabled only while the upload runs (nothing of its own is in flight), and the line beside it says why. The other fields stay editable. Progress over 10 seconds adds "Still uploading. Keep waiting or cancel."</p>
+      </div>
+
+      <!-- 3. Upload failed: a rejected file, and a dropped connection -->
+      <div class="state" id="state-upload-failed" data-od-id="state-upload-failed">
+        <p class="eyebrow">3 · Upload failed</p>
+        <div class="frame frame-pad">
+          <div class="frame-split">
+            <div>
+              <p class="frame-label">The file was rejected (type, size, not an image)</p>
+              <div class="field">
+                <span class="field-label" id="f-photo-label">Photo</span>
+                <label class="dropzone is-error">
+                  <input class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" aria-labelledby="f-photo-label f-photo-add" aria-describedby="f-photo-err" aria-invalid="true">
+                  <svg class="icon" aria-hidden="true"><use href="#i-image-plus"/></svg>
+                  <span class="dropzone-title" id="f-photo-add">Add a photo</span>
+                  <span class="dropzone-sub">Drag it here or <u>choose a file</u></span>
+                  <span class="helper">JPEG, PNG or WebP, up to 5 MB</span>
+                </label>
+                <p class="error" id="f-photo-err" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>That photo didn't upload. Try a JPEG, PNG or WebP under 5 MB.</p>
+              </div>
+            </div>
+            <div>
+              <p class="frame-label">The connection dropped during the upload</p>
+              <div class="field">
+                <span class="field-label">Photo</span>
+                <div class="media is-uploading"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="Your photo, not uploaded yet: croissants on a bakery counter" width="800" height="600" loading="lazy"></div>
+                <p class="error" id="f-net-err" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>pastry-walk.jpg didn't finish uploading.</p>
+                <div class="photo-bar"><p class="photo-file"><strong>pastry-walk.jpg</strong> · 2.4 MB</p><div class="photo-actions"><button type="button" class="btn btn-secondary btn-sm" aria-describedby="f-net-err" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Try again</button><button type="button" class="btn btn-ghost btn-sm" data-component="Button"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Remove</button></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Two failures, two next steps. <strong>Rejected:</strong> the browser's own check or the API refuses the file (wrong type, over 5 MB with the API's 413, or not really an image). The photo is dropped, the drop zone comes back with a red edge, and the message says what to pick instead. <strong>Dropped connection:</strong> the file was fine but the upload didn't finish. The faded preview and file name stay, "Try again" re-sends the same file, and Remove clears it. In both cases the rest of the form keeps what was typed, and "Send for review" stays disabled until a photo has uploaded.</p>
+      </div>
+
+      <!-- 4. Submitting -->
+      <div class="state" id="state-submitting" data-od-id="state-submitting">
+        <p class="eyebrow">4 · Sending for review</p>
+        <div class="frame frame-pad">
+          <div class="share">
+            <div class="form" aria-busy="true">
+              <div class="field" data-component="Input">
+                <label class="field-label" for="s-title">Title</label>
+                <input class="input" id="s-title" type="text" value="Sunday pastry walk" readonly>
+                <div class="helper-row"><span class="helper">Short and concrete works best.</span><span class="count">18/80</span></div>
+              </div>
+              <fieldset class="field">
+                <legend class="field-label">Duration</legend>
+                <div class="seg">
+                  <label><input class="sr-only" type="radio" name="s-duration" value="short" checked disabled><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>1–2 hours</span></label>
+                  <label><input class="sr-only" type="radio" name="s-duration" value="half-day" disabled><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Half day</span></label>
+                  <label><input class="sr-only" type="radio" name="s-duration" value="full-day" disabled><span><svg class="icon seg-check" aria-hidden="true"><use href="#i-check"/></svg>Full day</span></label>
+                </div>
+              </fieldset>
+              <div class="submit">
+                <div class="submit-row">
+                  <button type="button" class="btn btn-primary btn-md" aria-disabled="true" aria-describedby="s-status" data-component="Button"><svg class="icon btn-spin" aria-hidden="true"><use href="#i-loader"/></svg>Sending…</button>
+                  <p class="submit-status" id="s-status" role="status">Sending your idea for review…</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">The button keeps its size and focus (<code>aria-disabled</code>, repeat clicks ignored), shows the spinner and "Sending…", and the status line is announced. Fields are read-only while <code>POST /ideas</code> runs; nothing is cleared. The frame shows the last field and the button; the fields above look the same, read-only.</p>
+      </div>
+
+      <!-- 5. Success -->
+      <div class="state" id="state-success" data-od-id="state-success">
+        <p class="eyebrow">5 · Sent: waiting for review</p>
+        <div class="frame frame-pad">
+          <div class="share">
+            <div class="done" tabindex="-1">
+              <svg class="icon" aria-hidden="true"><use href="#i-circle-check"/></svg>
+              <h3>Thanks! Your idea is <em>waiting for review.</em></h3>
+              <p class="done-copy">An admin checks every idea before it goes live. Until then it shows as Pending review on your profile, and only you can see it.</p>
+              <div class="mini-card" data-component="Card">
+                <div class="media">
+                  <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop" alt="Croissants on a bakery counter" width="800" height="600" loading="lazy">
+                  <span class="badge"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Pending review</span>
+                </div>
+                <p class="card-title">Sunday pastry walk</p>
+                <p class="meta">$ · 1–2 hours</p>
+                <div class="chips"><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg>Food</span><span class="chip" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-mountain"/></svg>Adventure</span></div>
+              </div>
+              <div class="done-actions">
+                <a class="btn btn-primary btn-md" href="profile.html#ideas" data-od-goto="profile" data-component="Button">See it on your profile<svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+                <a class="btn btn-secondary btn-md" href="share.html" data-component="Button">Share another</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">Replaces the form after <code>201</code>, and focus moves to the heading. The card is the new idea as it will look on Profile, with both its tags, with the "Pending review" badge in warn colour. "See it on your profile" opens Profile on Your ideas; "Share another" gives a fresh, empty form (frame 7). A toast is not used here because the page itself changes.</p>
+      </div>
+
+      <!-- 6. Logged out -->
+      <div class="state" id="state-logged-out" data-od-id="state-logged-out">
+        <p class="eyebrow">6 · Logged out (a note: this page never shows)</p>
+        <div class="frame frame-pad">
+          <div class="note-panel">
+            <svg class="icon icon-muted" aria-hidden="true"><use href="#i-lock"/></svg>
+            <h3>You never see this page logged out</h3>
+            <p>The route guard sends a logged-out visitor from <code>/share</code> to <code>/login?next=%2Fshare</code> before anything here renders. Log in opens with the hint "Log in to share your idea", and after logging in (or signing up) they come straight back to an empty Share form.</p>
+            <p class="redirect"><code>/share</code><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg><code>/login?next=%2Fshare</code><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg><code>/share</code></p>
+            <a class="btn btn-secondary btn-sm" href="auth.html#state-next" data-od-goto="auth" data-component="Button">See the hint on Log in</a>
+          </div>
+        </div>
+        <p class="state-note">"Share an idea" in the logged-out header, and the phone "+ Share" pill, link to Log in with the same <code>next</code>. The guard is <code>apps/web/src/app/guards.tsx</code>; <code>safeNext</code> only accepts same-site paths.</p>
+      </div>
+
+      <!-- 7. Empty -->
+      <div class="state" id="state-empty" data-od-id="state-empty">
+        <p class="eyebrow">7 · Empty, before you start</p>
+        <div class="frame frame-pad">
+          <div class="share">
+            <div class="form">
+              <div class="field">
+                <span class="field-label" id="n-photo-label">Photo</span>
+                <label class="dropzone">
+                  <input class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" aria-labelledby="n-photo-label n-photo-add" aria-describedby="n-photo-help">
+                  <svg class="icon" aria-hidden="true"><use href="#i-image-plus"/></svg>
+                  <span class="dropzone-title" id="n-photo-add">Add a photo</span>
+                  <span class="dropzone-sub">Drag it here or <u>choose a file</u></span>
+                  <span class="helper" id="n-photo-help">JPEG, PNG or WebP, up to 5 MB</span>
+                </label>
+              </div>
+              <div class="field" data-component="Input">
+                <label class="field-label" for="n-title">Title</label>
+                <input class="input" id="n-title" type="text" maxlength="80" placeholder="Pottery for two" aria-describedby="n-title-count">
+                <div class="helper-row"><span class="helper">Short and concrete works best.</span><span class="count" id="n-title-count">0/80</span></div>
+              </div>
+              <div class="field" data-component="Input">
+                <label class="field-label" for="n-desc">Description</label>
+                <textarea class="input" id="n-desc" maxlength="2000" rows="3" placeholder="What do you do, and what makes it fun?" aria-describedby="n-desc-help n-desc-count"></textarea>
+                <div class="helper-row"><span class="helper" id="n-desc-help">At least 20 characters</span><span class="count" id="n-desc-count">0/2000</span></div>
+              </div>
+              <div class="field" data-component="Input">
+                <label class="field-label" for="n-place">Place type</label>
+                <div class="select-wrap">
+                  <select class="select" id="n-place"><option value="" selected disabled>Choose a place type</option><option value="none">No place needed</option><option value="restaurant">Restaurant</option></select>
+                  <svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">What "Share another" and a first visit show. Nothing is picked: no tag, no budget, no duration, and the place type select says "Choose a place type". No messages until a field is left (validation on blur). Tags, budget and duration look like the page above with nothing selected.</p>
+      </div>
+
+      <!-- 8. At the limits -->
+      <div class="state" id="state-limits" data-od-id="state-limits">
+        <p class="eyebrow">8 · At the limits: 80 characters and 3 tags</p>
+        <div class="frame frame-pad">
+          <div class="share">
+            <div class="form">
+              <div class="field" data-component="Input">
+                <label class="field-label" for="l-title">Title</label>
+                <textarea class="input is-title" id="l-title" maxlength="80" rows="3" aria-describedby="l-title-count">A slow Saturday at the farmers market, then a picnic lunch by the river for two!</textarea>
+                <div class="helper-row"><span class="helper">Short and concrete works best.</span><span class="count is-full" id="l-title-count">80/80</span></div>
+              </div>
+              <fieldset class="field">
+                <legend class="field-label">Tags</legend>
+                <p class="helper" id="l-tags-help">You've picked 3. Remove one to pick another.</p>
+                <div class="chip-pick" role="group" aria-describedby="l-tags-help">
+                  <button type="button" class="pick" aria-pressed="true" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Food</button>
+                  <button type="button" class="pick" aria-pressed="true" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Adventure</button>
+                  <button type="button" class="pick" aria-disabled="true" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Home</button>
+                  <button type="button" class="pick" aria-disabled="true" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Self-date</button>
+                  <button type="button" class="pick" aria-disabled="true" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-dice"/></svg>Board games</button>
+                  <button type="button" class="pick" aria-disabled="true" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>Dancing</button>
+                  <button type="button" class="pick" aria-disabled="true" aria-pressed="false" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-flower"/></svg>Self-care</button>
+                  <button type="button" class="pick" aria-pressed="true" data-component="Chip"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Learning</button>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+        <p class="state-note">The 80-character title (content.md idea 2) wraps in full in the field, which grows to fit (two lines on desktop, three on phones); the counter turns dark at 80/80 and the field takes no more. In the app the title is a one-line input that scrolls; this frame shows it as two lines so the whole title can be read. With 3 tags picked, the other five are dimmed (<code>aria-disabled</code>) and the hint says how to change; tapping one does nothing. A description at 2000/2000 behaves the same and the box scrolls.</p>
+      </div>
+    </div>
+  </section>
+  </details>
+</main>
+
+<div class="toast-region" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var header = document.getElementById('site-header');
+  function onScroll() { if (header) header.classList.toggle('is-scrolled', window.scrollY > 0); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  var form = document.querySelector('[data-share-form]');
+
+  // Character counters ("18/80"), dark at the limit.
+  form.querySelectorAll('[data-count-for]').forEach(function (el) {
+    var out = document.getElementById(el.getAttribute('data-count-for'));
+    var max = +el.getAttribute('maxlength');
+    function paint() { out.textContent = el.value.length + '/' + max; out.classList.toggle('is-full', el.value.length >= max); }
+    el.addEventListener('input', paint);
+    paint();
+  });
+
+  // Tags: pick 1–3. At 3, the rest are aria-disabled and the hint says how to change.
+  var tags = Array.prototype.slice.call(form.querySelectorAll('[data-tags] .pick'));
+  var tagsHelp = form.querySelector('[data-tags-help]');
+  function paintTags() {
+    var n = tags.filter(function (t) { return t.getAttribute('aria-pressed') === 'true'; }).length;
+    tags.forEach(function (t) {
+      if (n >= 3 && t.getAttribute('aria-pressed') !== 'true') t.setAttribute('aria-disabled', 'true');
+      else t.removeAttribute('aria-disabled');
+    });
+    tagsHelp.textContent = n >= 3 ? "You've picked 3. Remove one to pick another." : 'Pick up to 3';
+  }
+  tags.forEach(function (t) {
+    t.addEventListener('click', function () {
+      if (t.getAttribute('aria-disabled') === 'true') return;
+      t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      paintTags();
+    });
+  });
+  paintTags();
+
+  // Photo: Remove shows the drop zone; picking a file (or Replace) shows the preview.
+  var zone = form.querySelector('[data-dropzone]');
+  var preview = form.querySelector('[data-preview]');
+  var fileInput = form.querySelector('[data-photo-input]');
+  form.querySelector('[data-photo-remove]').addEventListener('click', function () {
+    preview.hidden = true; zone.hidden = false; fileInput.focus();
+  });
+  form.querySelector('[data-photo-replace]').addEventListener('click', function () { fileInput.click(); });
+  fileInput.addEventListener('change', function () {
+    var f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+    form.querySelector('[data-preview-img]').src = URL.createObjectURL(f);
+    form.querySelector('[data-preview-name]').textContent = f.name;
+    zone.hidden = true; preview.hidden = false;
+  });
+  ['dragenter', 'dragover'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add('is-over'); }); });
+  ['dragleave', 'drop'].forEach(function (ev) { zone.addEventListener(ev, function () { zone.classList.remove('is-over'); }); });
+
+  // Prototype only: "Send for review" shows the busy button for a moment, then opens the board at
+  // "Sent: waiting for review". In the app the form is replaced in place.
+  var submit = form.querySelector('[data-submit]');
+  var status = form.querySelector('[data-submit-status]');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (submit.getAttribute('aria-disabled') === 'true') return;
+    submit.setAttribute('aria-disabled', 'true');
+    submit.innerHTML = '<svg class="icon btn-spin" aria-hidden="true"><use href="#i-loader"/></svg>Sending…';
+    status.textContent = 'Sending your idea for review…';
+    setTimeout(function () {
+      submit.removeAttribute('aria-disabled');
+      submit.textContent = 'Send for review';
+      status.textContent = '';
+      var board = document.querySelector('.design-states');
+      var done = document.getElementById('state-success');
+      if (board) board.open = true;
+      if (done) done.scrollIntoView({ block: 'start' });
+    }, 900);
+  });
+
+  document.addEventListener('click', function (e) {
+    var acct = e.target.closest('.account-btn[aria-controls]');
+    if (acct) {
+      var menu = document.getElementById(acct.getAttribute('aria-controls'));
+      var open = acct.getAttribute('aria-expanded') !== 'true';
+      acct.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (menu) menu.hidden = !open;
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.account-btn[aria-expanded="true"]').forEach(function (b) {
+      b.setAttribute('aria-expanded', 'false');
+      var p = document.getElementById(b.getAttribute('aria-controls'));
+      if (p) p.hidden = true;
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "path": "DESIGN.md",
+  "sha256": "d32b2f61e802aff2b3c058678f971eb878af45c2c804a063ca00950ad4e82574",
+  "kind": "markdown",
+  "extractedAt": "2026-11-25T03:17:41.897Z",
+  "markdownPath": ".open-design/sources/design-md/source.md",
+  "lines": 133,
+  "chars": 8982,
+  "sections": [
+    {
+      "heading": "(before the first heading)",
+      "level": 0,
+      "startLine": 1,
+      "endLine": 54,
+      "chars": 1297
+    },
+    {
+      "heading": "Design System Inspired by Coral Friendly",
+      "level": 1,
+      "startLine": 55,
+      "endLine": 59,
+      "chars": 231
+    },
+    {
+      "heading": "Color Palette",
+      "level": 2,
+      "startLine": 60,
+      "endLine": 76,
+      "chars": 1451
+    },
+    {
+      "heading": "Typography",
+      "level": 2,
+      "startLine": 77,
+      "endLine": 85,
+      "chars": 861
+    },
+    {
+      "heading": "Voice & Tone",
+      "level": 2,
+      "startLine": 86,
+      "endLine": 89,
+      "chars": 440
+    },
+    {
+      "heading": "Imagery & Iconography",
+      "level": 2,
+      "startLine": 90,
+      "endLine": 96,
+      "chars": 617
+    },
+    {
+      "heading": "Layout & Spacing",
+      "level": 2,
+      "startLine": 97,
+      "endLine": 105,
+      "chars": 739
+    },
+    {
+      "heading": "Motion",
+      "level": 2,
+      "startLine": 106,
+      "endLine": 115,
+      "chars": 528
+    },
+    {
+      "heading": "Components",
+      "level": 2,
+      "startLine": 116,
+      "endLine": 130,
+      "chars": 2163
+    },
+    {
+      "heading": "Agent Prompt Guide",
+      "level": 2,
+      "startLine": 131,
+      "endLine": 134,
+      "chars": 637
+    }
+  ],
+  "assets": [],
+  "warnings": []
+}

@@ -1,0 +1,610 @@
+{
+  "locale": "en-US",
+  "currency": "USD",
+  "today": "2026-11-25",
+  "note": "Shared sample data for every screen in It's a Date screens. Mirrors content.md; close to the DTO shapes (packages/shared/src/dto.ts): before using it in MSW mocks, map tags slugs to TagDTO objects, image to {url, publicId} (alt and credit are design-only), and dates to ISO timestamps. Maya Chen is the logged-in user (saved and myRating are hers).",
+  "labels": {
+    "budget": {
+      "1": "$",
+      "2": "$$",
+      "3": "$$$"
+    },
+    "duration": {
+      "short": "1–2 hours",
+      "half-day": "Half day",
+      "full-day": "Full day"
+    },
+    "sort": {
+      "new": "New",
+      "top": "Top rated"
+    }
+  },
+  "pageSize": 24,
+  "users": [
+    {
+      "id": "u-maya",
+      "name": "Maya Chen",
+      "email": "maya.chen@example.com",
+      "role": "user"
+    },
+    {
+      "id": "u-panos",
+      "name": "Panos",
+      "email": "panos@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "u-jonah",
+      "name": "Jonah Reyes",
+      "email": "jonah.reyes@example.com",
+      "role": "user"
+    },
+    {
+      "id": "u-priya",
+      "name": "Priya Natarajan",
+      "email": "priya.natarajan@example.com",
+      "role": "user"
+    },
+    {
+      "id": "u-sam",
+      "name": "Sam Okafor",
+      "email": "sam.okafor@example.com",
+      "role": "user"
+    },
+    {
+      "id": "u-lena",
+      "name": "Lena Brooks",
+      "email": "lena.brooks@example.com",
+      "role": "user"
+    },
+    {
+      "id": "u-daniel",
+      "name": "Daniel Okoye",
+      "email": "daniel.okoye@example.com",
+      "role": "user"
+    },
+    {
+      "id": "u-maria",
+      "name": "Maria Fernanda Castellanos-Villalobos y de la Cruz",
+      "email": "mariafernanda.castellanos@example.com",
+      "role": "user"
+    }
+  ],
+  "tags": [
+    {
+      "id": "tag-food",
+      "name": "Food",
+      "slug": "food",
+      "icon": "utensils"
+    },
+    {
+      "id": "tag-adventure",
+      "name": "Adventure",
+      "slug": "adventure",
+      "icon": "mountain"
+    },
+    {
+      "id": "tag-home",
+      "name": "Home",
+      "slug": "home",
+      "icon": "house"
+    },
+    {
+      "id": "tag-self-date",
+      "name": "Self-date",
+      "slug": "self-date",
+      "icon": "heart"
+    },
+    {
+      "id": "tag-board-game",
+      "name": "Board games",
+      "slug": "board-game",
+      "icon": "dice-5"
+    },
+    {
+      "id": "tag-dancing",
+      "name": "Dancing",
+      "slug": "dancing",
+      "icon": "music"
+    },
+    {
+      "id": "tag-self-care",
+      "name": "Self-care",
+      "slug": "self-care",
+      "icon": "flower-2"
+    },
+    {
+      "id": "tag-learning",
+      "name": "Learning",
+      "slug": "learning",
+      "icon": "book-open"
+    }
+  ],
+  "ideas": [
+    {
+      "id": "salsa-social-night",
+      "title": "Salsa social night",
+      "description": "Many studios run a beginner lesson before an open social. Learn a basic step, swap partners if you feel brave and stay for the last song.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80&auto=format&fit=crop",
+        "alt": "A crowded dance floor seen from above in warm light",
+        "credit": "Unsplash photo-1504609813442-a8924e83f76e, Unsplash Licence"
+      },
+      "tags": [
+        "dancing"
+      ],
+      "placeType": "bar",
+      "budget": 2,
+      "duration": "short",
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 3,
+      "creator": {
+        "id": "u-jonah",
+        "name": "Jonah Reyes"
+      },
+      "createdAt": "2026-11-24",
+      "status": "approved",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "farmers-market-picnic",
+      "title": "A slow Saturday at the farmers market, then a picnic lunch by the river for two!",
+      "description": "Get there early, before the crowds and while the bread is still warm. Bring a tote bag each, some cash in small notes and no shopping list at all. The rule for the morning is simple: you each have ten dollars, and you have to buy one thing the other person has never tried.\n\nWalk the whole market once before you buy anything. Taste every sample you are offered, ask the cheese seller what they would take home tonight, and let the person at the flower stall talk you into a small bunch of something bright. If there is a coffee cart, start there. If there is a busker, stop and listen to one full song, even if you have heard it a hundred times.\n\nOn your second lap, start building lunch. A good loaf, something soft to spread on it, a handful of whatever fruit is in season and a jar of something pickled are all you really need. Add a wedge of cheese, a few slices of cured meat or a tub of hummus, and one sweet thing you will argue about splitting. Ask for a paper bag for the tomatoes and keep the berries on top so they survive the walk.\n\nThen head for the river. Find a patch of grass with a bit of shade, spread out a blanket or your jackets, and unpack everything at once like a little feast. Tear the bread by hand. Use a pocket knife for the cheese, or just break it. Take your time: nobody is waiting for the table, and there is no bill to ask for.\n\nAfter lunch, lie back and watch the boats, the joggers and the dogs who think every picnic is for them. Read a few pages of a book out loud, play a round of cards, or close your eyes for twenty minutes. If the weather turns, there is usually a covered bench or a cafe close by, and the picnic simply moves indoors.\n\nBefore you leave, gather every crumb and wrapper and take them with you. Keep the flowers for the kitchen table, in a jar of water by the window, all week. And write down the name of the stall that sold you the best thing you ate, because next Saturday you will want to go back and say thank you, and probably buy double.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80&auto=format&fit=crop",
+        "alt": "Market stalls piled high with fruit and vegetables",
+        "credit": "Unsplash photo-1488459716781-31db52582fe9, Unsplash Licence"
+      },
+      "tags": [
+        "food",
+        "adventure"
+      ],
+      "placeType": "park",
+      "budget": 1,
+      "duration": "full-day",
+      "ratingAvg": 4.8,
+      "ratingCount": 23,
+      "saveCount": 61,
+      "creator": {
+        "id": "u-maria",
+        "name": "Maria Fernanda Castellanos-Villalobos y de la Cruz"
+      },
+      "createdAt": "2026-11-22",
+      "status": "approved",
+      "myRating": null,
+      "saved": true
+    },
+    {
+      "id": "dumpling-crawl",
+      "title": "Dumpling crawl",
+      "description": "Pick three dumpling spots within walking distance and order one plate at each. Compare the fillings, argue about the dipping sauce, and keep the best place for round two.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&q=80&auto=format&fit=crop",
+        "alt": "Dumplings on a wooden plate with chopsticks",
+        "credit": "Unsplash photo-1496116218417-1a781b1c416c, Unsplash Licence"
+      },
+      "tags": [
+        "food"
+      ],
+      "placeType": "restaurant",
+      "budget": 2,
+      "duration": "short",
+      "ratingAvg": 4.6,
+      "ratingCount": 128,
+      "saveCount": 342,
+      "creator": {
+        "id": "u-maya",
+        "name": "Maya Chen"
+      },
+      "createdAt": "2026-11-19",
+      "status": "approved",
+      "myRating": 5,
+      "saved": false
+    },
+    {
+      "id": "bookshop-and-coffee-afternoon",
+      "title": "Bookshop and coffee afternoon",
+      "description": "Browse an independent bookshop until something finds you. Take it to a cafe nearby, order a good coffee and read the first chapter before you head home.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop",
+        "alt": "Long bookshelves under warm hanging bulbs",
+        "credit": "Unsplash photo-1481627834876-b7833e8f5570, Unsplash Licence"
+      },
+      "tags": [
+        "self-date",
+        "learning",
+        "food"
+      ],
+      "placeType": "cafe",
+      "budget": 1,
+      "duration": "half-day",
+      "ratingAvg": 4.9,
+      "ratingCount": 57,
+      "saveCount": 203,
+      "creator": {
+        "id": "u-maya",
+        "name": "Maya Chen"
+      },
+      "createdAt": "2026-11-14",
+      "status": "approved",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "golden-hour-viewpoint-drive",
+      "title": "Golden-hour viewpoint drive",
+      "description": "Chase the last hour of daylight to the best lookout within reach. Bring a thermos, a blanket and a playlist, and stay until the lights come on below you.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80&auto=format&fit=crop",
+        "alt": "Mountain valley lookout with pines",
+        "credit": "Unsplash photo-1464822759023-fed622ff2c3b, Unsplash Licence"
+      },
+      "tags": [
+        "adventure"
+      ],
+      "placeType": "viewpoint",
+      "budget": 1,
+      "duration": "half-day",
+      "ratingAvg": 4.7,
+      "ratingCount": 89,
+      "saveCount": 276,
+      "creator": {
+        "id": "u-sam",
+        "name": "Sam Okafor"
+      },
+      "createdAt": "2026-11-10",
+      "status": "approved",
+      "myRating": 4,
+      "saved": true
+    },
+    {
+      "id": "game-cafe-afternoon",
+      "title": "Game cafe afternoon",
+      "description": "Find a cafe with a shelf of games and ask the staff for something neither of you has played. Order a snack, read the rules together and play the first round slowly.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800&q=80&auto=format&fit=crop",
+        "alt": "A board game mid-play with dice and wooden pieces",
+        "credit": "Unsplash photo-1610890716171-6b1bb98ffd09, Unsplash Licence"
+      },
+      "tags": [
+        "board-game"
+      ],
+      "placeType": "cafe",
+      "budget": 2,
+      "duration": "half-day",
+      "ratingAvg": 4.2,
+      "ratingCount": 19,
+      "saveCount": 47,
+      "creator": {
+        "id": "u-jonah",
+        "name": "Jonah Reyes"
+      },
+      "createdAt": "2026-11-06",
+      "status": "approved",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "dress-up-night-at-a-jazz-club",
+      "title": "Dress-up night at a jazz club",
+      "description": "Wear the outfit you save for special occasions and book a table near the band. Order something good, stay for both sets and slow dance on the way home.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800&q=80&auto=format&fit=crop",
+        "alt": "A saxophone section playing under stage lights",
+        "credit": "Unsplash photo-1415201364774-f6f0bb35f28f, Unsplash Licence"
+      },
+      "tags": [
+        "dancing"
+      ],
+      "placeType": "bar",
+      "budget": 3,
+      "duration": "short",
+      "ratingAvg": 4.5,
+      "ratingCount": 64,
+      "saveCount": 190,
+      "creator": {
+        "id": "u-priya",
+        "name": "Priya Natarajan"
+      },
+      "createdAt": "2026-10-30",
+      "status": "approved",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "pizza-from-scratch",
+      "title": "Pizza from scratch",
+      "description": "Make the dough together, then pile on whatever is in the fridge. Stretch it badly, bake it hot and eat it straight off the tray.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop",
+        "alt": "A home-baked pizza with cherry tomatoes and rosemary",
+        "credit": "Unsplash photo-1513104890138-7c749659a591, Unsplash Licence"
+      },
+      "tags": [
+        "home",
+        "food"
+      ],
+      "placeType": "none",
+      "budget": 1,
+      "duration": "short",
+      "ratingAvg": 4.4,
+      "ratingCount": 112,
+      "saveCount": 301,
+      "creator": {
+        "id": "u-sam",
+        "name": "Sam Okafor"
+      },
+      "createdAt": "2026-10-24",
+      "status": "approved",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "couples-massage",
+      "title": "Couples massage",
+      "description": "Book side-by-side treatments and arrive early enough for tea. The best part is the hour after: nowhere to be and nothing to decide.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80&auto=format&fit=crop",
+        "alt": "A relaxing massage at a spa",
+        "credit": "Unsplash photo-1544161515-4ab6ce6db874, Unsplash Licence"
+      },
+      "tags": [
+        "self-care"
+      ],
+      "placeType": "spa",
+      "budget": 3,
+      "duration": "half-day",
+      "ratingAvg": 4.8,
+      "ratingCount": 36,
+      "saveCount": 154,
+      "creator": {
+        "id": "u-maya",
+        "name": "Maya Chen"
+      },
+      "createdAt": "2026-10-15",
+      "status": "approved",
+      "myRating": null,
+      "saved": true
+    },
+    {
+      "id": "sushi-counter-night",
+      "title": "Sushi counter night",
+      "description": "Grab two seats at the counter and let the chef choose. Ask what is best today, try one thing neither of you would normally order, and take your time.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80&auto=format&fit=crop",
+        "alt": "Salmon sushi rolls on a counter in low light",
+        "credit": "Unsplash photo-1579871494447-9811cf80d66c, Unsplash Licence"
+      },
+      "tags": [
+        "food"
+      ],
+      "placeType": "sushi",
+      "budget": 3,
+      "duration": "short",
+      "ratingAvg": 4.6,
+      "ratingCount": 73,
+      "saveCount": 219,
+      "creator": {
+        "id": "u-priya",
+        "name": "Priya Natarajan"
+      },
+      "createdAt": "2026-10-08",
+      "status": "approved",
+      "myRating": 4,
+      "saved": false
+    },
+    {
+      "id": "backyard-movie-night",
+      "title": "Backyard movie night",
+      "description": "Hang a sheet, point a projector or a laptop at it and bring out every blanket you own. Make popcorn, dim the lights and let the stars do the rest.",
+      "image": null,
+      "tags": [
+        "home"
+      ],
+      "placeType": "none",
+      "budget": 1,
+      "duration": "short",
+      "ratingAvg": 4.3,
+      "ratingCount": 41,
+      "saveCount": 88,
+      "creator": {
+        "id": "u-lena",
+        "name": "Lena Brooks"
+      },
+      "createdAt": "2024-06-02",
+      "status": "approved",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "planetarium-show",
+      "title": "Planetarium show",
+      "description": "Lean back in the dark and let someone else point out the constellations. Afterwards, walk home looking up and see how many you can still find.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80&auto=format&fit=crop",
+        "alt": "A starry night sky with a shooting star",
+        "credit": "Unsplash photo-1419242902214-272b3f66ee7a, Unsplash Licence"
+      },
+      "tags": [
+        "learning"
+      ],
+      "placeType": "museum",
+      "budget": null,
+      "duration": null,
+      "ratingAvg": 3.9,
+      "ratingCount": 8,
+      "saveCount": 12,
+      "creator": {
+        "id": "u-daniel",
+        "name": "Daniel Okoye"
+      },
+      "createdAt": "2024-02-17",
+      "status": "approved",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "sunday-pastry-walk",
+      "title": "Sunday pastry walk",
+      "description": "Pick three bakeries within walking distance and buy one pastry at each. Share everything, score them out of ten on a napkin, and finish with a coffee at the winner.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop",
+        "alt": "Croissants on a bakery counter",
+        "credit": "Unsplash photo-1555507036-ab1f4038808a, Unsplash Licence"
+      },
+      "tags": [
+        "food",
+        "adventure"
+      ],
+      "placeType": "cafe",
+      "budget": 1,
+      "duration": "short",
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 0,
+      "creator": {
+        "id": "u-maya",
+        "name": "Maya Chen"
+      },
+      "createdAt": "2026-11-25",
+      "status": "pending",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "sushi-boat-contest",
+      "title": "Sushi boat eating contest",
+      "description": "Order the biggest sushi boat on the menu and race to see who taps out first. The loser pays and the winner picks dessert.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80&auto=format&fit=crop",
+        "alt": "A wooden sushi boat loaded with maki and nigiri",
+        "credit": "Unsplash photo-1553621042-f6e147245754, Unsplash Licence"
+      },
+      "tags": [
+        "food"
+      ],
+      "placeType": "sushi",
+      "budget": 3,
+      "duration": "short",
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 0,
+      "creator": {
+        "id": "u-maya",
+        "name": "Maya Chen"
+      },
+      "createdAt": "2026-11-21",
+      "status": "rejected",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "next-read-bookshop",
+      "title": "Pick each other's next read at a secondhand bookshop",
+      "description": "Meet at a secondhand bookshop with ten dollars each and pick a book for the other person. Swap them over coffee and explain your choice in one sentence, no spoilers.",
+      "image": {
+        "url": "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800&q=80&auto=format&fit=crop",
+        "alt": "Secondhand books standing in a row on a stall",
+        "credit": "Unsplash photo-1495446815901-a7297e633e8d, Unsplash Licence"
+      },
+      "tags": [
+        "learning",
+        "food"
+      ],
+      "placeType": "cafe",
+      "budget": 1,
+      "duration": "short",
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 0,
+      "creator": {
+        "id": "u-maria",
+        "name": "Maria Fernanda Castellanos-Villalobos y de la Cruz"
+      },
+      "createdAt": "2026-11-22",
+      "status": "pending",
+      "myRating": null,
+      "saved": false
+    },
+    {
+      "id": "ice-skating-hot-chocolate",
+      "title": "Ice skating and hot chocolate",
+      "description": "Go to the outdoor rink when it opens for the winter, hold on to each other for the first wobbly lap, then warm up with the thickest hot chocolate you can find nearby.",
+      "image": null,
+      "tags": [
+        "adventure"
+      ],
+      "placeType": "park",
+      "budget": null,
+      "duration": null,
+      "ratingAvg": 0,
+      "ratingCount": 0,
+      "saveCount": 0,
+      "creator": {
+        "id": "u-lena",
+        "name": "Lena Brooks"
+      },
+      "createdAt": "2024-03-09",
+      "status": "pending",
+      "myRating": null,
+      "saved": false
+    }
+  ],
+  "places": [
+    {
+      "name": "Bernal Heights Summit",
+      "lat": 37.743,
+      "lng": -122.4155,
+      "distanceM": 1200,
+      "address": "Bernal Heights Blvd, San Francisco, CA 94110",
+      "website": "https://sfrecpark.org/"
+    },
+    {
+      "name": "Mission Dolores Park",
+      "lat": 37.7596,
+      "lng": -122.4269,
+      "distanceM": 1400,
+      "address": "Dolores St & 19th St, San Francisco, CA 94114",
+      "website": "https://sfrecpark.org/"
+    },
+    {
+      "name": "Billy Goat Hill",
+      "lat": 37.7414,
+      "lng": -122.4327,
+      "distanceM": 1900,
+      "address": "Laidley St & 30th St, San Francisco, CA 94131"
+    },
+    {
+      "name": "Kite Hill Open Space",
+      "lat": 37.7586,
+      "lng": -122.44,
+      "distanceM": 2300,
+      "address": "Yukon St & 19th St, San Francisco, CA 94114"
+    },
+    {
+      "name": "Corona Heights Park",
+      "lat": 37.7653,
+      "lng": -122.4387,
+      "distanceM": 2600,
+      "address": "Roosevelt Way & Museum Way, San Francisco, CA 94114",
+      "website": "https://sfrecpark.org/"
+    },
+    {
+      "name": "Twin Peaks Summit Overlook",
+      "lat": 37.7525,
+      "lng": -122.4476,
+      "distanceM": 2800,
+      "address": "501 Twin Peaks Blvd, San Francisco, CA 94114",
+      "website": "https://sfrecpark.org/"
+    },
+    {
+      "name": "Tank Hill",
+      "lat": 37.7599,
+      "lng": -122.4477,
+      "distanceM": 2900
+    }
+  ],
+  "adminNote": "Admin (Task 6): ideas 15 and 16 join 13 in the pending queue, shown oldest first (16, 15, 13). 16 is a migrated idea (review:false became pending): no photo, budget or duration, placeType from its tag default. User emails other than Maya and Maria are placeholders at example.com; panos@example.com stands in for the owner's real admin email."
+}
