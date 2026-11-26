@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { expectNoAxeViolations } from '../../test/axe';
 import { Button } from './Button';
 
@@ -21,6 +22,38 @@ describe('Button', () => {
     const cls = screen.getByRole('button').className;
     expect(cls).toContain('bg-accent');
     expect(cls).toContain('text-accent-on');
+  });
+
+  it('busy keeps the label, sets aria-disabled and ignores clicks', async () => {
+    const onClick = vi.fn();
+    render(
+      <Button busy onClick={onClick}>
+        Send for review
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: 'Send for review' });
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).not.toBeDisabled();
+    await userEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('danger variant uses on-danger text', () => {
+    render(<Button variant="danger">Delete</Button>);
+    const cls = screen.getByRole('button').className;
+    expect(cls).toContain('bg-danger');
+    expect(cls).toContain('text-on-danger');
+  });
+
+  it('ghost tone colours the text and underlines on hover', () => {
+    render(
+      <Button variant="ghost" tone="success">
+        Approve
+      </Button>,
+    );
+    const cls = screen.getByRole('button').className;
+    expect(cls).toContain('text-success');
+    expect(cls).toContain('hover:underline');
   });
 
   it('has no axe violations', async () => {

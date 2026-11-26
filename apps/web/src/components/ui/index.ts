@@ -1,5 +1,5 @@
 export { Button, buttonClasses } from './Button';
-export { Chip } from './Chip';
+export { Chip, SelectableChip } from './Chip';
 export { Container } from './Container';
 export { EmptyState } from './EmptyState';
 export { Input } from './Input';
