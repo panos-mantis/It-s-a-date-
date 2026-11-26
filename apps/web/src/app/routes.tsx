@@ -1,5 +1,5 @@
 import type { RouteObject } from 'react-router';
-import { HomePage } from '../features/home/HomePage';
+import { HomePage } from '../features/ideas/HomePage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { SignupPage } from '../features/auth/SignupPage';
 import { RedirectIfAuthed, RequireAuth, RequireRole } from './guards';
