@@ -20,6 +20,13 @@ if (typeof HTMLCanvasElement !== 'undefined') {
     null) as typeof HTMLCanvasElement.prototype.getContext;
 }
 
+// jsdom has no object URLs; the photo preview needs them.
+if (typeof URL !== 'undefined' && typeof URL.createObjectURL !== 'function') {
+  let blobCount = 0;
+  URL.createObjectURL = () => `blob:test/${(blobCount += 1)}`;
+  URL.revokeObjectURL = () => undefined;
+}
+
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 
 // Vitest `globals` is off, so Testing Library's automatic cleanup is never registered.

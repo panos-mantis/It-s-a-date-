@@ -1,11 +1,13 @@
-import { CircleAlert } from 'lucide-react';
 import { useId, type InputHTMLAttributes, type ReactNode, type Ref } from 'react';
 import { cn } from '../../lib/cn';
+import { describedBy, fieldClasses, FieldMessages } from './Field';
 
 export function Input({
   label,
   hint,
   error,
+  counter,
+  counterFull,
   action,
   afterError,
   className,
@@ -17,6 +19,10 @@ export function Input({
   /** Helper text. It gives way to the error while one shows. */
   hint?: string;
   error?: string;
+  /** A character count ("18/80") at the right of the message row. */
+  counter?: string;
+  /** The count is at its limit. */
+  counterFull?: boolean;
   /** A control inside the right edge of the field (the password Show / Hide button). */
   action?: ReactNode;
   /** Shown under the error message (for example a "Log in instead" link). */
@@ -25,10 +31,6 @@ export function Input({
 }) {
   const autoId = useId();
   const inputId = id ?? autoId;
-  const errorId = `${inputId}-error`;
-  const hintId = `${inputId}-hint`;
-  const showHint = Boolean(hint) && !error;
-  const describedBy = error ? errorId : showHint ? hintId : undefined;
 
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
@@ -41,36 +43,19 @@ export function Input({
           ref={ref}
           id={inputId}
           aria-invalid={error ? true : undefined}
-          aria-describedby={describedBy}
-          className={cn(
-            'min-h-12 w-full rounded-sm border bg-surface px-3.5 py-3 text-base text-fg placeholder:text-muted',
-            error ? 'border-danger' : 'border-muted',
-            action ? 'pr-[76px]' : null,
-            'motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-friendly',
-            'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus-ring focus-visible:border-accent-ink',
-            'group-aria-busy:bg-surface-sunk',
-            className,
-          )}
+          aria-describedby={describedBy(inputId, { error, hint, counter })}
+          className={cn(fieldClasses(error, action ? 'pr-[76px]' : undefined), className)}
         />
         {action && <div className="absolute inset-y-0.5 right-0.5 flex">{action}</div>}
       </div>
-      {error && (
-        <p id={errorId} className="flex items-start gap-1.5 text-xs text-danger">
-          <CircleAlert
-            aria-hidden="true"
-            size={14}
-            strokeWidth={1.75}
-            className="mt-0.5 shrink-0"
-          />
-          {error}
-        </p>
-      )}
-      {error && afterError}
-      {showHint && (
-        <p id={hintId} className="text-xs text-muted">
-          {hint}
-        </p>
-      )}
+      <FieldMessages
+        id={inputId}
+        error={error}
+        hint={hint}
+        counter={counter}
+        counterFull={counterFull}
+        afterError={afterError}
+      />
     </div>
   );
 }

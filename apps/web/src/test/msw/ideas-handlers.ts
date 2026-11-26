@@ -222,7 +222,7 @@ export const ideasHandlers: RequestHandler[] = [
     createdCount += 1;
     const idea: IdeaDTO = {
       ...rest,
-      id: `new-idea-${createdCount}`,
+      id: `64d${String(createdCount).padStart(21, '0')}`,
       tags: chosen.filter((t): t is TagDTO => t !== undefined),
       status: 'pending',
       ratingAvg: 0,

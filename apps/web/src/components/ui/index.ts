@@ -10,3 +10,7 @@ export { Card } from './Card';
 export { CategoryRow } from './CategoryRow';
 export { SearchBar, type SearchValues, type SearchVibe } from './SearchBar';
 export { StarRating, StarRatingInput } from './StarRating';
+export { PhotoDropZone, type PhotoValue } from './PhotoDropZone';
+export { SegmentedControl, type SegmentOption } from './SegmentedControl';
+export { Select } from './Select';
+export { Textarea } from './Textarea';

@@ -1,6 +1,7 @@
 import type { RouteObject } from 'react-router';
 import { HomePage } from '../features/ideas/HomePage';
 import { IdeaDetailPage } from '../features/ideas/IdeaDetailPage';
+import { SharePage } from '../features/ideas/SharePage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { SignupPage } from '../features/auth/SignupPage';
 import { RedirectIfAuthed, RequireAuth, RequireRole } from './guards';
@@ -41,7 +42,7 @@ export const routes: RouteObject[] = [
         path: 'share',
         element: (
           <RequireAuth>
-            <ComingSoonPage title="Share an idea" />
+            <SharePage />
           </RequireAuth>
         ),
       },
