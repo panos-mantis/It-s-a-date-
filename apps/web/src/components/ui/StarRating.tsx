@@ -5,35 +5,40 @@ import { cn } from '../../lib/cn';
 export function StarRating({
   value,
   count,
+  format = 'card',
   className,
 }: {
   value: number;
   count: number;
+  format?: 'card' | 'detail';
   className?: string;
 }) {
   if (count === 0) {
+    if (format === 'card') return null;
+    return <p className={cn('text-sm text-muted', className)}>No ratings yet. Be the first.</p>;
+  }
+  const average = value.toFixed(1);
+  const noun = count === 1 ? 'rating' : 'ratings';
+  const spoken = `Rated ${average} out of 5 from ${count} ${noun}`;
+  if (format === 'detail') {
     return (
-      <span
-        className={cn('inline-flex items-center text-sm font-semibold text-accent-ink', className)}
-      >
-        <span aria-hidden="true">New</span>
-        <span className="sr-only">No ratings yet</span>
+      <span className={cn('inline-flex items-center gap-1.5 text-sm text-fg', className)}>
+        <Star aria-hidden="true" size={16} strokeWidth={1.75} className="fill-fg text-fg" />
+        <span aria-hidden="true">
+          {average} · {count} {noun}
+        </span>
+        <span className="sr-only">{spoken}</span>
       </span>
     );
   }
-  const average = value.toFixed(1);
   return (
     <span className={cn('inline-flex items-center gap-1 text-sm', className)}>
       <Star aria-hidden="true" size={13} strokeWidth={1.75} className="fill-fg text-fg" />
-      <span aria-hidden="true" className="font-semibold text-fg">
-        {average}
+      <span aria-hidden="true">
+        <span className="font-semibold text-fg">{average}</span>{' '}
+        <span className="text-muted">({count})</span>
       </span>
-      <span aria-hidden="true" className="text-muted">
-        ({count})
-      </span>
-      <span className="sr-only">
-        Rated {average} out of 5 from {count} {count === 1 ? 'rating' : 'ratings'}
-      </span>
+      <span className="sr-only">{spoken}</span>
     </span>
   );
 }

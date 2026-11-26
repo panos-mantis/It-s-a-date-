@@ -55,6 +55,31 @@ describe('Card', () => {
     expect(screen.getByText('Staff pick')).toBeInTheDocument();
   });
 
+  it('no link without href', () => {
+    setup({ href: undefined });
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Pottery for two' })).toBeInTheDocument();
+  });
+
+  it('hides rating when count is 0', () => {
+    setup({ rating: { value: 0, count: 0 } });
+    expect(screen.queryByText(/rated|rating|New/i)).not.toBeInTheDocument();
+  });
+
+  it('shows status badge and line', () => {
+    setup({ meta: 'Brooklyn', status: { tone: 'pending', line: 'Waiting for an admin to look' } });
+    expect(screen.getByText('Pending review')).toBeInTheDocument();
+    expect(screen.getByText('Waiting for an admin to look')).toBeInTheDocument();
+  });
+
+  it('renders an 80-character title with line-clamp-2', () => {
+    const title = 'A'.repeat(79) + 'Z';
+    expect(title).toHaveLength(80);
+    setup({ title });
+    const link = screen.getByRole('link', { name: title });
+    expect(link.closest('h3')).toHaveClass('line-clamp-2');
+  });
+
   it('has no axe violations', async () => {
     const { container } = setup({
       rating: { value: 4.2, count: 3 },
