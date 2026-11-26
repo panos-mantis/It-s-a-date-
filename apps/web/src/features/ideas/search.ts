@@ -9,6 +9,7 @@ export interface IdeaSearch {
 }
 
 const shape = ideaQuerySchema.shape;
+const BUDGET_PARAM = { 1: '1', 2: '2', 3: '3' } as const;
 
 /** Reads the URL into a search; each field is validated on its own and junk is dropped. */
 export function parseIdeaSearch(params: URLSearchParams): IdeaSearch {
@@ -20,7 +21,7 @@ export function parseIdeaSearch(params: URLSearchParams): IdeaSearch {
   return {
     q: (q.success && q.data) || '',
     tag: (tag.success && tag.data) || '',
-    budget: budget.success && budget.data !== undefined ? (String(budget.data) as '1') : '',
+    budget: budget.success && budget.data !== undefined ? BUDGET_PARAM[budget.data] : '',
     duration: (duration.success && duration.data) || '',
     sort: sort.success ? sort.data : 'new',
   };

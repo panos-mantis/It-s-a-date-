@@ -8,7 +8,7 @@ import { ApiError } from '../../lib/api';
 import { ideaFixtures } from '../../test/fixtures/ideas';
 import { tagFixtures } from '../../test/fixtures/tags';
 import { authStore } from '../../test/msw/handlers';
-import { ideaStore, uploadStore } from '../../test/msw/ideas-handlers';
+import { ideaStore, uploadedImage, uploadStore } from '../../test/msw/ideas-handlers';
 import { server } from '../../test/msw/server';
 import { createTestQueryClient } from '../../test/render';
 import { useTags } from '../tags/api';
@@ -23,6 +23,12 @@ function setup() {
     <AppProviders queryClient={queryClient}>{children}</AppProviders>
   );
   return { queryClient, wrapper };
+}
+
+function ideaId(title: string): string {
+  const found = ideaFixtures.find((i) => i.title === title);
+  if (!found) throw new Error('No fixture titled ' + title);
+  return found.id;
 }
 
 function loginAsMaya() {
@@ -118,16 +124,63 @@ describe('useIdeas', () => {
 describe('useIdea', () => {
   it('returns an approved idea', async () => {
     const { wrapper } = setup();
-    const { result } = renderHook(() => useIdea('dumpling-crawl'), { wrapper });
+    const { result } = renderHook(() => useIdea(ideaId('Dumpling crawl')), { wrapper });
     await waitFor(() => expect(result.current.data?.title).toBe('Dumpling crawl'));
   });
 
-  it('is a 404 for a pending idea', async () => {
+  it('is a 404 for a pending idea when logged out', async () => {
     const { wrapper } = setup();
-    const { result } = renderHook(() => useIdea('sunday-pastry-walk'), { wrapper });
+    const { result } = renderHook(() => useIdea(ideaId('Sunday pastry walk')), { wrapper });
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error).toBeInstanceOf(ApiError);
     expect(result.current.error?.status).toBe(404);
+  });
+});
+
+describe('useIdea visibility and params', () => {
+  it('shows a pending idea to its creator', async () => {
+    loginAsMaya();
+    const { wrapper } = setup();
+    const { result } = renderHook(() => useIdea(ideaId('Sunday pastry walk')), { wrapper });
+    await waitFor(() => expect(result.current.data?.status).toBe('pending'));
+  });
+
+  it('hides a pending idea from another user but shows it to an admin', async () => {
+    authStore.addUser({ name: 'Sam', email: 'sam@x.com', password: 'secret123' });
+    authStore.loginAs('sam@x.com');
+    const other = renderHook(() => useIdea(ideaId('Sunday pastry walk')), {
+      wrapper: setup().wrapper,
+    });
+    await waitFor(() => expect(other.result.current.error?.status).toBe(404));
+
+    authStore.addUser({
+      name: 'Panos',
+      email: 'panos@example.com',
+      password: 'secret123',
+      role: 'admin',
+    });
+    authStore.loginAs('panos@example.com');
+    const admin = renderHook(() => useIdea(ideaId('Sunday pastry walk')), {
+      wrapper: setup().wrapper,
+    });
+    await waitFor(() => expect(admin.result.current.data?.status).toBe('pending'));
+  });
+
+  it('is a 422 on params for an id that is not an ObjectId', async () => {
+    const { wrapper } = setup();
+    const { result } = renderHook(() => useIdea('dumpling-crawl'), { wrapper });
+    await waitFor(() => expect(result.current.error?.status).toBe(422));
+    expect(result.current.error?.issues).toContainEqual(
+      expect.objectContaining({ location: 'params', path: 'id' }),
+    );
+  });
+
+  it('gives the session user the same id as the ideas they created', async () => {
+    loginAsMaya();
+    const { wrapper } = setup();
+    const { result } = renderHook(() => useMyIdeas(), { wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(authStore.sessionUser()?.id).toBe(ideaFixtures[2]?.creator.id);
   });
 });
 
@@ -167,7 +220,7 @@ describe('useMyIdeas and useCreateIdea', () => {
       result.current.create.mutateAsync({
         title: 'Rooftop stargazing',
         description: 'Take a blanket and a flask up to a rooftop and name the stars.',
-        image: { url: 'https://example.com/a.jpg', publicId: 'a' },
+        image: uploadedImage(),
         tagIds: [tagFixtures[0]!.id],
         placeType: 'none',
         budget: 1,
@@ -182,13 +235,32 @@ describe('useMyIdeas and useCreateIdea', () => {
     );
   });
 
+  it('rejects an image that was not uploaded through the app', async () => {
+    loginAsMaya();
+    const { wrapper } = setup();
+    const create = renderHook(() => useCreateIdea(), { wrapper });
+    await act(async () => {
+      await create.result.current
+        .mutateAsync({
+          title: 'Rooftop stargazing',
+          description: 'Take a blanket and a flask up to a rooftop and name the stars.',
+          image: { url: 'https://example.com/a.jpg', publicId: 'a' },
+          tagIds: [tagFixtures[0]!.id],
+          placeType: 'none',
+          budget: 1,
+          duration: 'short',
+        })
+        .catch(() => undefined);
+    });
+    await waitFor(() => expect(create.result.current.error?.status).toBe(422));
+    expect(create.result.current.error?.issues).toContainEqual(
+      expect.objectContaining({ location: 'body', path: 'image' }),
+    );
+  });
+
   it('returns 422 issues in the API shape', async () => {
     loginAsMaya();
     const { wrapper } = setup();
-    const seen: string[] = [];
-    server.events.on('response:mocked', async ({ request, response }) =>
-      seen.push(request.method + ' ' + (await response.clone().text()).slice(0, 120)),
-    );
     const create = renderHook(() => useCreateIdea(), { wrapper });
     await act(async () => {
       await create.result.current.mutateAsync({ title: 'x' } as never).catch(() => undefined);

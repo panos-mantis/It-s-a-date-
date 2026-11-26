@@ -1,4 +1,5 @@
 import {
+  idParamsSchema,
   ideaCreateSchema,
   ideaQuerySchema,
   type IdeaDTO,
@@ -86,16 +87,54 @@ function validationResponse(issues: ValidationIssue[]) {
   return errorResponse(422, 'VALIDATION', 'Check the highlighted fields', { issues });
 }
 
+function paramsInvalid(issues: { path: PropertyKey[]; message: string }[]) {
+  return validationResponse(
+    issues.map((i) => ({
+      location: 'params',
+      path: i.path.map(String).join('.'),
+      message: i.message,
+    })),
+  );
+}
+
+// Mirrors apps/api/src/lib/images.ts isOwnImage, with the cloud and folder the tests use.
+const CLOUD = 'demo';
+const FOLDER = 'itsadate/dev';
+
+function isOwnImage(image: { url: string; publicId: string }): boolean {
+  const { publicId } = image;
+  if (!/^[A-Za-z0-9_/-]+$/.test(publicId) || publicId.split('/').includes('..')) return false;
+  if (!publicId.startsWith(`${FOLDER}/`)) return false;
+  let url: URL;
+  try {
+    url = new URL(image.url);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== 'https:' || url.host !== 'res.cloudinary.com') return false;
+  if (url.username || url.password) return false;
+  const prefix = `/${CLOUD}/image/upload/`;
+  if (!url.pathname.startsWith(prefix)) return false;
+  const rest = url.pathname.slice(prefix.length).replace(/^v\d+\//, '');
+  return ['jpg', 'jpeg', 'png', 'webp'].some((ext) => rest === `${publicId}.${ext}`);
+}
+
+/** An image the upload handler would have issued, for tests that post an idea directly. */
+export function uploadedImage(n = 1): { url: string; publicId: string } {
+  return {
+    url: `https://res.cloudinary.com/${CLOUD}/image/upload/v1/${FOLDER}/test-${n}.jpg`,
+    publicId: `${FOLDER}/test-${n}`,
+  };
+}
+
 function unauthorised() {
   return errorResponse(401, 'UNAUTHORIZED', 'Please log in');
 }
 
-/** The session user as a fixture creator: fixture people keep their fixture id. */
+/** The session user as an idea creator. Fixture people share their id with authStore. */
 function sessionCreator(): { id: string; name: string } | null {
   const user = authStore.sessionUser();
-  if (!user) return null;
-  const fixture = users.find((u) => u.email === user.email);
-  return fixture ? { id: fixture.id, name: fixture.name } : { id: user.id, name: user.name };
+  return user ? { id: user.id, name: user.name } : null;
 }
 
 // Fixtures carry Maya's saves and ratings; everyone else sees them blank.
@@ -141,10 +180,15 @@ export const ideasHandlers: RequestHandler[] = [
   }),
 
   http.get('*/api/v1/ideas/:id', ({ params }) => {
-    const idea = ideas.find((i) => i.id === params.id);
-    if (!idea || idea.status !== 'approved') {
-      return errorResponse(404, 'NOT_FOUND', 'Idea not found');
-    }
+    const parsedId = idParamsSchema.safeParse(params);
+    if (!parsedId.success) return paramsInvalid(parsedId.error.issues);
+    const idea = ideas.find((i) => i.id === parsedId.data.id);
+    // Approved ideas are public; the rest only show to their creator or an admin.
+    const viewer = authStore.sessionUser();
+    const allowed =
+      idea?.status === 'approved' ||
+      (viewer !== null && (viewer.role === 'admin' || viewer.id === idea?.creator.id));
+    if (!idea || !allowed) return errorResponse(404, 'NOT_FOUND', 'Idea not found');
     return HttpResponse.json(forViewer(idea));
   }),
 
@@ -160,6 +204,15 @@ export const ideasHandlers: RequestHandler[] = [
           message: i.message,
         })),
       );
+    }
+    if (!isOwnImage(parsed.data.image)) {
+      return validationResponse([
+        {
+          location: 'body',
+          path: 'image',
+          message: "Use an image uploaded through It's a Date",
+        },
+      ]);
     }
     const { tagIds, ...rest } = parsed.data;
     const chosen = tagIds.map((id) => tags.find((t) => t.id === id));
@@ -210,12 +263,6 @@ export const ideasHandlers: RequestHandler[] = [
       return errorResponse(422, 'VALIDATION', 'Use a JPEG, PNG or WebP image under 5 MB');
     }
     uploadCount += 1;
-    return HttpResponse.json(
-      {
-        url: `https://res.cloudinary.com/itsadate/image/upload/test-${uploadCount}.jpg`,
-        publicId: `itsadate/test-${uploadCount}`,
-      },
-      { status: 201 },
-    );
+    return HttpResponse.json(uploadedImage(uploadCount), { status: 201 });
   }),
 ];

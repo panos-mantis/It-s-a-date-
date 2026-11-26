@@ -1,4 +1,5 @@
 import type { Role, UserDTO } from '@itsadate/shared';
+import { userFixtures } from '../fixtures/users';
 
 export interface FakeUser extends UserDTO {
   password: string;
@@ -18,10 +19,14 @@ export const authStore = {
     nextId = 1;
   },
   addUser(input: { name: string; email: string; password: string; role?: Role }): UserDTO {
+    const email = input.email.toLowerCase();
     const user: FakeUser = {
-      id: `u${nextId++}`,
+      // Fixture people keep their fixture id, so a session user matches the ideas they created.
+      id:
+        userFixtures.find((u) => u.email === email)?.id ??
+        `64d${String(nextId++).padStart(21, '0')}`,
       name: input.name,
-      email: input.email.toLowerCase(),
+      email,
       password: input.password,
       role: input.role ?? 'user',
     };
