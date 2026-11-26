@@ -4,6 +4,7 @@ import { emptyToUndefined, paginationSchema } from './common.js';
 
 export const adminIdeaQuerySchema = paginationSchema.extend({
   status: z.preprocess(emptyToUndefined, z.enum(IDEA_STATUSES).default('pending')),
+  q: z.preprocess(emptyToUndefined, z.string().trim().min(1).max(100).optional()),
 });
 
 export const adminUserQuerySchema = paginationSchema.extend({

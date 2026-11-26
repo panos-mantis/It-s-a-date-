@@ -9,6 +9,12 @@ describe('admin schemas', () => {
     expect(adminIdeaQuerySchema.safeParse({ status: 'live' }).success).toBe(false);
   });
 
+  it('parses the idea search query', () => {
+    expect(adminIdeaQuerySchema.parse({ q: '  pottery ' }).q).toBe('pottery');
+    expect(adminIdeaQuerySchema.parse({ q: '' }).q).toBeUndefined();
+    expect(adminIdeaQuerySchema.safeParse({ q: 'x'.repeat(101) }).success).toBe(false);
+  });
+
   it('parses the user query', () => {
     expect(adminUserQuerySchema.parse({ q: ' ana ' }).q).toBe('ana');
     expect(adminUserQuerySchema.parse({ q: '' }).q).toBeUndefined();
