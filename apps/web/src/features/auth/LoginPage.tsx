@@ -1,14 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '@itsadate/shared';
+import { useId } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import type { z } from 'zod';
 import { paths } from '../../app/paths';
 import { Button, Input, useToast } from '../../components/ui';
+import { ApiError } from '../../lib/api';
 import { applyServerErrors, authResolverOptions } from '../../lib/form-errors';
 import { useLogin } from './api';
-import { AuthLayout, FormError } from './AuthLayout';
-import { safeNext } from './safe-next';
+import { AuthLayout, BusyStatus, FormError, PasswordInput, textLinkClasses } from './AuthLayout';
+import { authPath, loginHint, safeNext } from './safe-next';
 
 type Values = z.input<typeof loginSchema>;
 type Parsed = z.output<typeof loginSchema>;
@@ -18,19 +20,22 @@ export function LoginPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const login = useLogin();
+  const statusId = useId();
   const {
     register,
     handleSubmit,
     setError,
     setFocus,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<Values, unknown, Parsed>({
     resolver: zodResolver(loginSchema, authResolverOptions),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: params.get('email') ?? '', password: '' },
   });
 
   const next = params.get('next');
-  const signupTo = next ? `${paths.signup}?next=${encodeURIComponent(next)}` : paths.signup;
+  const reason = params.get('reason');
+  const busy = isSubmitting || login.isPending;
 
   const onSubmit = async (values: Parsed) => {
     try {
@@ -39,21 +44,28 @@ export function LoginPage() {
       void navigate(safeNext(next), { replace: true });
     } catch (err) {
       applyServerErrors(err, setError, ['email', 'password']);
-      setFocus('password');
+      // A wrong password is cleared so it can be typed again; the email stays.
+      if (err instanceof ApiError && err.status === 401) {
+        setValue('password', '');
+        setFocus('password');
+      }
     }
   };
 
   return (
     <AuthLayout
-      title="Welcome back"
+      title={
+        <>
+          Welcome <em>back</em>
+        </>
+      }
+      sub="Log in to save ideas, rate them and share your own."
+      hint={loginHint(next, reason)}
       footer={
         <>
           New here?{' '}
-          <Link
-            to={signupTo}
-            className="rounded-sm font-semibold text-accent-ink underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent/30"
-          >
-            Sign up
+          <Link to={authPath(paths.signup, { next, reason })} className={textLinkClasses}>
+            Create an account
           </Link>
         </>
       }
@@ -62,26 +74,30 @@ export function LoginPage() {
       <form
         onSubmit={(e) => void handleSubmit(onSubmit)(e)}
         noValidate
-        className="flex flex-col gap-4"
+        aria-busy={busy}
+        className="group flex flex-col gap-4"
       >
         <FormError message={errors.root?.server?.message} />
         <Input
           label="Email"
           type="email"
           autoComplete="email"
+          placeholder="name@example.com"
+          readOnly={busy}
           error={errors.email?.message}
           {...register('email')}
         />
-        <Input
+        <PasswordInput
           label="Password"
-          type="password"
           autoComplete="current-password"
+          readOnly={busy}
           error={errors.password?.message}
           {...register('password')}
         />
-        <Button type="submit" loading={isSubmitting || login.isPending}>
+        <Button type="submit" busy={busy} aria-describedby={statusId} className="w-full">
           Log in
         </Button>
+        <BusyStatus id={statusId} busy={busy} text="Logging you in…" />
       </form>
     </AuthLayout>
   );

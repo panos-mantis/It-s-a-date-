@@ -8,7 +8,7 @@ export function RootLayout({ children }: { children?: ReactNode }) {
     <div className="min-h-screen bg-bg text-fg">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-30 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:font-semibold focus:text-accent-on focus:outline-none focus:ring-[3px] focus:ring-accent/30"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-30 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:font-semibold focus:text-accent-on"
       >
         Skip to content
       </a>
