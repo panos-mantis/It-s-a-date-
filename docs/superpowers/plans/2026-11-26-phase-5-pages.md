@@ -29,9 +29,9 @@
 
 ## Status (2026-11-28): read this first if you're picking the phase up
 
-**Tasks 1–12 are done.** Every page is built, has had its task review, and was checked against the real API on `itsadate_dev`. The pages have been re-critiqued against their screens and pass the final whole-branch review after one fix wave. `npm run ci` and `prettier --check` pass. **The only step left is Step 6: push, then open the PR into `modernize`. Ask the owner first.**
+**Phase 5 is done and merged into `modernize` (PR #7, 2026-11-28; the owner asked for the merge).** All 12 tasks are complete. Every page is built, has had its task review, and was checked against the real API on `itsadate_dev`. The pages have been re-critiqued against their screens and pass the final whole-branch review after one fix wave. `npm run ci` and `prettier --check` pass, and CI was green on the PR. Next are Phases 6a and 6b. See START-HERE.
 
-- **Branch:** `phase-5-pages`, from `modernize` at `ebfbaed`. Nothing is pushed.
+- **Branch:** `phase-5-pages`, from `modernize` at `ebfbaed`, merged through PR #7.
 - **Ledger:** `.superpowers/sdd/2026-11-26-phase-5-pages/progress.md`. It's git-ignored and exists only on the original machine. It holds every ruling, the deferred minor findings and the review reports.
 - **Real-API check (Task 12 Step 1):** passed. A throwaway admin approved and undid, rejected, edited, added, renamed and deleted a tag, and changed roles. Every change was reverted. Two throwaway plain users remain in dev: `phase5-check-1795814746@itsadate-dev.test` and `phase5-check2-1795814746@itsadate-dev.test`.
 - **Design re-critique (Step 2):** the verdict was "polish", and it was fixed in `e586eaa`. After the polish, Share, Profile and Admin were checked only by reading their CSS, so the owner click-test should look at those at 360px.

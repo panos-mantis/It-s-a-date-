@@ -1,15 +1,13 @@
 # START HERE — resuming the It's a Date modernization
 
-Last updated: 2026-11-28 (Phases 2, 3 and 4 merged; Phase 5 built, PR pending). Read this first in a new session, then the files it points to.
+Last updated: 2026-11-28 (Phases 2–5 merged). Read this first in a new session, then the files it points to.
 
 ## How to resume
 
 1. Open the folder `C:\Users\manti\Desktop\its-a-date` in VS Code and start a **new** Claude Code conversation.
-2. Phases 2, 3 and 4 are merged into `modernize` (PRs #4, #5 and #6).
-3. **Phase 5 (pages) is built** on branch `phase-5-pages`. Its PR into `modernize` is pending.
-   - To finish it, follow the **Status** section at the top of `docs/superpowers/plans/2026-11-26-phase-5-pages.md`. Only Step 6 of Task 12 is left: push and open the PR, after asking the owner.
-4. After Phase 5 merges, Phases 6a (ratings and saves) and 6b (nearby places) can run in parallel. Each writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below.
-5. Each phase ends with its own PR into `modernize`.
+2. Phases 2–5 are merged into `modernize` (PRs #4–#7). Phase 5's Status section, at the top of `docs/superpowers/plans/2026-11-26-phase-5-pages.md`, lists the owner decisions that are still open.
+3. **Next:** Phases 6a (ratings and saves) and 6b (nearby places), which can run in parallel. Each writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below.
+4. Each phase ends with its own PR into `modernize`.
 
 **Hand-off notes from Phase 5**
 - **6a: ratings and saves.** Wire these onto the finished pages (ruling P1 left them out):
@@ -43,7 +41,7 @@ Last updated: 2026-11-28 (Phases 2, 3 and 4 merged; Phase 5 built, PR pending). 
 
 ## Where things stand
 
-**Phase 5 (pages) is built on `phase-5-pages`. The PR is pending.**
+**Phase 5 (pages) is merged into `modernize` (PR #7, 2026-11-28).**
 - **Pages built** in `apps/web`, from the approved screens: Home, Idea detail, Share an idea, Log in / Sign up, Profile (Your ideas), Admin (Pending, All ideas, Edit, Tags, Users) and 404.
 - **Shared pieces:** the new kit components and the data layer. MSW handlers mirror the real API.
 - **API change:** one, the admin ideas `q` search.
