@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react';
 import { useId, type InputHTMLAttributes, type ReactNode, type Ref } from 'react';
 import { cn } from '../../lib/cn';
 import { describedBy, fieldClasses, FieldMessages } from './Field';
@@ -9,6 +10,7 @@ export function Input({
   counter,
   counterFull,
   action,
+  icon: Icon,
   afterError,
   className,
   id,
@@ -25,6 +27,8 @@ export function Input({
   counterFull?: boolean;
   /** A control inside the right edge of the field (the password Show / Hide button). */
   action?: ReactNode;
+  /** An icon inside the left edge of the field (the search icon). */
+  icon?: LucideIcon;
   /** Shown under the error message (for example a "Log in instead" link). */
   afterError?: ReactNode;
   ref?: Ref<HTMLInputElement>;
@@ -44,8 +48,19 @@ export function Input({
           id={inputId}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy(inputId, { error, hint, counter })}
-          className={cn(fieldClasses(error, action ? 'pr-[76px]' : undefined), className)}
+          className={cn(
+            fieldClasses(error, cn(action ? 'pr-[76px]' : null, Icon ? 'pl-[42px]' : null)),
+            className,
+          )}
         />
+        {Icon && (
+          <Icon
+            aria-hidden="true"
+            size={18}
+            strokeWidth={1.75}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
+          />
+        )}
         {action && <div className="absolute inset-y-0.5 right-0.5 flex">{action}</div>}
       </div>
       <FieldMessages

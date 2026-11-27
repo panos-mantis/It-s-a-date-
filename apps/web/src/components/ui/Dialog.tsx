@@ -74,6 +74,7 @@ export function Dialog({
   open,
   onClose,
   labelledBy,
+  describedBy,
   variant,
   initialFocus,
   children,
@@ -81,6 +82,8 @@ export function Dialog({
   open: boolean;
   onClose: () => void;
   labelledBy: string;
+  /** The id of the text that explains the dialog (a confirm dialog's body). */
+  describedBy?: string;
   variant: Variant;
   initialFocus?: RefObject<HTMLElement | null>;
   children: ReactNode;
@@ -124,6 +127,7 @@ export function Dialog({
         role={variant === 'alert' ? 'alertdialog' : 'dialog'}
         aria-modal="true"
         aria-labelledby={labelledBy}
+        aria-describedby={describedBy}
         tabIndex={-1}
         onKeyDown={onKeyDown}
         className={cn('relative bg-surface text-fg focus:outline-none', surface[variant])}

@@ -1,10 +1,10 @@
 import { LoaderCircle } from 'lucide-react';
-import type { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, Ref } from 'react';
 import { cn } from '../../lib/cn';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type Size = 'md' | 'sm';
-type Tone = 'default' | 'success' | 'danger';
+type Tone = 'default' | 'plain' | 'success' | 'danger';
 
 const variants: Record<Variant, string> = {
   primary: 'bg-accent text-accent-on border-transparent hover:bg-accent-hover',
@@ -17,6 +17,8 @@ const variants: Record<Variant, string> = {
 // Text-button tones for ghost buttons (Admin approve / reject); they underline on hover.
 const tones: Record<Tone, string> = {
   default: 'text-accent-ink',
+  // Admin Edit: a quiet text action next to Approve and Reject.
+  plain: 'text-fg',
   success: 'text-success',
   danger: 'text-danger',
 };
@@ -68,6 +70,7 @@ export function Button({
   loading?: boolean;
   /** Spinner plus aria-disabled, so it stays focusable and keeps the label. Clicks are ignored. */
   busy?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 }) {
   return (
     <button

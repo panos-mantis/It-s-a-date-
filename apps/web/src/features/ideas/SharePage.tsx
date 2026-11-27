@@ -32,12 +32,12 @@ import { ShareSuccess } from './ShareSuccess';
 type Values = z.input<typeof ideaCreateSchema>;
 type Parsed = z.output<typeof ideaCreateSchema>;
 
-const BUDGET_OPTIONS = [
+export const BUDGET_OPTIONS = [
   { value: '1', label: '$', ariaLabel: '$, low budget' },
   { value: '2', label: '$$', ariaLabel: '$$, medium budget' },
   { value: '3', label: '$$$', ariaLabel: '$$$, high budget' },
 ];
-const DURATION_OPTIONS = DURATIONS.map((d) => ({
+export const DURATION_OPTIONS = DURATIONS.map((d) => ({
   value: d,
   label: DURATION_LABELS[d],
 }));
@@ -56,7 +56,6 @@ const EMPTY = {
 } as unknown as Values;
 
 export function SharePage() {
-  const tags = useTags();
   const create = useCreateIdea();
   const upload = useUploadImage();
   const formRef = useRef<HTMLFormElement>(null);
@@ -67,7 +66,6 @@ export function SharePage() {
   const statusId = useId();
   const waitId = useId();
   const noteId = useId();
-  const tagHintId = useId();
 
   const {
     register,
@@ -83,7 +81,6 @@ export function SharePage() {
   });
 
   const busy = isSubmitting || create.isPending;
-  const picked = useWatch({ control, name: 'tagIds' }) ?? [];
   const titleLength = (useWatch({ control, name: 'title' }) ?? '').length;
   const descriptionLength = (useWatch({ control, name: 'description' }) ?? '').length;
 
@@ -123,7 +120,6 @@ export function SharePage() {
       ?.focus();
   };
 
-  const atLimit = picked.length >= MAX_TAGS;
   const tagError = errors.tagIds?.message ?? errors.tagIds?.root?.message;
 
   return (
@@ -227,61 +223,18 @@ export function SharePage() {
           />
         </div>
 
-        <fieldset
-          data-field="tagIds"
-          aria-describedby={tagHintId}
-          className="flex min-w-0 scroll-mt-24 flex-col gap-1.5"
-        >
-          <legend className="text-sm font-semibold text-fg">Tags</legend>
-          <p id={tagHintId} className={tagError ? 'text-xs text-danger' : 'text-xs text-muted'}>
-            {tagError ??
-              (atLimit ? "You've picked 3. Remove one to pick another." : 'Pick up to 3')}
-          </p>
-          {tags.isPending ? (
-            <div role="status" aria-label="Loading tags" className="flex flex-wrap gap-2">
-              {Array.from({ length: 5 }, (_, i) => (
-                <Skeleton key={i} className="h-11 w-24 rounded-pill" />
-              ))}
-            </div>
-          ) : tags.isError ? (
-            <div className="flex flex-wrap items-center gap-3 text-sm">
-              <p>We couldn&apos;t load the tags.</p>
-              <Button variant="secondary" size="sm" onClick={() => void tags.refetch()}>
-                Try again
-              </Button>
-            </div>
-          ) : tags.data.length === 0 ? (
-            <p className="text-sm text-muted">There are no tags yet. Check back soon.</p>
-          ) : (
-            <Controller
-              control={control}
-              name="tagIds"
-              render={({ field }) => {
-                const ids = field.value;
-                return (
-                  <div className="mt-1 flex flex-wrap gap-2">
-                    {tags.data.map((t) => {
-                      const on = ids.includes(t.id);
-                      return (
-                        <SelectableChip
-                          key={t.id}
-                          selected={on}
-                          disabled={!on && atLimit}
-                          icon={tagIcon(t.icon)}
-                          onToggle={() => {
-                            field.onChange(on ? ids.filter((i) => i !== t.id) : [...ids, t.id]);
-                          }}
-                        >
-                          {t.name}
-                        </SelectableChip>
-                      );
-                    })}
-                  </div>
-                );
-              }}
+        <Controller
+          control={control}
+          name="tagIds"
+          render={({ field }) => (
+            <TagPicker
+              value={field.value}
+              onChange={field.onChange}
+              error={tagError}
+              limitHint="You've picked 3. Remove one to pick another."
             />
           )}
-        </fieldset>
+        />
 
         <div data-field="placeType" className="scroll-mt-24 group-aria-busy:pointer-events-none">
           <Select
@@ -373,5 +326,70 @@ export function SharePage() {
         </div>
       </form>
     </div>
+  );
+}
+
+/**
+ * Pick 1 to 3 tags (Share, and Admin Edit). The hint row shows the error, else the limit hint once
+ * 3 are picked, else "Pick up to 3". Covers the tags loading, failing and being empty.
+ */
+export function TagPicker({
+  value,
+  onChange,
+  error,
+  limitHint,
+}: {
+  value: string[];
+  onChange: (ids: string[]) => void;
+  error?: string;
+  limitHint: string;
+}) {
+  const tags = useTags();
+  const hintId = useId();
+  const atLimit = value.length >= MAX_TAGS;
+  return (
+    <fieldset
+      data-field="tagIds"
+      aria-describedby={hintId}
+      className="flex min-w-0 scroll-mt-24 flex-col gap-1.5"
+    >
+      <legend className="text-sm font-semibold text-fg">Tags</legend>
+      <p id={hintId} className={error ? 'text-xs text-danger' : 'text-xs text-muted'}>
+        {error ?? (atLimit ? limitHint : 'Pick up to 3')}
+      </p>
+      {tags.isPending ? (
+        <div role="status" aria-label="Loading tags" className="flex flex-wrap gap-2">
+          {Array.from({ length: 5 }, (_, i) => (
+            <Skeleton key={i} className="h-11 w-24 rounded-pill" />
+          ))}
+        </div>
+      ) : tags.isError ? (
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <p>We couldn&apos;t load the tags.</p>
+          <Button variant="secondary" size="sm" onClick={() => void tags.refetch()}>
+            Try again
+          </Button>
+        </div>
+      ) : tags.data.length === 0 ? (
+        <p className="text-sm text-muted">There are no tags yet. Check back soon.</p>
+      ) : (
+        <div className="mt-1 flex flex-wrap gap-2">
+          {tags.data.map((t) => {
+            const on = value.includes(t.id);
+            return (
+              <SelectableChip
+                key={t.id}
+                selected={on}
+                disabled={!on && atLimit}
+                icon={tagIcon(t.icon)}
+                onToggle={() => onChange(on ? value.filter((i) => i !== t.id) : [...value, t.id])}
+              >
+                {t.name}
+              </SelectableChip>
+            );
+          })}
+        </div>
+      )}
+    </fieldset>
   );
 }

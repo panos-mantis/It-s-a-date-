@@ -1,7 +1,9 @@
 import {
+  adminIdeaQuerySchema,
   idParamsSchema,
   ideaCreateSchema,
   ideaQuerySchema,
+  ideaUpdateSchema,
   type IdeaDTO,
   type TagDTO,
   type UserDTO,
@@ -33,6 +35,7 @@ export const ideaStore = {
   add(idea: IdeaDTO): void {
     ideas = [idea, ...ideas];
   },
+  find: (id: string): IdeaDTO | undefined => ideas.find((i) => i.id === id),
 };
 
 export const tagStore = {
@@ -136,6 +139,22 @@ function sessionCreator(): { id: string; name: string } | null {
   const user = authStore.sessionUser();
   return user ? { id: user.id, name: user.name } : null;
 }
+
+/** Mirrors requireAuth + requireRole('admin'): 401 logged out, 403 for everyone but admins. */
+function adminGate() {
+  const user = authStore.sessionUser();
+  if (!user) return unauthorised();
+  if (user.role !== 'admin')
+    return errorResponse(403, 'FORBIDDEN', "You don't have access to this");
+  return null;
+}
+
+type Issue = { path: PropertyKey[]; message: string };
+const toIssues = (location: ValidationIssue['location'], issues: Issue[]): ValidationIssue[] =>
+  issues.map((i) => ({ location, path: i.path.map(String).join('.'), message: i.message }));
+
+// Mirrors apps/api/src/lib/regex.ts: user text matches literally.
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Fixtures carry Maya's saves and ratings; everyone else sees them blank.
 function forViewer(idea: IdeaDTO): IdeaDTO {
@@ -253,6 +272,79 @@ export const ideasHandlers: RequestHandler[] = [
       pageSize,
       total: mine.length,
     });
+  }),
+
+  // The pending queue is oldest first; other statuses newest first. `q` searches title and
+  // description, case-insensitive, as a literal string.
+  http.get('*/api/v1/admin/ideas', ({ request }) => {
+    const denied = adminGate();
+    if (denied) return denied;
+    const parsed = adminIdeaQuerySchema.safeParse(
+      Object.fromEntries(new URL(request.url).searchParams),
+    );
+    if (!parsed.success) return validationResponse(toIssues('query', parsed.error.issues));
+    const { status, q, page, pageSize } = parsed.data;
+    const rx = q ? new RegExp(escapeRegex(q), 'i') : null;
+    const matches = ideas
+      .filter((i) => i.status === status)
+      .filter((i) => !rx || rx.test(i.title) || rx.test(i.description));
+    const oldest = (a: IdeaDTO, b: IdeaDTO) =>
+      a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id);
+    const sorted = [...matches].sort(status === 'pending' ? oldest : (a, b) => oldest(b, a));
+    const start = (page - 1) * pageSize;
+    return HttpResponse.json({
+      items: sorted.slice(start, start + pageSize).map(forViewer),
+      page,
+      pageSize,
+      total: sorted.length,
+    });
+  }),
+
+  http.patch('*/api/v1/admin/ideas/:id', async ({ params, request }) => {
+    const denied = adminGate();
+    if (denied) return denied;
+    // Like the validate middleware: params and body issues are reported together.
+    const parsedId = idParamsSchema.safeParse(params);
+    const parsedBody = ideaUpdateSchema.safeParse(await request.json().catch(() => ({})));
+    const issues = [
+      ...(parsedId.success ? [] : toIssues('params', parsedId.error.issues)),
+      ...(parsedBody.success ? [] : toIssues('body', parsedBody.error.issues)),
+    ];
+    if (!parsedId.success || !parsedBody.success) return validationResponse(issues);
+    const idea = ideaStore.find(parsedId.data.id);
+    if (!idea) return errorResponse(404, 'NOT_FOUND', 'Idea not found');
+    const { tagIds, image, ...rest } = parsedBody.data;
+    const inputIssues: ValidationIssue[] = [];
+    if (image && !isOwnImage(image)) {
+      inputIssues.push({
+        location: 'body',
+        path: 'image',
+        message: "Use an image uploaded through It's a Date",
+      });
+    }
+    const chosen = tagIds?.map((id) => tags.find((t) => t.id === id));
+    if (chosen?.some((t) => !t)) {
+      inputIssues.push({ location: 'body', path: 'tagIds', message: 'Unknown tag' });
+    }
+    if (inputIssues.length > 0) return validationResponse(inputIssues);
+    const updated: IdeaDTO = {
+      ...idea,
+      ...rest,
+      ...(image ? { image } : {}),
+      ...(chosen ? { tags: chosen.filter((t): t is TagDTO => t !== undefined) } : {}),
+    };
+    ideaStore.set(ideas.map((i) => (i.id === idea.id ? updated : i)));
+    return HttpResponse.json(forViewer(updated));
+  }),
+
+  http.delete('*/api/v1/admin/ideas/:id', ({ params }) => {
+    const denied = adminGate();
+    if (denied) return denied;
+    const parsedId = idParamsSchema.safeParse(params);
+    if (!parsedId.success) return validationResponse(toIssues('params', parsedId.error.issues));
+    if (!ideaStore.find(parsedId.data.id)) return errorResponse(404, 'NOT_FOUND', 'Idea not found');
+    ideaStore.set(ideas.filter((i) => i.id !== parsedId.data.id));
+    return new HttpResponse(null, { status: 204 });
   }),
 
   http.post('*/api/v1/uploads/image', async () => {

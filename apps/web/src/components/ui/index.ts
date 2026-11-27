@@ -15,3 +15,4 @@ export { SegmentedControl, type SegmentOption } from './SegmentedControl';
 export { Select } from './Select';
 export { Textarea } from './Textarea';
 export { BusyStatus, FormError } from './FormError';
+export { Tabs, tabDomId, type TabItem } from './Tabs';

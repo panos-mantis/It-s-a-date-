@@ -40,6 +40,7 @@ export function PhotoDropZone({
   onUploadingChange,
   error,
   label = 'Photo',
+  removable = true,
 }: {
   value: PhotoValue | null;
   onChange: (value: PhotoValue | null) => void;
@@ -50,6 +51,8 @@ export function PhotoDropZone({
   /** A message from outside (a form check or the API), shown when the field has none of its own. */
   error?: string;
   label?: string;
+  /** False hides Remove: Admin Edit can replace a photo but the API can't clear one. */
+  removable?: boolean;
 }) {
   const id = useId();
   const labelId = `${id}-label`;
@@ -191,7 +194,8 @@ export function PhotoDropZone({
         type="file"
         accept={TYPES.join(',')}
         // In the preview the picker is only opened by Replace; it must not be a tab stop.
-        className={showPreview ? 'hidden' : 'peer sr-only'}
+        hidden={showPreview}
+        className="peer sr-only"
         aria-labelledby={`${labelId} ${addId}`}
         aria-describedby={invalid ? `${helpId} ${errorId}` : helpId}
         aria-invalid={invalid || undefined}
@@ -275,10 +279,12 @@ export function PhotoDropZone({
                 <RefreshCw aria-hidden="true" size={16} strokeWidth={1.75} />
                 Replace
               </Button>
-              <Button variant="ghost" size="sm" onClick={remove}>
-                <Trash2 aria-hidden="true" size={16} strokeWidth={1.75} />
-                Remove
-              </Button>
+              {removable && (
+                <Button variant="ghost" size="sm" onClick={remove}>
+                  <Trash2 aria-hidden="true" size={16} strokeWidth={1.75} />
+                  Remove
+                </Button>
+              )}
             </div>
           </div>
         </div>
