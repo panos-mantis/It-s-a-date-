@@ -1,15 +1,30 @@
 # START HERE — resuming the It's a Date modernization
 
-Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 built, PR pending). Read this first in a new session, then the files it points to.
+Last updated: 2026-11-28 (Phases 2, 3 and 4 merged; Phase 5 built, PR pending). Read this first in a new session, then the files it points to.
 
 ## How to resume
 
 1. Open the folder `C:\Users\manti\Desktop\its-a-date` in VS Code and start a **new** Claude Code conversation.
-2. Phases 2 and 3 are merged into `modernize` (PR #4 and PR #5). **Phase 4 (designs) is built** on branch `phase-4-designs`. It isn't pushed yet, and its PR is pending. Phase 5 starts after Phase 4 merges. Each later phase writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below, then executes it.
-   - **To finish Phase 4,** follow the **Status** section at the top of `docs/superpowers/plans/2026-11-25-phase-4-designs.md`. Only Task 8 is left: the whole-branch review, then push and open the PR into `modernize`.
-   - Prompt for a new session: "Read docs/superpowers/START-HERE.md and do Phase 4 Task 8 from the plan's Status section."
-   - **Phase 5 ports from** `.open-design/itsadate-screens/HANDOFF.md` (see the hand-off notes below).
-3. Each phase ends with its own PR into `modernize`. Phase 5 starts after 2, 3 and 4 have merged.
+2. Phases 2, 3 and 4 are merged into `modernize` (PRs #4, #5 and #6).
+3. **Phase 5 (pages) is built** on branch `phase-5-pages`. Its PR into `modernize` is pending.
+   - To finish it, follow the **Status** section at the top of `docs/superpowers/plans/2026-11-26-phase-5-pages.md`. Only Step 6 of Task 12 is left: push and open the PR, after asking the owner.
+4. After Phase 5 merges, Phases 6a (ratings and saves) and 6b (nearby places) can run in parallel. Each writes its own plan first, with superpowers:writing-plans, from the spec, the roadmap and the hand-off notes below.
+5. Each phase ends with its own PR into `modernize`.
+
+**Hand-off notes from Phase 5**
+- **6a: ratings and saves.** Wire these onto the finished pages (ruling P1 left them out):
+  - the heart on cards and on Idea detail (the "♥ 276" pill)
+  - the "Your rating" panel (`StarRatingInput`; HANDOFF §3)
+  - Profile's Saved tab
+  - the "Saved ideas" account-menu item (`/profile#saved`)
+
+  Profile currently shows "Your ideas" as a heading, not a tablist. Use `components/ui/Tabs` once Saved exists. The login hints for `reason=save` and `reason=rate` already exist in `features/auth/safe-next.ts`.
+- **6b: places.** Add the places card on Idea detail (HANDOFF §2 "Places panel and map", frames 5–10). Idea detail has no coral fill today; "Find places near me" becomes the page's one coral fill.
+- **7: uploads.**
+  - **Endpoint:** add `POST /api/v1/uploads/image`. It takes multipart form field `image` and returns `{ url, publicId }`. Share and Admin Edit already call it through `useUploadImage` (`features/ideas/api.ts`, XHR for progress). Until the endpoint exists, the photo step shows "That photo didn't upload. Try a JPEG, PNG or WebP under 5 MB.", so no idea can be created yet.
+  - **Error classification:** `PhotoDropZone` treats every non-5xx error as a rejected file. Make only 400, 413, 415 and 422 mean "rejected", give 401 a "log in again" message, and treat everything else as dropped.
+  - **XHR:** add a timeout, an abort, and a Cancel upload button (design frame 2).
+- **Owner decisions:** the open ones are listed in the Phase 5 plan's Status section.
 
 **Execution method (owner's choice): agent per task.** Use superpowers:subagent-driven-development.
 - Each task gets a fresh implementer agent, using the project agent named for that phase in the roadmap: Phase 2 `itsadate-api`, Phase 3 `itsadate-web`, Phase 4 `itsadate-designer`.
@@ -28,7 +43,18 @@ Last updated: 2026-11-25 (Phases 2 and 3 merged; Phase 4 built, PR pending). Rea
 
 ## Where things stand
 
-**Phase 4 (designs) is built on `phase-4-designs`. The PR is pending (Task 8).**
+**Phase 5 (pages) is built on `phase-5-pages`. The PR is pending.**
+- **Pages built** in `apps/web`, from the approved screens: Home, Idea detail, Share an idea, Log in / Sign up, Profile (Your ideas), Admin (Pending, All ideas, Edit, Tags, Users) and 404.
+- **Shared pieces:** the new kit components and the data layer. MSW handlers mirror the real API.
+- **API change:** one, the admin ideas `q` search.
+- **Checks:**
+  - Checked against the real API on `itsadate_dev` with a throwaway admin. Every change was reverted, and two throwaway plain users remain.
+  - Re-critiqued against the screens; the "polish" fixes are in.
+  - Final whole-branch review clean after one fix wave.
+  - `npm run ci` passes (shared 40, api 171, web 366 tests).
+- **Ledger:** `.superpowers/sdd/2026-11-26-phase-5-pages/progress.md`.
+
+**Phase 4 (designs) is merged into `modernize` (PR #6).** The notes below are kept for reference.
 - All 7 screens are designed, checked, critiqued and reviewed, in `.open-design/itsadate-screens/`: Home, Idea detail, Share an idea, Log in and sign up, Profile, Admin and Page not found. Each works at desktop and phone width.
 - The owner signed off Home and Idea detail on 2026-11-25 ("i let you decide im fine with everything", after round 1).
 - The collection check passes: no broken links, dead ends, unlinked screens or unreachable tasks. The one nav drift left, on auth's logged-out header, is accepted.

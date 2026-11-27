@@ -27,6 +27,49 @@
 - `.open-design/itsadate-screens/content.md`
 - `DESIGN.md`
 
+## Status (2026-11-28): read this first if you're picking the phase up
+
+**Tasks 1–12 are done.** Every page is built, has had its task review, and was checked against the real API on `itsadate_dev`. The pages have been re-critiqued against their screens and pass the final whole-branch review after one fix wave. `npm run ci` and `prettier --check` pass. **The only step left is Step 6: push, then open the PR into `modernize`. Ask the owner first.**
+
+- **Branch:** `phase-5-pages`, from `modernize` at `ebfbaed`. Nothing is pushed.
+- **Ledger:** `.superpowers/sdd/2026-11-26-phase-5-pages/progress.md`. It's git-ignored and exists only on the original machine. It holds every ruling, the deferred minor findings and the review reports.
+- **Real-API check (Task 12 Step 1):** passed. A throwaway admin approved and undid, rejected, edited, added, renamed and deleted a tag, and changed roles. Every change was reverted. Two throwaway plain users remain in dev: `phase5-check-1795814746@itsadate-dev.test` and `phase5-check2-1795814746@itsadate-dev.test`.
+- **Design re-critique (Step 2):** the verdict was "polish", and it was fixed in `e586eaa`. After the polish, Share, Profile and Admin were checked only by reading their CSS, so the owner click-test should look at those at 360px.
+
+### Commits
+
+| Task | Commits |
+|---|---|
+| Plan | `1af9bb0` |
+| 1 Admin ideas search (API) | `0152f99` |
+| 2 Tokens, Button, Chip, tag icons | `6b09a70`, `6748977` |
+| 3 Card, StarRating, Toast | `bf8f98a`, `2350bfc`, `7af608e` |
+| 4 Data layer, fixtures, MSW | `250debd`, `19e500f` |
+| 5 Header, guards, auth, 404 | `50a50fc` |
+| 6 Home | `ce22736`, `3631c9a` |
+| 7 Idea detail | `e60eed5` |
+| 8 Share an idea | `de91b01` |
+| 9 Profile | `6a886f0`, `72f4e0d` |
+| 10 Admin queue, all ideas, edit | `b0a7213`, `0ea3bab` |
+| 11 Admin tags and users | `6d52556`, `239b975` |
+| 12 Design polish, final-review fixes | `e586eaa`, `557fcf1` |
+
+### Owner decisions to make (listed in the PR body too)
+
+- **Edit validation.** Admin Edit validates every field, not only the ones that changed. A migrated idea that breaks a create rule can't be saved until it's fixed: for example, a description under 20 characters, or no tags left after a tag delete. Decide before the Phase 7 migration.
+- **New copy to approve.** These strings aren't in the screens:
+  - the duration clause in Home's no-match line
+  - "We couldn't load more ideas / people. Check your connection and try again."
+  - the Make admin confirm: "Make X an admin?" / "Admins can review ideas and manage tags and users."
+  - "No tags yet."
+  - "We couldn't load the tags." and "We couldn't load the people."
+  - `No people match "q".` and "No people yet."
+  - "You're no longer an admin."
+- **Tag slugs.** Renaming a tag changes its slug, so old `?tag=` links stop matching. Home now shows the no-match state for those links.
+- **Phone Back.** On phones, Back doesn't close the full-screen search sheet.
+- **Delete-tag wording.** The delete-tag dialog wording is verbatim from `admin.html`.
+- **Show/Hide toggle.** The Show/Hide password toggle changes its label and also sets `aria-pressed`. This follows the design.
+
 ## Rulings for this phase (binding unless the owner overturns them)
 
 **P1. What waits for later phases.** The roadmap gives saves and ratings to 6a, places to 6b, and uploads to 7, and those endpoints don't exist yet (HANDOFF §4). So Phase 5 leaves these out:
