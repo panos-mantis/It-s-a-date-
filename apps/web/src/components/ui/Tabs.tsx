@@ -13,6 +13,15 @@ export interface TabItem {
 export const tabDomId = (id: string) => `${id}-tab`;
 const panelDomId = (id: string) => `${id}-panel`;
 
+/** The tab id a hash names; a malformed escape (`#%`) names none rather than throwing. */
+function hashId(hash: string): string {
+  try {
+    return decodeURIComponent(hash.slice(1));
+  } catch {
+    return '';
+  }
+}
+
 /**
  * A real tablist: roving tabindex, Left / Right / Home / End (selection follows focus). The URL
  * hash picks the tab, so a link can open one; picking a tab replaces the hash rather than adding
@@ -24,7 +33,7 @@ export function Tabs({ label, tabs }: { label: string; tabs: TabItem[] }) {
   const navigate = useNavigate();
   const buttons = useRef(new Map<string, HTMLButtonElement>());
 
-  const fromHash = decodeURIComponent(location.hash.slice(1));
+  const fromHash = hashId(location.hash);
   const current = tabs.find((t) => t.id === fromHash)?.id ?? tabs[0]?.id;
 
   const select = (id: string) => {

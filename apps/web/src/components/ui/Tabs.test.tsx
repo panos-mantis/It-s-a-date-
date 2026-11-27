@@ -82,6 +82,14 @@ describe('Tabs', () => {
     expect(screen.getByRole('tab', { name: 'Pending' })).toHaveAttribute('aria-selected', 'true');
   });
 
+  it.each(['#%', '#%E0', '#%E0%A4%A'])(
+    'a malformed hash (%s) falls back to the first tab instead of crashing',
+    (hash) => {
+      setup(`/admin${hash}`);
+      expect(screen.getByRole('tab', { name: 'Pending' })).toHaveAttribute('aria-selected', 'true');
+    },
+  );
+
   it('has no axe violations', async () => {
     setup();
     await expectNoAxeViolations(document.body);
