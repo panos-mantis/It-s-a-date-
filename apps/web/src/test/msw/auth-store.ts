@@ -45,6 +45,10 @@ export const authStore = {
   emailTaken(email: string): boolean {
     return users.some((u) => u.email === email.toLowerCase());
   },
+  /** Mirrors a role change made through the admin API, so `/auth/me` agrees with it. */
+  setRole(id: string, role: Role): void {
+    users = users.map((u) => (u.id === id ? { ...u, role } : u));
+  },
   /** The logged-in user, or null. */
   sessionUser(): UserDTO | null {
     const user = users.find((u) => u.email === sessionEmail);

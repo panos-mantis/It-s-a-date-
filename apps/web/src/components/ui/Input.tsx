@@ -19,7 +19,7 @@ export function Input({
 }: InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   /** Helper text. It gives way to the error while one shows. */
-  hint?: string;
+  hint?: ReactNode;
   error?: string;
   /** A character count ("18/80") at the right of the message row. */
   counter?: string;

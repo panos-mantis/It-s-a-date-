@@ -3,8 +3,10 @@ import { Tabs, tabDomId } from '../../components/ui';
 import { useAdminIdeas } from './api';
 import { AllIdeasTab } from './AllIdeasTab';
 import { PendingTab } from './PendingTab';
+import { TagsTab } from './TagsTab';
+import { UsersTab } from './UsersTab';
 
-/** Admin (HANDOFF §1 "Admin"): Pending and All ideas. Task 11 adds Tags and Users to the tabs. */
+/** Admin (HANDOFF §1 "Admin"): Pending, All ideas, Tags and Users. */
 export function AdminPage() {
   const navigate = useNavigate();
   // The same query as the Pending tab, so the count is the queue's own total.
@@ -53,6 +55,8 @@ export function AdminPage() {
             panel: <PendingTab onSeeAll={seeAll} />,
           },
           { id: 'all', label: 'All ideas', panel: <AllIdeasTab /> },
+          { id: 'tags', label: 'Tags', panel: <TagsTab /> },
+          { id: 'users', label: 'Users', panel: <UsersTab /> },
         ]}
       />
     </>

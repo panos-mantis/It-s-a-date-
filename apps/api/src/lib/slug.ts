@@ -1,9 +1,2 @@
-/** Lowercase ASCII slug: diacritics stripped, runs of non [a-z0-9] become one dash. */
-export function slugify(name: string): string {
-  return name
-    .normalize('NFKD')
-    .replace(/\p{M}/gu, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+// The one slug rule lives in the shared package, so the admin Tags form previews what the API stores.
+export { slugify } from '@itsadate/shared';

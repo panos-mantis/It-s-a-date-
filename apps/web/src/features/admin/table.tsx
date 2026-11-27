@@ -96,3 +96,25 @@ export function RowSkeletons({ actions = 3 }: { actions?: number }) {
     </div>
   );
 }
+
+/** Three skeleton rows for a plain list: a line and a short line, with actions (dropped on phones). */
+export function ListSkeleton({ actions = 2 }: { actions?: number }) {
+  return (
+    <div className={tableWrap} aria-hidden="true">
+      {Array.from({ length: 3 }, (_, i) => (
+        <div key={i} className="flex items-center gap-3 border-b border-border p-4 last:border-b-0">
+          <Skeleton className="size-9 shrink-0 rounded-pill" />
+          <div className="flex flex-1 flex-col gap-2">
+            <Skeleton className="h-4 w-2/5 rounded-sm" />
+            <Skeleton className="h-3 w-1/4 rounded-sm" />
+          </div>
+          <div className="hidden gap-2 sm:flex">
+            {Array.from({ length: actions }, (_, j) => (
+              <Skeleton key={j} className="h-8 w-22 rounded-md" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

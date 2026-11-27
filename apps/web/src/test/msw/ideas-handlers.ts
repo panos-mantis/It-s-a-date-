@@ -1,9 +1,14 @@
 import {
   adminIdeaQuerySchema,
+  adminUserQuerySchema,
   idParamsSchema,
   ideaCreateSchema,
   ideaQuerySchema,
   ideaUpdateSchema,
+  roleUpdateSchema,
+  slugify,
+  tagCreateSchema,
+  tagUpdateSchema,
   type IdeaDTO,
   type TagDTO,
   type UserDTO,
@@ -22,6 +27,7 @@ let uploadMode: 'ok' | 'reject' | 'network' = 'ok';
 let uploadDelayMs = 0;
 let uploadCount = 0;
 let createdCount = 0;
+let tagCount = 0;
 
 export const ideaStore = {
   reset(): void {
@@ -41,6 +47,7 @@ export const ideaStore = {
 export const tagStore = {
   reset(): void {
     tags = [...tagFixtures];
+    tagCount = 0;
   },
   all: (): TagDTO[] => tags,
   set(next: TagDTO[]): void {
@@ -162,7 +169,141 @@ function forViewer(idea: IdeaDTO): IdeaDTO {
   return me?.id === mayaId ? idea : { ...idea, myRating: null, saved: false };
 }
 
+const NAME_TAKEN = 'A tag with this name already exists';
+
+/** Mirrors tags.service slugOf: a name with no letter or number has no slug. */
+function slugOrIssue(name: string): { slug: string } | { issue: ValidationIssue } {
+  const slug = slugify(name);
+  return slug === ''
+    ? {
+        issue: { location: 'body', path: 'name', message: 'Use at least one letter or number' },
+      }
+    : { slug };
+}
+
+// Mirrors admin-users.service.setRole: a demotion that leaves no admin is undone and refused.
+function applyRole(id: string, role: 'admin' | 'user'): UserDTO | 'missing' | 'last-admin' {
+  const user = users.find((u) => u.id === id);
+  if (!user) return 'missing';
+  const admins = users.filter((u) => u.role === 'admin').length;
+  if (user.role === 'admin' && role !== 'admin' && admins === 1) return 'last-admin';
+  const updated = { ...user, role };
+  users = users.map((u) => (u.id === id ? updated : u));
+  authStore.setRole(id, role);
+  return updated;
+}
+
+const adminTagsHandlers: RequestHandler[] = [
+  http.post('*/api/v1/admin/tags', async ({ request }) => {
+    const denied = adminGate();
+    if (denied) return denied;
+    const parsed = tagCreateSchema.safeParse(await request.json().catch(() => ({})));
+    if (!parsed.success) return validationResponse(toIssues('body', parsed.error.issues));
+    const named = slugOrIssue(parsed.data.name);
+    if ('issue' in named) return validationResponse([named.issue]);
+    if (tags.some((t) => t.slug === named.slug)) return errorResponse(409, 'CONFLICT', NAME_TAKEN);
+    tagCount += 1;
+    const tag: TagDTO = {
+      id: `64a1${String(tagCount).padStart(20, '0')}`,
+      name: parsed.data.name,
+      slug: named.slug,
+      icon: parsed.data.icon,
+    };
+    tags = [...tags, tag];
+    return HttpResponse.json(tag, { status: 201 });
+  }),
+
+  http.patch('*/api/v1/admin/tags/:id', async ({ params, request }) => {
+    const denied = adminGate();
+    if (denied) return denied;
+    const parsedId = idParamsSchema.safeParse(params);
+    const parsedBody = tagUpdateSchema.safeParse(await request.json().catch(() => ({})));
+    if (!parsedId.success || !parsedBody.success) {
+      return validationResponse([
+        ...(parsedId.success ? [] : toIssues('params', parsedId.error.issues)),
+        ...(parsedBody.success ? [] : toIssues('body', parsedBody.error.issues)),
+      ]);
+    }
+    const { id } = parsedId.data;
+    const patch: Partial<TagDTO> = {};
+    if (parsedBody.data.icon !== undefined) patch.icon = parsedBody.data.icon;
+    if (parsedBody.data.name !== undefined) {
+      const named = slugOrIssue(parsedBody.data.name);
+      if ('issue' in named) return validationResponse([named.issue]);
+      if (tags.some((t) => t.slug === named.slug && t.id !== id)) {
+        return errorResponse(409, 'CONFLICT', NAME_TAKEN);
+      }
+      patch.name = parsedBody.data.name;
+      patch.slug = named.slug;
+    }
+    const tag = tags.find((t) => t.id === id);
+    if (!tag) return errorResponse(404, 'NOT_FOUND', 'Tag not found');
+    const updated = { ...tag, ...patch };
+    tags = tags.map((t) => (t.id === id ? updated : t));
+    // Ideas carry their tags inline, so a rename shows on them too.
+    ideas = ideas.map((i) => ({ ...i, tags: i.tags.map((t) => (t.id === id ? updated : t)) }));
+    return HttpResponse.json(updated);
+  }),
+
+  // Pulls the tag off every idea first, as tags.repository.remove does.
+  http.delete('*/api/v1/admin/tags/:id', ({ params }) => {
+    const denied = adminGate();
+    if (denied) return denied;
+    const parsedId = idParamsSchema.safeParse(params);
+    if (!parsedId.success) return validationResponse(toIssues('params', parsedId.error.issues));
+    const { id } = parsedId.data;
+    if (!tags.some((t) => t.id === id)) return errorResponse(404, 'NOT_FOUND', 'Tag not found');
+    ideas = ideas.map((i) => ({ ...i, tags: i.tags.filter((t) => t.id !== id) }));
+    tags = tags.filter((t) => t.id !== id);
+    return new HttpResponse(null, { status: 204 });
+  }),
+];
+
+const adminUsersHandlers: RequestHandler[] = [
+  // Name or email, case-insensitive, as a literal string.
+  http.get('*/api/v1/admin/users', ({ request }) => {
+    const denied = adminGate();
+    if (denied) return denied;
+    const parsed = adminUserQuerySchema.safeParse(
+      Object.fromEntries(new URL(request.url).searchParams),
+    );
+    if (!parsed.success) return validationResponse(toIssues('query', parsed.error.issues));
+    const { q, page, pageSize } = parsed.data;
+    const rx = q ? new RegExp(escapeRegex(q), 'i') : null;
+    const matches = users.filter((u) => !rx || rx.test(u.name) || rx.test(u.email));
+    const start = (page - 1) * pageSize;
+    return HttpResponse.json({
+      items: matches.slice(start, start + pageSize),
+      page,
+      pageSize,
+      total: matches.length,
+    });
+  }),
+
+  http.post('*/api/v1/admin/users/:id/role', async ({ params, request }) => {
+    const denied = adminGate();
+    if (denied) return denied;
+    const parsedId = idParamsSchema.safeParse(params);
+    const parsedBody = roleUpdateSchema.safeParse(await request.json().catch(() => ({})));
+    if (!parsedId.success || !parsedBody.success) {
+      return validationResponse([
+        ...(parsedId.success ? [] : toIssues('params', parsedId.error.issues)),
+        ...(parsedBody.success ? [] : toIssues('body', parsedBody.error.issues)),
+      ]);
+    }
+    const result = applyRole(parsedId.data.id, parsedBody.data.role);
+    if (result === 'missing') return errorResponse(404, 'NOT_FOUND', 'User not found');
+    if (result === 'last-admin') {
+      return errorResponse(409, 'CONFLICT', "You can't remove the last admin");
+    }
+    return HttpResponse.json(result);
+  }),
+];
+
 export const ideasHandlers: RequestHandler[] = [
+  ...adminTagsHandlers,
+  ...adminUsersHandlers,
+
   http.get('*/api/v1/tags', () => HttpResponse.json(tags)),
 
   http.get('*/api/v1/ideas', ({ request }) => {

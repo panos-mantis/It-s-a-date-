@@ -10,7 +10,7 @@ export function fieldIds(id: string) {
 /** Space-separated ids of the messages that currently show. */
 export function describedBy(
   id: string,
-  { error, hint, counter }: { error?: string; hint?: string; counter?: string },
+  { error, hint, counter }: { error?: string; hint?: ReactNode; counter?: string },
 ): string | undefined {
   const ids = fieldIds(id);
   const parts = [error ? ids.error : hint ? ids.hint : null, counter ? ids.counter : null].filter(
@@ -42,7 +42,7 @@ export function FieldMessages({
 }: {
   id: string;
   error?: string;
-  hint?: string;
+  hint?: ReactNode;
   counter?: string;
   afterError?: ReactNode;
   /** The counter is at its limit: darker and heavier. */

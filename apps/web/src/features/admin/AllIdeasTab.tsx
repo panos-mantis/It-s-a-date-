@@ -16,6 +16,7 @@ import { cn } from '../../lib/cn';
 import { useAdminIdeas } from './api';
 import { EditIdeaPanel } from './EditIdeaPanel';
 import { formatDate } from './relative-date';
+import { useDebounced } from './use-debounced';
 import {
   actionsTdClass,
   CardLabel,
@@ -44,15 +45,6 @@ const STATUS_WORD: Record<IdeaStatus, string> = {
   rejected: 'not approved',
 };
 const SEARCH_DELAY_MS = 300;
-
-function useDebounced(value: string, ms: number): string {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), ms);
-    return () => clearTimeout(t);
-  }, [value, ms]);
-  return debounced;
-}
 
 /** Hidden on mid-width tables, shown again on the stacked cards. */
 const midHidden = '@min-[720px]:@max-[959px]:hidden';
