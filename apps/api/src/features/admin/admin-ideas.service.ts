@@ -12,9 +12,9 @@ import { savesRepository } from '../saves/saves.repository.js';
 export const adminIdeasService = {
   /** The pending queue is oldest first; other statuses are newest first. */
   async list(query: AdminIdeaQuery, admin: AuthContext): Promise<Paginated<IdeaDTO>> {
-    const { page, pageSize, status } = query;
+    const { page, pageSize, status, q } = query;
     const { items, total } = await ideasRepository.find(
-      { status },
+      { status, q },
       status === 'pending' ? 'oldest' : 'new',
       page,
       pageSize,

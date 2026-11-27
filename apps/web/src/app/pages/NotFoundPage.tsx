@@ -8,11 +8,17 @@ export function NotFoundPage() {
       <title>{"Page not found · It's a Date"}</title>
       <EmptyState
         headingLevel={1}
-        title="We couldn't find that page."
-        body="It may have moved, or the link has a typo."
+        hero
+        eyebrow="Page not found"
+        title={
+          <>
+            This page <em>wandered off</em>.
+          </>
+        }
+        body="The link may be old, or the idea was removed."
         action={
-          <Link to={paths.home} className={buttonClasses({ variant: 'secondary' })}>
-            Back to home
+          <Link to={paths.home} className={buttonClasses()}>
+            Back to all ideas
           </Link>
         }
       />

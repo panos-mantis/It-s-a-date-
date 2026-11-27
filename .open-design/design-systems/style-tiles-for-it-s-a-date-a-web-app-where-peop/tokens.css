@@ -49,4 +49,7 @@
   --soft: "SOFT" 100, "WONK" 0;
   --space-7: 48px;
   --surface-sunk: #F4EBE0;
+  --on-danger: #FFFDF9;
+  --scrim: rgba(42, 26, 20, 0.36);
+  --focus-ring: rgba(240, 106, 76, 0.3);
 }

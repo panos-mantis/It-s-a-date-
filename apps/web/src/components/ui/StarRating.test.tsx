@@ -17,10 +17,24 @@ describe('StarRating', () => {
     expect(screen.getByText('Rated 5.0 out of 5 from 1 rating')).toBeInTheDocument();
   });
 
-  it('says New with no ratings', () => {
-    render(<StarRating value={0} count={0} />);
-    expect(screen.getByText('New')).toBeInTheDocument();
-    expect(screen.getByText('No ratings yet')).toBeInTheDocument();
+  it('card format reads 4.7 (89)', () => {
+    const { container } = render(<StarRating value={4.7} count={89} format="card" />);
+    expect(container).toHaveTextContent('4.7 (89)');
+  });
+
+  it('card format renders nothing with no ratings', () => {
+    const { container } = render(<StarRating value={0} count={0} format="card" />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('detail format reads 4.7 · 89 ratings', () => {
+    render(<StarRating value={4.7} count={89} format="detail" />);
+    expect(screen.getByText('4.7 · 89 ratings')).toBeInTheDocument();
+  });
+
+  it('detail format, no ratings', () => {
+    render(<StarRating value={0} count={0} format="detail" />);
+    expect(screen.getByText('No ratings yet. Be the first.')).toBeInTheDocument();
   });
 
   it('input: picking 4 stars calls onChange(4)', async () => {
@@ -48,7 +62,7 @@ describe('StarRating', () => {
     const { container } = render(
       <div>
         <StarRating value={4.6} count={128} />
-        <StarRating value={0} count={0} />
+        <StarRating value={0} count={0} format="detail" />
         <StarRatingInput value={2} onChange={() => {}} />
       </div>,
     );

@@ -22,6 +22,24 @@ describe('EmptyState', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Nothing yet' })).toBeInTheDocument();
   });
 
+  it('renders an eyebrow and a rich title', () => {
+    render(
+      <EmptyState
+        headingLevel={1}
+        eyebrow="Page not found"
+        title={
+          <>
+            This page <em>wandered off</em>.
+          </>
+        }
+      />,
+    );
+    expect(screen.getByText('Page not found')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'This page wandered off.' }),
+    ).toBeInTheDocument();
+  });
+
   it('has no axe violations', async () => {
     const { container } = render(<EmptyState icon={Heart} title="Nothing yet" body="Body" />);
     await expectNoAxeViolations(container);

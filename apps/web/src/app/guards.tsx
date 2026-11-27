@@ -28,7 +28,7 @@ function GuardError({ onRetry }: { onRetry: () => void }) {
 
 export function RequireAuth({ children }: { children: ReactNode }) {
   const me = useMe();
-  const { pathname, search } = useLocation();
+  const { pathname, search, hash } = useLocation();
   // A logout that ran while this guard was mounted is sending the user home; don't bounce to /login.
   const [mountedAt] = useState(() => Date.now());
   const logoutStates = useMutationState({
@@ -52,7 +52,12 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   // Logout finished: send the user home even if the caller didn't navigate.
   if (!me.data && loggingOut.done) return <Navigate to={paths.home} replace />;
   if (!me.data) {
-    return <Navigate to={`${paths.login}?next=${encodeURIComponent(pathname + search)}`} replace />;
+    return (
+      <Navigate
+        to={`${paths.login}?next=${encodeURIComponent(pathname + search + hash)}`}
+        replace
+      />
+    );
   }
   return <>{children}</>;
 }
@@ -65,9 +70,10 @@ export function RequireRole({ role, children }: { role: Role; children: ReactNod
         <EmptyState
           headingLevel={1}
           title="This page is for admins."
+          body={`You're logged in as ${me.data.name}. If you need to review ideas, ask an admin to give you access.`}
           action={
-            <Link to={paths.home} className={buttonClasses({ variant: 'secondary' })}>
-              Go home
+            <Link to={paths.home} className={buttonClasses()}>
+              Back to all ideas
             </Link>
           }
         />

@@ -28,6 +28,47 @@ describe('Header', () => {
     expect(within(header).getByRole('link', { name: /Share an idea/ })).toBeInTheDocument();
   });
 
+  it('desktop shows Your ideas; the current link has aria-current', async () => {
+    login();
+    const first = renderApp('/profile');
+    const header = await screen.findByRole('banner');
+    await within(header).findByRole('button', { name: /Account menu/ });
+    const ideas = within(header).getByRole('link', { name: 'Your ideas' });
+    expect(ideas).toHaveAttribute('href', '/profile');
+    expect(ideas).toHaveAttribute('aria-current', 'page');
+    expect(within(header).getByRole('link', { name: 'Share an idea' })).not.toHaveAttribute(
+      'aria-current',
+    );
+    first.unmount();
+
+    renderApp('/');
+    const home = await screen.findByRole('banner');
+    await within(home).findByRole('button', { name: /Account menu/ });
+    expect(within(home).getByRole('link', { name: 'Your ideas' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
+  it('phone share link is named "Share an idea" and has a short visible label', async () => {
+    renderApp('/');
+    const header = await screen.findByRole('banner');
+    const share = await within(header).findByRole('link', { name: 'Share an idea' });
+    expect(share).toHaveAttribute('href', '/share');
+    expect(within(share).getByText('Share')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('marks the current auth link', async () => {
+    renderApp('/signup');
+    const header = await screen.findByRole('banner');
+    expect(await within(header).findByRole('link', { name: 'Sign up' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(within(header).getByRole('link', { name: 'Log in' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
   it('shows the account menu when logged in', async () => {
     login();
     renderApp('/');
@@ -38,8 +79,9 @@ describe('Header', () => {
     login('user');
     const first = renderApp('/');
     await first.user.click(await menuButton());
-    expect(screen.getByRole('link', { name: 'Profile' })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument();
+    const firstMenu = within(screen.getByRole('group', { name: 'Your account' }));
+    expect(firstMenu.getByRole('link', { name: 'Your ideas' })).toHaveAttribute('href', '/profile');
+    expect(firstMenu.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument();
     first.unmount();
 
     authStore.reset();
@@ -58,6 +100,55 @@ describe('Header', () => {
     await user.keyboard('{Escape}');
     expect(button).toHaveAttribute('aria-expanded', 'false');
     expect(button).toHaveFocus();
+  });
+
+  it('one Escape closes the menu and leaves a toast for the next Escape', async () => {
+    login();
+    server.use(
+      http.post('*/api/v1/auth/logout', () =>
+        HttpResponse.json({ error: { code: 'INTERNAL', message: 'Boom' } }, { status: 500 }),
+      ),
+    );
+    const { user } = renderApp('/');
+    const button = await menuButton();
+    await user.click(button);
+    await user.click(screen.getByRole('button', { name: 'Log out' }));
+    expect(await screen.findByText("We couldn't log you out. Try again.")).toBeInTheDocument();
+    await user.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+
+    await user.keyboard('{Escape}');
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText("We couldn't log you out. Try again.")).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByText("We couldn't log you out. Try again.")).not.toBeInTheDocument(),
+    );
+  });
+
+  it('menu has no Saved ideas item', async () => {
+    login('admin');
+    const { user } = renderApp('/');
+    await user.click(await menuButton());
+    const menu = within(screen.getByRole('group', { name: 'Your account' }));
+    expect(menu.queryByText('Saved ideas')).not.toBeInTheDocument();
+    expect(menu.getAllByRole('link').map((l) => l.textContent)).toEqual(['Your ideas', 'Admin']);
+    expect(menu.getByRole('button', { name: 'Log out' })).toBeInTheDocument();
+  });
+
+  it('menu closes when an item is picked', async () => {
+    login();
+    const { user, router } = renderApp('/');
+    const button = await menuButton();
+    await user.click(button);
+    await user.click(
+      within(screen.getByRole('group', { name: 'Your account' })).getByRole('link', {
+        name: 'Your ideas',
+      }),
+    );
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(router.state.location.pathname).toBe('/profile');
   });
 
   it('menu closes on outside click', async () => {

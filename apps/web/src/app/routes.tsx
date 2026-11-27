@@ -1,10 +1,13 @@
 import type { RouteObject } from 'react-router';
-import { HomePage } from '../features/home/HomePage';
+import { HomePage } from '../features/ideas/HomePage';
+import { IdeaDetailPage } from '../features/ideas/IdeaDetailPage';
+import { SharePage } from '../features/ideas/SharePage';
+import { AdminPage } from '../features/admin/AdminPage';
+import { ProfilePage } from '../features/profile/ProfilePage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { SignupPage } from '../features/auth/SignupPage';
 import { RedirectIfAuthed, RequireAuth, RequireRole } from './guards';
 import { RootLayout } from './layout/RootLayout';
-import { ComingSoonPage } from './pages/ComingSoonPage';
 import { ErrorPage } from './pages/ErrorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
@@ -19,6 +22,7 @@ export const routes: RouteObject[] = [
     ),
     children: [
       { index: true, element: <HomePage /> },
+      { path: 'ideas/:id', element: <IdeaDetailPage /> },
       {
         path: 'login',
         element: (
@@ -39,7 +43,7 @@ export const routes: RouteObject[] = [
         path: 'share',
         element: (
           <RequireAuth>
-            <ComingSoonPage title="Share an idea" />
+            <SharePage />
           </RequireAuth>
         ),
       },
@@ -47,7 +51,7 @@ export const routes: RouteObject[] = [
         path: 'profile',
         element: (
           <RequireAuth>
-            <ComingSoonPage title="Profile" />
+            <ProfilePage />
           </RequireAuth>
         ),
       },
@@ -56,7 +60,7 @@ export const routes: RouteObject[] = [
         element: (
           // eslint-disable-next-line jsx-a11y/aria-role -- a user role, not an ARIA role
           <RequireRole role="admin">
-            <ComingSoonPage title="Admin" />
+            <AdminPage />
           </RequireRole>
         ),
       },

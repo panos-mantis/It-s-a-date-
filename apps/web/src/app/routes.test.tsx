@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
+import { expectNoAxeViolations } from '../test/axe';
 import { api } from '../lib/api';
 import { createQueryClient } from '../lib/query-client';
 import { authStore } from '../test/msw/handlers';
@@ -26,11 +27,18 @@ describe('routes', () => {
 
   it('renders 404 for unknown paths', async () => {
     renderApp('/nope');
-    expect(await screen.findByText("We couldn't find that page.")).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Back to home' })).toHaveAttribute('href', '/');
     expect(
-      screen.getByRole('heading', { level: 1, name: "We couldn't find that page." }),
+      await screen.findByRole('heading', { level: 1, name: 'This page wandered off.' }),
     ).toBeInTheDocument();
+    expect(screen.getByText('Page not found', { selector: 'p' })).toBeInTheDocument();
+    expect(screen.getByText('The link may be old, or the idea was removed.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to all ideas' })).toHaveAttribute('href', '/');
+  });
+
+  it('404 has no axe violations', async () => {
+    const { container } = renderApp('/nope');
+    await screen.findByRole('heading', { level: 1, name: 'This page wandered off.' });
+    await expectNoAxeViolations(container);
   });
 
   it('guard redirects with next', async () => {
@@ -40,17 +48,71 @@ describe('routes', () => {
     expect(router.state.location.search).toBe('?next=%2Fshare%3Fx%3D1');
   });
 
+  it('/share logged out goes to /login?next=%2Fshare, shows the hint, and returns after login', async () => {
+    authStore.addUser({ name: 'Ana', email: 'ana@x.com', password: 'password1' });
+    const { router, user } = renderApp('/share');
+    expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/login');
+    expect(router.state.location.search).toBe('?next=%2Fshare');
+    expect(screen.getByText('Log in to share your idea')).toBeVisible();
+    await user.type(screen.getByLabelText('Email'), 'ana@x.com');
+    await user.type(screen.getByLabelText('Password'), 'password1');
+    await user.click(screen.getByRole('button', { name: 'Log in' }));
+    expect(await screen.findByRole('heading', { name: 'Share an idea' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/share');
+  });
+
+  it('/admin logged out goes to /login?next=%2Fadmin and returns to /admin after an admin logs in', async () => {
+    authStore.addUser({
+      name: 'Ana',
+      email: 'ana@x.com',
+      password: 'password1',
+      role: 'admin',
+    });
+    const { router, user } = renderApp('/admin');
+    expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/login');
+    expect(router.state.location.search).toBe('?next=%2Fadmin');
+    await user.type(screen.getByLabelText('Email'), 'ana@x.com');
+    await user.type(screen.getByLabelText('Password'), 'password1');
+    await user.click(screen.getByRole('button', { name: 'Log in' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/admin');
+  });
+
+  it('/profile#ideas keeps the hash through login', async () => {
+    authStore.addUser({ name: 'Ana', email: 'ana@x.com', password: 'password1' });
+    const { router, user } = renderApp('/profile#ideas');
+    expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
+    expect(router.state.location.search).toBe('?next=%2Fprofile%23ideas');
+    expect(screen.getByText('Log in to see your ideas and saved ideas')).toBeVisible();
+    await user.type(screen.getByLabelText('Email'), 'ana@x.com');
+    await user.type(screen.getByLabelText('Password'), 'password1');
+    await user.click(screen.getByRole('button', { name: 'Log in' }));
+    expect(await screen.findByRole('heading', { name: 'Ana' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/profile');
+    expect(router.state.location.hash).toBe('#ideas');
+  });
+
   it('lets a logged-in user in', async () => {
     login();
     renderApp('/share');
     expect(await screen.findByRole('heading', { name: 'Share an idea' })).toBeInTheDocument();
   });
 
-  it('keeps non-admins out of admin', async () => {
-    login('user');
+  it('keeps non-admins out of admin, naming them', async () => {
+    authStore.addUser({ name: 'Maya Chen', email: 'maya@x.com', password: 'secret123' });
+    authStore.loginAs('maya@x.com');
     renderApp('/admin');
-    expect(await screen.findByText('This page is for admins.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Go home' })).toHaveAttribute('href', '/');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'This page is for admins.' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "You're logged in as Maya Chen. If you need to review ideas, ask an admin to give you access.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to all ideas' })).toHaveAttribute('href', '/');
   });
 
   it('lets an admin into admin', async () => {
@@ -152,7 +214,7 @@ describe('error element', () => {
     expect(screen.getByText('Try again, or head back home.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Back to home' })).toHaveAttribute('href', '/');
-    expect(screen.queryByText("We couldn't find that page.")).not.toBeInTheDocument();
+    expect(screen.queryByText('This page wandered off.')).not.toBeInTheDocument();
     spy.mockRestore();
   });
 });

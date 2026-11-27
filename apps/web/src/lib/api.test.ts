@@ -101,4 +101,30 @@ describe('api client', () => {
       message: NETWORK_MESSAGE,
     });
   });
+
+  it('uploads form data without a JSON content type', async () => {
+    let contentType: string | null = null;
+    server.use(
+      http.post('*/api/v1/uploads/image', ({ request }) => {
+        contentType = request.headers.get('content-type');
+        return HttpResponse.json({ ok: true }, { status: 201 });
+      }),
+    );
+    const form = new FormData();
+    form.append('image', new File(['x'], 'a.png', { type: 'image/png' }));
+    await expect(api.upload('/uploads/image', form)).resolves.toEqual({ ok: true });
+    expect(contentType).toMatch(/^multipart\/form-data/);
+  });
+
+  it('upload surfaces API errors as ApiError', async () => {
+    server.use(
+      http.post('*/api/v1/uploads/image', () =>
+        HttpResponse.json({ error: { code: 'VALIDATION', message: 'Too big' } }, { status: 422 }),
+      ),
+    );
+    await expect(api.upload('/uploads/image', new FormData())).rejects.toMatchObject({
+      status: 422,
+      code: 'VALIDATION',
+    });
+  });
 });

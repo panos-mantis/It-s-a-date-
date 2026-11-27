@@ -5,4 +5,5 @@ export const paths = {
   share: '/share',
   profile: '/profile',
   admin: '/admin',
+  idea: (id: string) => `/ideas/${id}`,
 } as const;

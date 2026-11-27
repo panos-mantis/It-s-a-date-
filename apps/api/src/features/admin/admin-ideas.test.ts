@@ -24,6 +24,36 @@ async function setup() {
   return { admin, user, userCookie, tag, mk };
 }
 
+describe('admin ideas search', () => {
+  it('filters by q within the status', async () => {
+    const { admin, mk } = await setup();
+    const hit = await mk({ status: 'approved', title: 'Pottery night' });
+    await mk({ status: 'approved', title: 'Sunset picnic' });
+    await mk({ status: 'pending', title: 'Pottery class' });
+    const res = await request(app).get(`${base}?status=approved&q=pottery`).set('Cookie', admin);
+    expect(res.status).toBe(200);
+    const body = res.body as Paginated<IdeaDTO>;
+    expect(body.items.map((i) => i.id)).toEqual([hit.id]);
+    expect(body.total).toBe(1);
+  });
+
+  it('treats regex characters literally', async () => {
+    const { admin, mk } = await setup();
+    await mk({ status: 'pending', title: 'Pottery night' });
+    const res = await request(app).get(`${base}?q=(`).set('Cookie', admin);
+    expect(res.status).toBe(200);
+    expect((res.body as Paginated<IdeaDTO>).items).toEqual([]);
+  });
+
+  it('still needs an admin', async () => {
+    const { userCookie } = await setup();
+    expect((await request(app).get(`${base}?q=pottery`)).status).toBe(401);
+    expect((await request(app).get(`${base}?q=pottery`).set('Cookie', userCookie)).status).toBe(
+      403,
+    );
+  });
+});
+
 describe('admin ideas', () => {
   it('lists the pending queue oldest first, other statuses newest first', async () => {
     const { admin, mk } = await setup();

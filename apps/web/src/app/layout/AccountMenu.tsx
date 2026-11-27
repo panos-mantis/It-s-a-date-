@@ -1,14 +1,14 @@
 import type { UserDTO } from '@itsadate/shared';
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import { useToast } from '../../components/ui';
 import { useLogout } from '../../features/auth/api';
 import { paths } from '../paths';
 
 const itemClasses =
-  'block w-full rounded-sm px-3 py-2 text-left text-sm font-medium text-fg cursor-pointer hover:bg-surface-sunk ' +
-  'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent/30 disabled:opacity-60';
+  'block w-full rounded-sm px-3 py-2.5 text-left text-sm font-medium text-fg cursor-pointer hover:bg-surface-sunk ' +
+  'aria-[current=page]:font-semibold disabled:opacity-60';
 
 export function AccountMenu({ user }: { user: UserDTO }) {
   const [open, setOpen] = useState(false);
@@ -28,15 +28,17 @@ export function AccountMenu({ user }: { user: UserDTO }) {
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        // Handled here: the capture listener below runs before a toast's, which then skips it.
+        e.preventDefault();
         setOpen(false);
         buttonRef.current?.focus();
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keydown', onKeyDown, true);
     return () => {
       document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keydown', onKeyDown, true);
     };
   }, [open]);
 
@@ -61,7 +63,7 @@ export function AccountMenu({ user }: { user: UserDTO }) {
         aria-controls={panelId}
         aria-label={`Account menu for ${user.name}`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex cursor-pointer items-center gap-2 rounded-pill border border-border bg-surface py-1 pl-1 pr-2 text-sm font-medium text-fg motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-friendly hover:bg-surface-sunk focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent/30 sm:pr-3"
+        className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-border bg-surface py-1 pl-1 pr-2 text-sm font-medium text-fg motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-friendly hover:bg-surface-sunk sm:pr-3"
       >
         <span
           aria-hidden="true"
@@ -77,15 +79,17 @@ export function AccountMenu({ user }: { user: UserDTO }) {
       {open && (
         <div
           id={panelId}
+          role="group"
+          aria-label="Your account"
           className="absolute right-0 top-full z-20 mt-2 flex w-48 flex-col gap-1 rounded-md border border-border bg-surface p-2 shadow-raised"
         >
-          <Link to={paths.profile} className={itemClasses} onClick={() => setOpen(false)}>
-            Profile
-          </Link>
+          <NavLink to={paths.profile} end className={itemClasses} onClick={() => setOpen(false)}>
+            Your ideas
+          </NavLink>
           {user.role === 'admin' && (
-            <Link to={paths.admin} className={itemClasses} onClick={() => setOpen(false)}>
+            <NavLink to={paths.admin} end className={itemClasses} onClick={() => setOpen(false)}>
               Admin
-            </Link>
+            </NavLink>
           )}
           <button type="button" className={itemClasses} onClick={() => void handleLogout()}>
             Log out
