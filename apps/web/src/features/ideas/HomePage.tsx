@@ -8,12 +8,12 @@ import {
   CategoryRow,
   EmptyState,
   SearchBar,
-  useToast,
   type SearchValues,
 } from '../../components/ui';
 import { paths } from '../../app/paths';
 import { cn } from '../../lib/cn';
 import { tagIcon } from '../../lib/tag-icons';
+import { useShowMore } from '../../lib/use-show-more';
 import { useTags } from '../tags/api';
 import { useIdeas } from './api';
 import { FiltersPopover } from './FiltersPopover';
@@ -69,7 +69,6 @@ export function HomePage() {
   const { sort, ...values } = search;
   const tags = useTags();
   const ideas = useIdeas(search);
-  const toast = useToast();
   const [bandRef, stuck] = useStuck<HTMLElement>();
 
   const vibes = useMemo(
@@ -90,17 +89,10 @@ export function HomePage() {
   }
   const applyValues = (next: SearchValues) => apply({ ...next, sort });
 
-  async function showMore() {
-    const result = await ideas.fetchNextPage();
-    if (result.isFetchNextPageError) {
-      toast.show("We couldn't load ideas. Check your connection and try again.", {
-        tone: 'error',
-      });
-    }
-  }
+  const showMore = useShowMore(ideas, 'ideas');
 
   const items = ideas.data?.pages.flatMap((p) => p.items) ?? [];
-  const filtered = Boolean(search.q || search.budget || search.duration);
+  const filtered = Boolean(search.q || search.tag || search.budget || search.duration);
   const tagLabel = vibes.find((v) => v.value === search.tag)?.label ?? search.tag;
 
   let results;
@@ -165,7 +157,8 @@ export function HomePage() {
   return (
     <>
       <title>{"It's a Date"}</title>
-      <section className="pt-8 text-center md:pt-12">
+      {/* pb keeps the italic descenders (y, g), which hang below the tight line box, out from under the sticky band. */}
+      <section className="pt-8 pb-2 text-center md:pt-12">
         <h1 className="text-balance text-2xl font-medium leading-tight tracking-display text-fg md:text-4xl [&_em]:font-normal [&_em]:italic">
           Plans worth <em>saying yes</em> to.
         </h1>

@@ -62,6 +62,24 @@ describe('routes', () => {
     expect(router.state.location.pathname).toBe('/share');
   });
 
+  it('/admin logged out goes to /login?next=%2Fadmin and returns to /admin after an admin logs in', async () => {
+    authStore.addUser({
+      name: 'Ana',
+      email: 'ana@x.com',
+      password: 'password1',
+      role: 'admin',
+    });
+    const { router, user } = renderApp('/admin');
+    expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/login');
+    expect(router.state.location.search).toBe('?next=%2Fadmin');
+    await user.type(screen.getByLabelText('Email'), 'ana@x.com');
+    await user.type(screen.getByLabelText('Password'), 'password1');
+    await user.click(screen.getByRole('button', { name: 'Log in' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/admin');
+  });
+
   it('/profile#ideas keeps the hash through login', async () => {
     authStore.addUser({ name: 'Ana', email: 'ana@x.com', password: 'password1' });
     const { router, user } = renderApp('/profile#ideas');

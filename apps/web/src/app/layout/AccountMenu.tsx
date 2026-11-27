@@ -28,15 +28,17 @@ export function AccountMenu({ user }: { user: UserDTO }) {
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        // Handled here: the capture listener below runs before a toast's, which then skips it.
+        e.preventDefault();
         setOpen(false);
         buttonRef.current?.focus();
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keydown', onKeyDown, true);
     return () => {
       document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keydown', onKeyDown, true);
     };
   }, [open]);
 

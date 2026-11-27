@@ -5,7 +5,7 @@ import { expectNoAxeViolations } from '../../test/axe';
 import { authStore } from '../../test/msw/handlers';
 import { tagStore, userStore } from '../../test/msw/ideas-handlers';
 import { server } from '../../test/msw/server';
-import { renderApp } from '../../test/render';
+import { createTestQueryClient, renderApp } from '../../test/render';
 
 const PANOS = '64c000000000000000000002';
 const MAYA = '64c000000000000000000001';
@@ -190,6 +190,36 @@ describe('Admin Tags', () => {
     expect(within(row).getByRole('button', { name: 'Rename' })).toHaveFocus();
   });
 
+  it('a renamed tag shows its new name on the Pending rows and refreshes Profile ideas', async () => {
+    const queryClient = createTestQueryClient();
+    queryClient.setDefaultOptions({
+      queries: { retry: false, gcTime: Infinity, staleTime: 30_000 },
+    });
+    const { user } = renderApp('/admin', { queryClient });
+    const queue = await screen.findByRole('table', {
+      name: 'Ideas waiting for review, oldest first',
+    });
+    expect(within(queue).getAllByText('Food').length).toBeGreaterThan(0);
+    const spy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    await user.click(screen.getByRole('tab', { name: 'Tags' }));
+    await screen.findByRole('table', { name: 'Tags, A to Z' });
+    await user.click(within(tagRow('Food')).getByRole('button', { name: 'Rename' }));
+    const input = screen.getByLabelText('New name');
+    await user.clear(input);
+    await user.type(input, 'Dinner');
+    await user.keyboard('{Enter}');
+    await screen.findByText('Tag renamed to Dinner');
+
+    expect(invalidatedKeys(spy)).toContainEqual(['me', 'ideas']);
+    await user.click(screen.getByRole('tab', { name: /^Pending/ }));
+    const again = await screen.findByRole('table', {
+      name: 'Ideas waiting for review, oldest first',
+    });
+    expect((await within(again).findAllByText('Dinner')).length).toBeGreaterThan(0);
+    expect(within(again).queryByText('Food')).not.toBeInTheDocument();
+  });
+
   it('delete asks first', async () => {
     const { user, queryClient } = await openTags();
     const spy = vi.spyOn(queryClient, 'invalidateQueries');
@@ -357,6 +387,51 @@ describe('Admin Users', () => {
         body: { role: 'user' },
       }),
     ]);
+  });
+
+  it('demoting yourself drops the cached admin data and never refetches it', async () => {
+    userStore.set(userStore.all().map((u) => (u.id === MAYA ? { ...u, role: 'admin' } : u)));
+    const { user, queryClient } = await openUsers();
+    await user.click(within(userRow('Panos')).getByRole('button', { name: 'Remove admin' }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Remove admin' }),
+    );
+    expect(await screen.findByText('This page is for admins.')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        queryClient
+          .getQueryCache()
+          .findAll({ queryKey: ['admin'] })
+          .filter((q) => q.state.data !== undefined),
+      ).toEqual([]),
+    );
+    // Only the first load: no refetch after the demotion would have been a 403.
+    expect(seen.filter((s) => s.method === 'GET' && s.path.endsWith('/admin/users'))).toHaveLength(
+      1,
+    );
+  });
+
+  it('Show more failing keeps the people and says so in a toast', async () => {
+    server.use(
+      http.get('*/api/v1/admin/users', ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page') ?? 1);
+        if (page > 1) {
+          return HttpResponse.json({ error: { code: 'X', message: 'no' } }, { status: 500 });
+        }
+        return HttpResponse.json({
+          items: userStore.all().slice(0, 1),
+          page,
+          pageSize: 1,
+          total: 2,
+        });
+      }),
+    );
+    const { user } = await openUsers();
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(
+      await screen.findByText("We couldn't load more people. Check your connection and try again."),
+    ).toBeInTheDocument();
+    expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(2);
   });
 
   it('a failed load shows a retry', async () => {

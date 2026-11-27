@@ -4,17 +4,11 @@ import { Link, useParams } from 'react-router';
 import { paths } from '../../app/paths';
 import { Button, buttonClasses, Chip, EmptyState, Skeleton, StarRating } from '../../components/ui';
 import type { ApiError } from '../../lib/api';
+import { formatDate } from '../../lib/dates';
 import { ideaMeta } from '../../lib/labels';
 import { tagIcon } from '../../lib/tag-icons';
 import { useIdea } from './api';
 import { BackLink } from './BackLink';
-
-const dateFormat = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-  timeZone: 'UTC',
-});
 
 /** A wrong, removed, pending or rejected idea (404), or an id the API cannot parse. */
 function isNotFound(error: ApiError): boolean {
@@ -104,7 +98,7 @@ function Detail({ idea }: { idea: IdeaDTO }) {
             </span>
             <p className="min-w-0 [overflow-wrap:anywhere]">
               Shared by <span className="font-semibold">{idea.creator.name}</span>{' '}
-              <span className="text-muted">· {dateFormat.format(new Date(idea.createdAt))}</span>
+              <span className="text-muted">· {formatDate(idea.createdAt)}</span>
             </p>
           </div>
 

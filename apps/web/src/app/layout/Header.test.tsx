@@ -102,6 +102,31 @@ describe('Header', () => {
     expect(button).toHaveFocus();
   });
 
+  it('one Escape closes the menu and leaves a toast for the next Escape', async () => {
+    login();
+    server.use(
+      http.post('*/api/v1/auth/logout', () =>
+        HttpResponse.json({ error: { code: 'INTERNAL', message: 'Boom' } }, { status: 500 }),
+      ),
+    );
+    const { user } = renderApp('/');
+    const button = await menuButton();
+    await user.click(button);
+    await user.click(screen.getByRole('button', { name: 'Log out' }));
+    expect(await screen.findByText("We couldn't log you out. Try again.")).toBeInTheDocument();
+    await user.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+
+    await user.keyboard('{Escape}');
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText("We couldn't log you out. Try again.")).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByText("We couldn't log you out. Try again.")).not.toBeInTheDocument(),
+    );
+  });
+
   it('menu has no Saved ideas item', async () => {
     login('admin');
     const { user } = renderApp('/');

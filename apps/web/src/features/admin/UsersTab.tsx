@@ -4,6 +4,7 @@ import { useId, useMemo, useRef, useState } from 'react';
 import { Button, Chip, EmptyState, Input, useToast } from '../../components/ui';
 import { ApiError } from '../../lib/api';
 import { cn } from '../../lib/cn';
+import { useShowMore } from '../../lib/use-show-more';
 import { useMe } from '../auth/api';
 import { useAdminUsers, useSetRole } from './api';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -51,6 +52,7 @@ export function UsersTab() {
   const [text, setText] = useState('');
   const q = useDebounced(text, SEARCH_DELAY_MS).trim();
   const users = useAdminUsers(q || undefined);
+  const showMore = useShowMore(users, 'people');
   const searchRef = useRef<HTMLInputElement>(null);
   const [asking, setAsking] = useState<UserDTO | null>(null);
   const [lastAdmin, setLastAdmin] = useState(false);
@@ -171,7 +173,7 @@ export function UsersTab() {
             <Button
               variant="secondary"
               busy={users.isFetchingNextPage}
-              onClick={() => void users.fetchNextPage()}
+              onClick={() => void showMore()}
             >
               Show more
             </Button>

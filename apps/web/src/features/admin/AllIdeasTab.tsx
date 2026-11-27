@@ -13,9 +13,10 @@ import {
   useToast,
 } from '../../components/ui';
 import { cn } from '../../lib/cn';
+import { formatDate } from '../../lib/dates';
+import { useShowMore } from '../../lib/use-show-more';
 import { useAdminIdeas } from './api';
 import { EditIdeaPanel } from './EditIdeaPanel';
-import { formatDate } from './relative-date';
 import { useDebounced } from './use-debounced';
 import {
   actionsTdClass,
@@ -55,6 +56,7 @@ export function AllIdeasTab() {
   const q = useDebounced(text, SEARCH_DELAY_MS).trim();
   const ideas = useAdminIdeas(status, q || undefined);
   const toast = useToast();
+  const showMore = useShowMore(ideas, 'ideas');
   const searchRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState<IdeaDTO | null>(null);
   const [focusSearch, setFocusSearch] = useState(0);
@@ -169,7 +171,7 @@ export function AllIdeasTab() {
             <Button
               variant="secondary"
               busy={ideas.isFetchingNextPage}
-              onClick={() => void ideas.fetchNextPage()}
+              onClick={() => void showMore()}
             >
               Show more
             </Button>

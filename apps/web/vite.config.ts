@@ -17,6 +17,8 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // Dates format in the reader's zone; pin it so expectations don't depend on the machine.
+    env: { TZ: 'UTC' },
     // Absolute path so it resolves regardless of the cwd vitest is launched from.
     setupFiles: [fileURLToPath(new URL('./src/test/setup.ts', import.meta.url))],
     include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.ts'],

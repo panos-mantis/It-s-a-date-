@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { formatDate, relativeSubmitted } from './relative-date';
+import { formatDate } from '../../lib/dates';
+import { relativeSubmitted } from './relative-date';
 
 const now = new Date('2026-11-25T15:00:00.000Z');
 

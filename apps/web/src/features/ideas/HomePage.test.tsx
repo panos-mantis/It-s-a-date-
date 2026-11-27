@@ -254,6 +254,26 @@ describe('Home', () => {
     expect(screen.queryByRole('button', { name: 'Show more' })).not.toBeInTheDocument();
   });
 
+  it('Show more failing keeps the grid and says so in a toast', async () => {
+    ideaStore.set(manyIdeas(30));
+    server.use(
+      http.get('*/api/v1/ideas', ({ request }) => {
+        if (new URL(request.url).searchParams.get('page') !== '1') {
+          return HttpResponse.json({ error: { code: 'X', message: 'no' } }, { status: 500 });
+        }
+        return undefined;
+      }),
+    );
+    const { user } = renderApp('/');
+    expect(await screen.findByRole('link', { name: 'Idea number 1' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(
+      await screen.findByText("We couldn't load more ideas. Check your connection and try again."),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('article')).toHaveLength(24);
+    expect(screen.queryByText("We couldn't load ideas.")).not.toBeInTheDocument();
+  });
+
   it('idea with no photo, no budget/duration, no ratings shows placeholder, no meta line, no rating', async () => {
     ideaStore.set([
       { ...fixture('Planetarium show'), image: null, ratingAvg: 0, ratingCount: 0 },
@@ -285,6 +305,20 @@ describe('Home', () => {
     expect(router.state.location.search).toBe('?sort=top');
     expect(await screen.findByRole('link', { name: 'Salsa social night' })).toBeInTheDocument();
     expect(within(screen.getByRole('search')).getByLabelText('What')).toHaveValue('');
+  });
+
+  it('a category with no ideas reads as a filter with Clear filters, not as an empty site', async () => {
+    ideaStore.set([fixture('Sushi counter night')].map((i) => ({ ...i, tags: [] })));
+    const { user, router } = renderApp('/?tag=learning');
+    expect(
+      await screen.findByRole('heading', { name: 'No ideas match those filters.' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Nothing in Learning. Try another vibe or budget.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Be the first to share one.')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('link', { name: 'Clear filters' }));
+    expect(router.state.location.search).toBe('');
   });
 
   it('with no ideas at all, invites you to share one', async () => {

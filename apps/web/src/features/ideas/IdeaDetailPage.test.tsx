@@ -20,6 +20,18 @@ const long = fixture(
 );
 
 describe('Detail', () => {
+  it("shows the date in the reader's time zone, the same day Admin shows", async () => {
+    const original = process.env.TZ;
+    process.env.TZ = 'Pacific/Auckland';
+    try {
+      ideaStore.set([{ ...golden, createdAt: '2026-11-24T23:30:00.000Z' }]);
+      renderApp(`/ideas/${golden.id}`);
+      expect(await screen.findByText(/· Nov 25, 2026/)).toBeInTheDocument();
+    } finally {
+      process.env.TZ = original;
+    }
+  });
+
   it('renders idea 5 fields', async () => {
     renderApp(`/ideas/${golden.id}`);
     expect(

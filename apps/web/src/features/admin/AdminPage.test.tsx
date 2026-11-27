@@ -2,6 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { expectNoAxeViolations } from '../../test/axe';
+import { ideaFixtures } from '../../test/fixtures/ideas';
 import { authStore } from '../../test/msw/handlers';
 import { ideaStore } from '../../test/msw/ideas-handlers';
 import { server } from '../../test/msw/server';
@@ -370,6 +371,26 @@ describe('Admin', () => {
     expect(screen.getByLabelText('Search titles')).toHaveValue('');
     expect(screen.getByLabelText('Search titles')).toHaveFocus();
     expect(await screen.findByText('Showing 12 of 12 approved ideas')).toBeInTheDocument();
+  });
+
+  it('Show more failing in the queue keeps the rows and says so in a toast', async () => {
+    server.use(
+      http.get('*/api/v1/admin/ideas', ({ request }) => {
+        const page = Number(new URL(request.url).searchParams.get('page') ?? 1);
+        if (page > 1) {
+          return HttpResponse.json({ error: { code: 'X', message: 'no' } }, { status: 500 });
+        }
+        const pending = ideaFixtures.filter((i) => i.status === 'pending');
+        return HttpResponse.json({ items: pending.slice(0, 1), page, pageSize: 1, total: 2 });
+      }),
+    );
+    const { user } = await openAdmin();
+    const table = await queue();
+    await user.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(
+      await screen.findByText("We couldn't load more ideas. Check your connection and try again."),
+    ).toBeInTheDocument();
+    expect(within(table).getAllByRole('row')).toHaveLength(2);
   });
 
   it('empty queue copy', async () => {

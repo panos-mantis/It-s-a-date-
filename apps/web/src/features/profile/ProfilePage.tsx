@@ -3,17 +3,10 @@ import { Lightbulb, Plus, WifiOff } from 'lucide-react';
 import { Fragment, useId } from 'react';
 import { Link } from 'react-router';
 import { paths } from '../../app/paths';
-import {
-  Button,
-  buttonClasses,
-  Card,
-  CardSkeleton,
-  Chip,
-  EmptyState,
-  useToast,
-} from '../../components/ui';
+import { Button, buttonClasses, Card, CardSkeleton, Chip, EmptyState } from '../../components/ui';
 import { ideaMeta } from '../../lib/labels';
 import { tagIcon } from '../../lib/tag-icons';
+import { useShowMore } from '../../lib/use-show-more';
 import { useMe } from '../auth/api';
 import { useMyIdeas } from '../ideas/api';
 
@@ -89,16 +82,8 @@ function MyIdeaCard({ idea }: { idea: IdeaDTO }) {
 export function ProfilePage() {
   const me = useMe();
   const ideas = useMyIdeas();
-  const toast = useToast();
 
-  async function showMore() {
-    const result = await ideas.fetchNextPage();
-    if (result.isFetchNextPageError) {
-      toast.show("We couldn't load more ideas. Check your connection and try again.", {
-        tone: 'error',
-      });
-    }
-  }
+  const showMore = useShowMore(ideas, 'ideas');
   const user = me.data;
   const items = ideas.data?.pages.flatMap((p) => p.items) ?? [];
   const total = ideas.data?.pages[0]?.total ?? 0;

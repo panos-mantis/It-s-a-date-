@@ -4,6 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Button, Chip, EmptyState, useToast } from '../../components/ui';
 import { cn } from '../../lib/cn';
 import { tagIcon } from '../../lib/tag-icons';
+import { useShowMore } from '../../lib/use-show-more';
 import { useAdminIdeas, useUpdateIdea } from './api';
 import { ConfirmDialog } from './ConfirmDialog';
 import { EditIdeaPanel } from './EditIdeaPanel';
@@ -51,6 +52,7 @@ export function PendingTab({ onSeeAll }: { onSeeAll: () => void }) {
   const ideas = useAdminIdeas('pending');
   const update = useUpdateIdea();
   const toast = useToast();
+  const showMore = useShowMore(ideas, 'ideas');
   const headingId = useId();
   const [busy, setBusy] = useState<ReadonlySet<string>>(() => new Set());
   const [rejecting, setRejecting] = useState<IdeaDTO | null>(null);
@@ -260,7 +262,7 @@ export function PendingTab({ onSeeAll }: { onSeeAll: () => void }) {
             <Button
               variant="secondary"
               busy={ideas.isFetchingNextPage}
-              onClick={() => void ideas.fetchNextPage()}
+              onClick={() => void showMore()}
             >
               Show more
             </Button>

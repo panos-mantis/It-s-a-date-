@@ -1,13 +1,4 @@
-const absolute = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-});
-
-/** "Mar 9, 2024". All ideas' Created column always uses this. */
-export function formatDate(iso: string): string {
-  return absolute.format(new Date(iso));
-}
+import { formatDate } from '../../lib/dates';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

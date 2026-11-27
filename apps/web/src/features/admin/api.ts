@@ -91,12 +91,13 @@ export function useDeleteIdea() {
   });
 }
 
-// Tags feed the category row on Home and the chips on every idea, so a change refreshes both.
+// Tags feed the category row on Home and the chips on every idea (the admin lists, the edit
+// panel's defaults and Profile too), so a change refreshes the tags and every idea list.
 // Resolves once the lists on screen have refetched.
 function refreshTags(queryClient: QueryClient): Promise<unknown> {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: ['tags'] }),
-    queryClient.invalidateQueries({ queryKey: ['ideas'] }),
+    refreshIdeas(queryClient),
   ]);
 }
 
@@ -159,13 +160,16 @@ export function useSetRole() {
     mutationKey: ['admin', 'users', 'role'],
     mutationFn: ({ id, role }) =>
       api.post<UserDTO>(`/admin/users/${encodeURIComponent(id)}/role`, { role }),
-    onSuccess: (_user, { id }) => {
+    onSuccess: async (_user, { id }) => {
       const me = queryClient.getQueryData<UserDTO | null>(authKeys.me);
-      return Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
-        // Changing your own role changes what you may see: the guard re-reads who you are.
-        me?.id === id ? queryClient.invalidateQueries({ queryKey: authKeys.me }) : undefined,
-      ]);
+      if (me?.id === id) {
+        // Changing your own role changes what you may see: the guard re-reads who you are. The
+        // admin data goes too, so nothing refetches into a 403 or lingers with people's emails.
+        await queryClient.invalidateQueries({ queryKey: authKeys.me });
+        queryClient.removeQueries({ queryKey: adminKeys.all });
+        return;
+      }
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
     },
   });
 }
