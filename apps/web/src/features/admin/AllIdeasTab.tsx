@@ -201,6 +201,7 @@ export function AllIdeasTab() {
           options={STATUS_OPTIONS}
           value={status}
           onChange={setStatus}
+          variant="pills"
         />
       </div>
       {body}
@@ -278,7 +279,7 @@ function AllRow({ idea, onEdit }: { idea: IdeaDTO; onEdit: () => void }) {
         {idea.creator.name}
       </td>
       <td className={cn(tdClass, '@max-[719px]:order-2 @max-[719px]:flex-none')}>
-        <Chip variant="status" status={idea.status} />
+        <Chip variant="status" status={idea.status} flat />
       </td>
       <td
         className={cn(

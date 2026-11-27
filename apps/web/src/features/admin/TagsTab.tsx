@@ -135,7 +135,7 @@ export function TagsTab() {
 
   const name = deleting?.name ?? '';
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <AddTagForm />
       <div className="min-w-0">
         <p className="mb-4 text-sm text-muted">
@@ -195,7 +195,7 @@ function AddTagForm() {
       noValidate
       onSubmit={(e) => void submit(e)}
       aria-busy={busy || undefined}
-      className="group flex flex-col gap-4 rounded-lg border border-border bg-surface p-5"
+      className="group flex flex-col gap-4 rounded-lg border border-border bg-surface p-5 lg:sticky lg:top-20 lg:order-2"
     >
       <h2 id={titleId} className="font-body text-base font-semibold leading-body text-fg">
         Add a tag
@@ -275,11 +275,11 @@ function TagRow({ tag, onDelete }: { tag: TagDTO; onDelete: () => void }) {
       </td>
       <td className={cn(tdClass, 'text-muted')}>
         <CardLabel>Slug</CardLabel>
-        <code>{tag.slug}</code>
+        <code className="rounded-sm bg-bg px-1.5 py-0.5 text-fg">{tag.slug}</code>
       </td>
       <td className={cn(tdClass, 'text-muted')}>
         <CardLabel>Icon</CardLabel>
-        <code>{tag.icon}</code>
+        <code className="rounded-sm bg-bg px-1.5 py-0.5 text-fg">{tag.icon}</code>
       </td>
       <td
         className={cn(

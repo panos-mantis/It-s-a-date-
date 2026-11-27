@@ -267,11 +267,11 @@ function UserRow({
         <span className="flex items-center gap-3">
           <span
             aria-hidden="true"
-            className="grid size-9 shrink-0 place-items-center rounded-pill bg-surface-sunk text-sm font-semibold text-fg"
+            className="grid size-9 shrink-0 place-items-center rounded-pill bg-accent-soft text-sm font-semibold text-accent-ink"
           >
             {user.name.charAt(0).toUpperCase()}
           </span>
-          <span id={nameId} className="font-medium text-fg [overflow-wrap:anywhere]">
+          <span id={nameId} className="font-semibold text-fg [overflow-wrap:anywhere]">
             <span>{user.name}</span>
             {you && <span className="ml-1 font-normal text-muted">(you)</span>}
           </span>
@@ -288,7 +288,7 @@ function UserRow({
         <div className="flex justify-end">
           <Button
             variant="ghost"
-            tone={admin ? 'danger' : 'default'}
+            tone={admin ? 'danger' : 'plain'}
             size="sm"
             busy={busy}
             aria-haspopup="dialog"

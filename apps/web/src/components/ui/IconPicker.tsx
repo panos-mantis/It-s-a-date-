@@ -34,10 +34,10 @@ export function IconPicker({
           <code>{value}</code>
         </span>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(44px,1fr))] gap-1">
         {TAG_ICON_NAMES.map((icon) => {
           return (
-            <label key={icon} className="relative">
+            <label key={icon} className="relative block">
               <input
                 type="radio"
                 name={name}
@@ -48,7 +48,7 @@ export function IconPicker({
               />
               <span
                 className={cn(
-                  'grid size-11 cursor-pointer place-items-center rounded-pill border-2',
+                  'grid h-11 w-full cursor-pointer place-items-center rounded-pill border-2',
                   'motion-safe:transition-colors motion-safe:duration-150 motion-safe:ease-friendly',
                   'peer-focus-visible:ring-[3px] peer-focus-visible:ring-focus-ring',
                   value === icon

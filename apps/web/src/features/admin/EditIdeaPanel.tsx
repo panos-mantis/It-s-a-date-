@@ -255,7 +255,7 @@ function EditForm({
                 legend="Status"
                 name="edit-status"
                 options={STATUS_OPTIONS}
-                columns={2}
+                fullWidth
                 value={field.value ?? null}
                 onChange={field.onChange}
                 disabled={busy}
@@ -341,6 +341,7 @@ function EditForm({
                   name="edit-budget"
                   options={EDIT_BUDGETS}
                   columns={2}
+                  fullWidth
                   value={field.value === undefined ? '' : String(field.value)}
                   onChange={(v) => field.onChange(v === '' ? undefined : v)}
                   disabledValues={idea.budget === null ? [] : ['']}
@@ -359,6 +360,7 @@ function EditForm({
                   name="edit-duration"
                   options={EDIT_DURATIONS}
                   columns={2}
+                  fullWidth
                   value={field.value ?? ''}
                   onChange={(v) => field.onChange(v === '' ? undefined : v)}
                   disabledValues={idea.duration === null ? [] : ['']}

@@ -29,7 +29,7 @@ export function BusyStatus({
   className?: string;
 }) {
   return (
-    <p id={id} role="status" className={className}>
+    <p id={id} role="status" className={busy ? className : 'sr-only'}>
       {busy ? text : null}
     </p>
   );

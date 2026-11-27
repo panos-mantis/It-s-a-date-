@@ -195,9 +195,10 @@ export function PendingTab({ onSeeAll }: { onSeeAll: () => void }) {
     );
   } else if (items.length === 0) {
     body = (
-      <div className="rounded-lg border border-border bg-surface">
+      <div className="mx-auto max-w-[448px] rounded-lg border border-border bg-surface">
         <EmptyState
           icon={CircleCheck}
+          iconClassName="text-success"
           title="Nothing to review. Nice work."
           body="New ideas show up here as soon as someone shares one."
           action={

@@ -8,6 +8,7 @@ export function NotFoundPage() {
       <title>{"Page not found · It's a Date"}</title>
       <EmptyState
         headingLevel={1}
+        hero
         eyebrow="Page not found"
         title={
           <>

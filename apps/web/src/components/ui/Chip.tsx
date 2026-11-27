@@ -20,7 +20,7 @@ const BASE = 'inline-flex items-center gap-1.5 rounded-pill px-3 py-1 text-xs fo
 
 type ChipProps =
   | { variant?: 'accent' | 'quiet'; children: ReactNode; icon?: LucideIcon }
-  | { variant: 'status'; status: Status; children?: never; icon?: never }
+  | { variant: 'status'; status: Status; flat?: boolean; children?: never; icon?: never }
   | { variant: 'role'; userRole: Role; children?: never; icon?: never };
 
 export function Chip(props: ChipProps) {
@@ -29,7 +29,11 @@ export function Chip(props: ChipProps) {
   let content: ReactNode;
   if (props.variant === 'status') {
     const s = STATUS[props.status];
-    ({ icon: Icon, tone } = s);
+    Icon = s.icon;
+    // In a table the chip is flat; on a photo it floats on an overlay with a raised shadow.
+    tone = props.flat
+      ? s.tone.replace('bg-overlay shadow-raised', 'border border-border bg-surface')
+      : s.tone;
     content = s.label;
   } else if (props.variant === 'role') {
     const r = ROLE[props.userRole];

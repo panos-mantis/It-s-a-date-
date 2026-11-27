@@ -27,6 +27,7 @@ import { tagIcon } from '../../lib/tag-icons';
 import { useTags } from '../tags/api';
 import { useCreateIdea, useUploadImage } from './api';
 import { SHARE_FIELDS, shareResolver, type ShareFieldName } from './share-errors';
+import { BackLink } from './BackLink';
 import { ShareSuccess } from './ShareSuccess';
 
 type Values = z.input<typeof ideaCreateSchema>;
@@ -123,209 +124,212 @@ export function SharePage() {
   const tagError = errors.tagIds?.message ?? errors.tagIds?.root?.message;
 
   return (
-    <div className="mx-auto max-w-[640px] pb-16 pt-2">
-      <title>Share an idea · It&apos;s a Date</title>
-      <div className="mb-6 flex flex-col gap-2 sm:mb-8">
-        <h1
-          ref={headRef}
-          tabIndex={-1}
-          className="text-[30px] leading-[1.08] tracking-display text-fg outline-none sm:text-[38px] [&_em]:font-normal [&_em]:italic"
-        >
-          Share <em>an idea</em>
-        </h1>
-        <p className="max-w-[52ch] text-muted">
-          Tell people about a date you&apos;d happily go on again. A good photo, a few lines on what
-          to do, and roughly what it costs.
-        </p>
-      </div>
-
-      <form
-        key={round}
-        ref={formRef}
-        onSubmit={(e) => void handleSubmit(onSubmit)(e)}
-        noValidate
-        aria-busy={busy}
-        className="group flex flex-col gap-8"
-      >
-        {submitCount > 0 && failed.length > 0 ? (
-          <div
-            role="alert"
-            className="flex items-start gap-2.5 rounded-sm border border-danger bg-surface px-3.5 py-3 text-sm font-semibold text-danger"
+    <>
+      <BackLink />
+      <div className="mx-auto max-w-[640px] pb-16 pt-2">
+        <title>Share an idea · It&apos;s a Date</title>
+        <div className="mb-6 flex flex-col gap-2 sm:mb-8">
+          <h1
+            ref={headRef}
+            tabIndex={-1}
+            className="text-[30px] leading-[1.08] tracking-display text-fg outline-none sm:text-[38px] [&_em]:font-normal [&_em]:italic"
           >
-            <div>
-              {failed.length === 1
-                ? 'Check the 1 field marked below.'
-                : `Check the ${failed.length} fields marked below.`}
-              <ul className="mt-1 list-disc pl-[18px] font-normal">
-                {failed.map((f) => (
-                  <li key={f.name}>
-                    <a
-                      href={`#${f.name}`}
-                      className="inline-flex min-h-11 items-center underline underline-offset-2"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        jump(f.name);
-                      }}
-                    >
-                      {f.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ) : (
-          <FormError message={errors.root?.server?.message} />
-        )}
-
-        <div data-field="image" className="scroll-mt-24">
-          <Controller
-            control={control}
-            name="image"
-            render={({ field, fieldState }) => (
-              <PhotoDropZone
-                value={field.value ?? null}
-                onChange={(next) => field.onChange(next ?? undefined)}
-                upload={upload.mutateAsync}
-                onUploadingChange={setUploading}
-                error={fieldState.error?.message}
-              />
-            )}
-          />
-        </div>
-
-        <div data-field="title" className="scroll-mt-24">
-          <Input
-            label="Title"
-            maxLength={80}
-            placeholder="Pottery for two"
-            hint="Short and concrete works best."
-            counter={`${titleLength}/80`}
-            counterFull={titleLength >= 80}
-            readOnly={busy}
-            error={errors.title?.message}
-            {...register('title')}
-          />
-        </div>
-
-        <div data-field="description" className="scroll-mt-24">
-          <Textarea
-            label="Description"
-            maxLength={2000}
-            rows={5}
-            placeholder="What do you do, and what makes it fun?"
-            hint="At least 20 characters"
-            counter={`${descriptionLength}/2000`}
-            counterFull={descriptionLength >= 2000}
-            readOnly={busy}
-            error={errors.description?.message}
-            {...register('description')}
-          />
-        </div>
-
-        <Controller
-          control={control}
-          name="tagIds"
-          render={({ field }) => (
-            <TagPicker
-              value={field.value}
-              onChange={field.onChange}
-              error={tagError}
-              limitHint="You've picked 3. Remove one to pick another."
-            />
-          )}
-        />
-
-        <div data-field="placeType" className="scroll-mt-24 group-aria-busy:pointer-events-none">
-          <Select
-            label="Place type"
-            hint={
-              'We use it to find places near whoever reads your idea. Pick "No place needed" for dates at home.'
-            }
-            error={errors.placeType?.message}
-            {...register('placeType')}
-          >
-            <option value="" disabled>
-              Choose a place type
-            </option>
-            {PLACE_TYPES.map((p) => (
-              <option key={p} value={p}>
-                {PLACE_TYPE_LABELS[p]}
-              </option>
-            ))}
-          </Select>
-        </div>
-
-        <div data-field="budget" className="flex flex-col gap-1 scroll-mt-24">
-          <Controller
-            control={control}
-            name="budget"
-            render={({ field, fieldState }) => (
-              <SegmentedControl
-                legend="Budget"
-                name="budget"
-                options={BUDGET_OPTIONS}
-                value={field.value === undefined ? null : String(field.value)}
-                onChange={field.onChange}
-                disabled={busy}
-                error={fieldState.error?.message}
-              />
-            )}
-          />
-          <p
-            aria-hidden="true"
-            className="flex max-w-[420px] justify-between px-4 text-xs text-muted"
-          >
-            <span>Low</span>
-            <span>High</span>
+            Share <em>an idea</em>
+          </h1>
+          <p className="max-w-[52ch] text-muted">
+            Tell people about a date you&apos;d happily go on again. A good photo, a few lines on
+            what to do, and roughly what it costs.
           </p>
         </div>
 
-        <div data-field="duration" className="scroll-mt-24">
+        <form
+          key={round}
+          ref={formRef}
+          onSubmit={(e) => void handleSubmit(onSubmit)(e)}
+          noValidate
+          aria-busy={busy}
+          className="group flex flex-col gap-8"
+        >
+          {submitCount > 0 && failed.length > 0 ? (
+            <div
+              role="alert"
+              className="flex items-start gap-2.5 rounded-sm border border-danger bg-surface px-3.5 py-3 text-sm font-semibold text-danger"
+            >
+              <div>
+                {failed.length === 1
+                  ? 'Check the 1 field marked below.'
+                  : `Check the ${failed.length} fields marked below.`}
+                <ul className="mt-1 list-disc pl-[18px] font-normal">
+                  {failed.map((f) => (
+                    <li key={f.name}>
+                      <a
+                        href={`#${f.name}`}
+                        className="inline-flex min-h-11 items-center underline underline-offset-2"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          jump(f.name);
+                        }}
+                      >
+                        {f.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <FormError message={errors.root?.server?.message} />
+          )}
+
+          <div data-field="image" className="scroll-mt-24">
+            <Controller
+              control={control}
+              name="image"
+              render={({ field, fieldState }) => (
+                <PhotoDropZone
+                  value={field.value ?? null}
+                  onChange={(next) => field.onChange(next ?? undefined)}
+                  upload={upload.mutateAsync}
+                  onUploadingChange={setUploading}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+          </div>
+
+          <div data-field="title" className="scroll-mt-24">
+            <Input
+              label="Title"
+              maxLength={80}
+              placeholder="Pottery for two"
+              hint="Short and concrete works best."
+              counter={`${titleLength}/80`}
+              counterFull={titleLength >= 80}
+              readOnly={busy}
+              error={errors.title?.message}
+              {...register('title')}
+            />
+          </div>
+
+          <div data-field="description" className="scroll-mt-24">
+            <Textarea
+              label="Description"
+              maxLength={2000}
+              rows={5}
+              placeholder="What do you do, and what makes it fun?"
+              hint="At least 20 characters"
+              counter={`${descriptionLength}/2000`}
+              counterFull={descriptionLength >= 2000}
+              readOnly={busy}
+              error={errors.description?.message}
+              {...register('description')}
+            />
+          </div>
+
           <Controller
             control={control}
-            name="duration"
-            render={({ field, fieldState }) => (
-              <SegmentedControl
-                legend="Duration"
-                name="duration"
-                options={DURATION_OPTIONS}
-                value={field.value ?? null}
+            name="tagIds"
+            render={({ field }) => (
+              <TagPicker
+                value={field.value}
                 onChange={field.onChange}
-                disabled={busy}
-                error={fieldState.error?.message}
+                error={tagError}
+                limitHint="You've picked 3. Remove one to pick another."
               />
             )}
           />
-        </div>
 
-        <div className="flex flex-col items-start gap-3 border-t border-border pt-2">
-          <div className="flex w-full flex-col gap-3 pt-4 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
-            <Button
-              type="submit"
-              busy={busy}
-              disabled={uploading}
-              aria-describedby={uploading ? waitId : noteId}
-              className="w-full sm:min-w-[200px] sm:w-auto"
+          <div data-field="placeType" className="scroll-mt-24 group-aria-busy:pointer-events-none">
+            <Select
+              label="Place type"
+              hint={
+                'We use it to find places near whoever reads your idea. Pick "No place needed" for dates at home.'
+              }
+              error={errors.placeType?.message}
+              {...register('placeType')}
             >
-              {busy ? 'Sending…' : 'Send for review'}
-            </Button>
-            {uploading ? (
-              <p id={waitId} className="flex items-center gap-2 text-sm text-muted">
-                <Clock aria-hidden="true" size={16} strokeWidth={1.75} />
-                You can send it once the photo has uploaded.
-              </p>
-            ) : (
-              <p id={noteId} className="flex items-center gap-2 text-sm text-muted">
-                <Shield aria-hidden="true" size={16} strokeWidth={1.75} />
-                An admin checks every idea before it goes live.
-              </p>
-            )}
+              <option value="" disabled>
+                Choose a place type
+              </option>
+              {PLACE_TYPES.map((p) => (
+                <option key={p} value={p}>
+                  {PLACE_TYPE_LABELS[p]}
+                </option>
+              ))}
+            </Select>
           </div>
-          <BusyStatus id={statusId} busy={busy} text="Sending your idea for review…" />
-        </div>
-      </form>
-    </div>
+
+          <div data-field="budget" className="flex flex-col gap-1 scroll-mt-24">
+            <Controller
+              control={control}
+              name="budget"
+              render={({ field, fieldState }) => (
+                <SegmentedControl
+                  legend="Budget"
+                  name="budget"
+                  options={BUDGET_OPTIONS}
+                  value={field.value === undefined ? null : String(field.value)}
+                  onChange={field.onChange}
+                  disabled={busy}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+            <p
+              aria-hidden="true"
+              className="flex max-w-[420px] justify-between px-4 text-xs text-muted"
+            >
+              <span>Low</span>
+              <span>High</span>
+            </p>
+          </div>
+
+          <div data-field="duration" className="scroll-mt-24">
+            <Controller
+              control={control}
+              name="duration"
+              render={({ field, fieldState }) => (
+                <SegmentedControl
+                  legend="Duration"
+                  name="duration"
+                  options={DURATION_OPTIONS}
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  disabled={busy}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+          </div>
+
+          <div className="flex flex-col items-start gap-3 border-t border-border pt-2">
+            <div className="flex w-full flex-col gap-3 pt-4 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
+              <Button
+                type="submit"
+                busy={busy}
+                disabled={uploading}
+                aria-describedby={uploading ? waitId : noteId}
+                className="w-full sm:min-w-[200px] sm:w-auto"
+              >
+                {busy ? 'Sending…' : 'Send for review'}
+              </Button>
+              {uploading ? (
+                <p id={waitId} className="flex items-center gap-2 text-sm text-muted">
+                  <Clock aria-hidden="true" size={16} strokeWidth={1.75} />
+                  You can send it once the photo has uploaded.
+                </p>
+              ) : (
+                <p id={noteId} className="flex items-center gap-2 text-sm text-muted">
+                  <Shield aria-hidden="true" size={16} strokeWidth={1.75} />
+                  An admin checks every idea before it goes live.
+                </p>
+              )}
+            </div>
+            <BusyStatus id={statusId} busy={busy} text="Sending your idea for review…" />
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
 

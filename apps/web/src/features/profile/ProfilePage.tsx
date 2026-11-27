@@ -207,7 +207,7 @@ export function ProfilePage() {
             >
               Your ideas
               {ideas.isSuccess && (
-                <span className="inline-grid h-[22px] min-w-6 place-items-center rounded-pill bg-surface-sunk px-[7px] text-xs font-semibold tabular-nums text-fg">
+                <span className="inline-grid h-[22px] min-w-6 place-items-center rounded-pill bg-surface-sunk px-[7px] font-body text-xs [font-variation-settings:normal] font-semibold tabular-nums text-fg">
                   {total}
                 </span>
               )}
