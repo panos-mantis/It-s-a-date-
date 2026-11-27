@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRef, useState } from 'react';
 import { describe, expect, it } from 'vitest';
@@ -77,6 +77,14 @@ function Harness({
             }}
           >
             Delete
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              toast.show('Tag deleted', { action: { label: 'Undo', onAction: () => undefined } })
+            }
+          >
+            Toast from dialog
           </button>
         </Dialog>
       </Dialog>
@@ -222,6 +230,28 @@ describe('Dialog', () => {
     expect(document.querySelector('[inert]')).toBeNull();
     expect(document.body.style.overflow).toBe('');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Edit idea' })).toHaveFocus());
+  });
+
+  it('leaves the toast viewport live while dialogs are open, so toasts are announced and usable', async () => {
+    const { user } = setup();
+    await user.click(screen.getByRole('button', { name: 'Edit idea' }));
+    await user.click(screen.getByRole('button', { name: 'Delete idea' }));
+    await user.click(screen.getByRole('button', { name: 'Toast from dialog' }));
+
+    const viewport = document.querySelector('[data-toast-viewport]');
+    // Its own child of body, outside the app root and the dialogs.
+    expect(viewport?.parentElement).toBe(document.body);
+    expect(isInert(viewport)).toBe(false);
+    expect(within(screen.getByRole('status')).getByText('Tag deleted')).toBeInTheDocument();
+    expect(isInert(screen.getByRole('button', { name: 'Undo' }))).toBe(false);
+
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(screen.queryByText('Tag deleted')).not.toBeInTheDocument();
+    // The dialogs are still open, and the toast never became part of the page they inert.
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(document.querySelector('[inert]')).toBeNull();
   });
 
   it('uses alertdialog for the alert variant', async () => {

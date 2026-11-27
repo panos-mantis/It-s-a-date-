@@ -73,4 +73,12 @@ describe('SegmentedControl', () => {
     );
     expect(screen.getByRole('radio', { name: 'Full day' })).toBeDisabled();
   });
+
+  it('draws the check with the kit stroke (1.75)', () => {
+    render(<Harness initial="short" />);
+    const icon = screen
+      .getByRole('radio', { name: '1–2 hours' })
+      .parentElement?.querySelector('svg');
+    expect(icon).toHaveAttribute('stroke-width', '1.75');
+  });
 });

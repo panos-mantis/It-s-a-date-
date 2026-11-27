@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '../../lib/cn';
 
 type Tone = 'info' | 'success' | 'error';
@@ -133,14 +134,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex flex-col items-center gap-2 px-4">
-        <div role="status" className="flex flex-col items-center gap-2">
-          {polite.map(card)}
-        </div>
-        <div role="alert" className="flex flex-col items-center gap-2">
-          {errors.map(card)}
-        </div>
-      </div>
+      {/* Its own child of body, which Dialog never inerts: toasts stay announced and usable while a
+          dialog is open. */}
+      {createPortal(
+        <div
+          data-toast-viewport=""
+          className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex flex-col items-center gap-2 px-4"
+        >
+          <div role="status" className="flex flex-col items-center gap-2">
+            {polite.map(card)}
+          </div>
+          <div role="alert" className="flex flex-col items-center gap-2">
+            {errors.map(card)}
+          </div>
+        </div>,
+        document.body,
+      )}
     </ToastContext.Provider>
   );
 }

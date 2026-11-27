@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   DURATION_LABELS,
   DURATIONS,
@@ -19,14 +18,15 @@ import {
   Select,
   Skeleton,
   Textarea,
+  BusyStatus,
+  FormError,
 } from '../../components/ui';
 import { applyServerErrors } from '../../lib/form-errors';
 import { PLACE_TYPE_LABELS } from '../../lib/labels';
 import { tagIcon } from '../../lib/tag-icons';
-import { BusyStatus, FormError } from '../auth/AuthLayout';
 import { useTags } from '../tags/api';
 import { useCreateIdea, useUploadImage } from './api';
-import { SHARE_FIELDS, shareResolverOptions, type ShareFieldName } from './share-errors';
+import { SHARE_FIELDS, shareResolver, type ShareFieldName } from './share-errors';
 import { ShareSuccess } from './ShareSuccess';
 
 type Values = z.input<typeof ideaCreateSchema>;
@@ -77,7 +77,7 @@ export function SharePage() {
     reset,
     formState: { errors, isSubmitting, submitCount },
   } = useForm<Values, unknown, Parsed>({
-    resolver: zodResolver(ideaCreateSchema, shareResolverOptions),
+    resolver: shareResolver,
     defaultValues: EMPTY,
     mode: 'onBlur',
   });

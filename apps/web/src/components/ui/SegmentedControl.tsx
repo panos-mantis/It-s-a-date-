@@ -78,7 +78,7 @@ export function SegmentedControl<T extends string>({
                 '[&>svg]:hidden peer-checked:[&>svg]:block',
               )}
             >
-              <Check aria-hidden="true" size={14} strokeWidth={2} />
+              <Check aria-hidden="true" size={14} strokeWidth={1.75} />
               {o.label}
             </span>
           </label>

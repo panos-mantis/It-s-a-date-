@@ -23,10 +23,12 @@ const surface: Record<Variant, string> = {
 
 /**
  * Open dialogs, bottom to top. Only the top one is live: every other child of `body` (the app,
- * the skip link, lower dialogs) is inert. The page's own state is saved when the first dialog
+ * the skip link, lower dialogs) is inert, except the toast viewport (`data-toast-viewport`), so
+ * toasts stay announced and their buttons usable. The page's own state is saved when the first dialog
  * opens and restored when the last one closes, in whatever order they close.
  */
 const stack: HTMLElement[] = [];
+const isExempt = (el: Element) => el.hasAttribute('data-toast-viewport');
 let saved: { inert: Set<Element>; overflow: string } | null = null;
 
 function syncStack(): void {
@@ -46,6 +48,7 @@ function syncStack(): void {
     overflow: document.body.style.overflow,
   };
   for (const el of Array.from(document.body.children)) {
+    if (isExempt(el)) continue;
     if (el === top) el.removeAttribute('inert');
     else el.setAttribute('inert', '');
   }

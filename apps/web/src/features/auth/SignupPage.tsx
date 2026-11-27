@@ -5,11 +5,11 @@ import { useForm, useWatch } from 'react-hook-form';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import type { z } from 'zod';
 import { paths } from '../../app/paths';
-import { Button, Input, useToast } from '../../components/ui';
+import { BusyStatus, Button, FormError, Input, useToast } from '../../components/ui';
 import { ApiError } from '../../lib/api';
 import { applyServerErrors, authResolverOptions } from '../../lib/form-errors';
 import { useRegister } from './api';
-import { AuthLayout, BusyStatus, FormError, PasswordInput, textLinkClasses } from './AuthLayout';
+import { AuthLayout, PasswordInput, textLinkClasses } from './AuthLayout';
 import { authPath, loginHint, safeNext } from './safe-next';
 
 type Values = z.input<typeof registerSchema>;

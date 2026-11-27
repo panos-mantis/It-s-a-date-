@@ -1,7 +1,6 @@
-import { CircleAlert, Lock, WifiOff } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { useId, useState, type ReactNode } from 'react';
 import { Input } from '../../components/ui';
-import { NETWORK_MESSAGE } from '../../lib/api';
 
 export const textLinkClasses =
   'inline-flex min-h-11 items-center rounded-sm align-middle font-semibold text-accent-ink underline underline-offset-2 hover:decoration-2';
@@ -40,29 +39,6 @@ export function AuthLayout({
         <p className="text-sm text-muted">{footer}</p>
       </section>
     </div>
-  );
-}
-
-export function FormError({ message }: { message?: string }) {
-  if (!message) return null;
-  const Icon = message === NETWORK_MESSAGE ? WifiOff : CircleAlert;
-  return (
-    <div
-      role="alert"
-      className="flex items-start gap-2.5 rounded-sm border border-danger bg-surface px-3.5 py-3 text-sm font-semibold text-danger"
-    >
-      <Icon aria-hidden="true" size={18} strokeWidth={1.75} className="mt-px shrink-0" />
-      {message}
-    </div>
-  );
-}
-
-/** Announces what a busy form is doing; the node stays mounted so screen readers pick the text up. */
-export function BusyStatus({ id, busy, text }: { id: string; busy: boolean; text: string }) {
-  return (
-    <p id={id} role="status" className="text-sm font-medium text-fg">
-      {busy ? text : null}
-    </p>
   );
 }
 
